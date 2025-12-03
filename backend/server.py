@@ -730,6 +730,456 @@ async def update_settings(settings_data: dict, current_user: User = Depends(get_
     
     return SystemSettings(**updated_settings)
 
+# ============ BLOCK ROUTES (Building Admin) ============
+
+@api_router.get("/blocks", response_model=List[Block])
+async def get_blocks(current_user: User = Depends(get_current_building_admin)):
+    blocks = await db.blocks.find({"building_id": current_user.building_id}, {"_id": 0}).to_list(1000)
+    for block in blocks:
+        if isinstance(block.get('created_at'), str):
+            block['created_at'] = datetime.fromisoformat(block['created_at'])
+    return blocks
+
+@api_router.post("/blocks", response_model=Block)
+async def create_block(block_data: BlockCreate, current_user: User = Depends(get_current_building_admin)):
+    if block_data.building_id != current_user.building_id:
+        raise HTTPException(status_code=403, detail="Cannot create block for another building")
+    
+    block_id = str(uuid.uuid4())
+    new_block = Block(
+        id=block_id,
+        building_id=block_data.building_id,
+        name=block_data.name,
+        floor_count=block_data.floor_count,
+        apartment_per_floor=block_data.apartment_per_floor,
+        created_at=datetime.now(timezone.utc)
+    )
+    
+    block_doc = new_block.model_dump()
+    block_doc['created_at'] = block_doc['created_at'].isoformat()
+    await db.blocks.insert_one(block_doc)
+    
+    return new_block
+
+@api_router.put("/blocks/{block_id}", response_model=Block)
+async def update_block(block_id: str, block_data: BlockUpdate, current_user: User = Depends(get_current_building_admin)):
+    existing_block = await db.blocks.find_one({"id": block_id, "building_id": current_user.building_id})
+    if not existing_block:
+        raise HTTPException(status_code=404, detail="Block not found")
+    
+    update_data = {k: v for k, v in block_data.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.blocks.update_one({"id": block_id}, {"$set": update_data})
+    
+    updated_block = await db.blocks.find_one({"id": block_id}, {"_id": 0})
+    
+    if isinstance(updated_block.get('created_at'), str):
+        updated_block['created_at'] = datetime.fromisoformat(updated_block['created_at'])
+    
+    return Block(**updated_block)
+
+@api_router.delete("/blocks/{block_id}")
+async def delete_block(block_id: str, current_user: User = Depends(get_current_building_admin)):
+    result = await db.blocks.delete_one({"id": block_id, "building_id": current_user.building_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Block not found")
+    return {"message": "Block deleted successfully"}
+
+# ============ APARTMENT ROUTES (Building Admin) ============
+
+@api_router.get("/apartments", response_model=List[Apartment])
+async def get_apartments(current_user: User = Depends(get_current_building_admin)):
+    apartments = await db.apartments.find({"building_id": current_user.building_id}, {"_id": 0}).to_list(1000)
+    for apartment in apartments:
+        if isinstance(apartment.get('created_at'), str):
+            apartment['created_at'] = datetime.fromisoformat(apartment['created_at'])
+    return apartments
+
+@api_router.post("/apartments", response_model=Apartment)
+async def create_apartment(apartment_data: ApartmentCreate, current_user: User = Depends(get_current_building_admin)):
+    if apartment_data.building_id != current_user.building_id:
+        raise HTTPException(status_code=403, detail="Cannot create apartment for another building")
+    
+    apartment_id = str(uuid.uuid4())
+    new_apartment = Apartment(
+        id=apartment_id,
+        building_id=apartment_data.building_id,
+        block_id=apartment_data.block_id,
+        floor=apartment_data.floor,
+        door_number=apartment_data.door_number,
+        apartment_number=apartment_data.apartment_number,
+        square_meters=apartment_data.square_meters,
+        room_count=apartment_data.room_count,
+        status=apartment_data.status,
+        created_at=datetime.now(timezone.utc)
+    )
+    
+    apartment_doc = new_apartment.model_dump()
+    apartment_doc['created_at'] = apartment_doc['created_at'].isoformat()
+    await db.apartments.insert_one(apartment_doc)
+    
+    return new_apartment
+
+@api_router.put("/apartments/{apartment_id}", response_model=Apartment)
+async def update_apartment(apartment_id: str, apartment_data: ApartmentUpdate, current_user: User = Depends(get_current_building_admin)):
+    existing_apartment = await db.apartments.find_one({"id": apartment_id, "building_id": current_user.building_id})
+    if not existing_apartment:
+        raise HTTPException(status_code=404, detail="Apartment not found")
+    
+    update_data = {k: v for k, v in apartment_data.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.apartments.update_one({"id": apartment_id}, {"$set": update_data})
+    
+    updated_apartment = await db.apartments.find_one({"id": apartment_id}, {"_id": 0})
+    
+    if isinstance(updated_apartment.get('created_at'), str):
+        updated_apartment['created_at'] = datetime.fromisoformat(updated_apartment['created_at'])
+    
+    return Apartment(**updated_apartment)
+
+@api_router.delete("/apartments/{apartment_id}")
+async def delete_apartment(apartment_id: str, current_user: User = Depends(get_current_building_admin)):
+    result = await db.apartments.delete_one({"id": apartment_id, "building_id": current_user.building_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Apartment not found")
+    return {"message": "Apartment deleted successfully"}
+
+# ============ RESIDENT ROUTES (Building Admin) ============
+
+@api_router.get("/residents", response_model=List[Resident])
+async def get_residents(current_user: User = Depends(get_current_building_admin)):
+    residents = await db.residents.find({"building_id": current_user.building_id}, {"_id": 0, "hashed_password": 0}).to_list(1000)
+    for resident in residents:
+        if isinstance(resident.get('created_at'), str):
+            resident['created_at'] = datetime.fromisoformat(resident['created_at'])
+        if isinstance(resident.get('move_in_date'), str):
+            resident['move_in_date'] = datetime.fromisoformat(resident['move_in_date'])
+        if resident.get('move_out_date') and isinstance(resident.get('move_out_date'), str):
+            resident['move_out_date'] = datetime.fromisoformat(resident['move_out_date'])
+    return residents
+
+@api_router.post("/residents", response_model=Resident)
+async def create_resident(resident_data: ResidentCreate, current_user: User = Depends(get_current_building_admin)):
+    if resident_data.building_id != current_user.building_id:
+        raise HTTPException(status_code=403, detail="Cannot create resident for another building")
+    
+    # Check if email already exists (if provided)
+    if resident_data.email:
+        existing_resident = await db.residents.find_one({"email": resident_data.email})
+        if existing_resident:
+            raise HTTPException(status_code=400, detail="Email already registered")
+    
+    resident_id = str(uuid.uuid4())
+    new_resident = ResidentInDB(
+        id=resident_id,
+        building_id=resident_data.building_id,
+        apartment_id=resident_data.apartment_id,
+        full_name=resident_data.full_name,
+        phone=resident_data.phone,
+        email=resident_data.email,
+        type=resident_data.type,
+        tc_number=resident_data.tc_number,
+        move_in_date=resident_data.move_in_date,
+        move_out_date=resident_data.move_out_date,
+        is_active=resident_data.is_active,
+        hashed_password=get_password_hash(resident_data.password),
+        created_at=datetime.now(timezone.utc)
+    )
+    
+    resident_doc = new_resident.model_dump()
+    resident_doc['created_at'] = resident_doc['created_at'].isoformat()
+    if resident_doc.get('move_in_date'):
+        resident_doc['move_in_date'] = resident_doc['move_in_date'].isoformat()
+    if resident_doc.get('move_out_date'):
+        resident_doc['move_out_date'] = resident_doc['move_out_date'].isoformat()
+    
+    await db.residents.insert_one(resident_doc)
+    
+    # Return without password
+    return Resident(**{k: v for k, v in new_resident.model_dump().items() if k != 'hashed_password'})
+
+@api_router.put("/residents/{resident_id}", response_model=Resident)
+async def update_resident(resident_id: str, resident_data: ResidentUpdate, current_user: User = Depends(get_current_building_admin)):
+    existing_resident = await db.residents.find_one({"id": resident_id, "building_id": current_user.building_id})
+    if not existing_resident:
+        raise HTTPException(status_code=404, detail="Resident not found")
+    
+    update_data = {k: v for k, v in resident_data.model_dump().items() if v is not None}
+    
+    # Hash password if provided
+    if 'password' in update_data:
+        update_data['hashed_password'] = get_password_hash(update_data['password'])
+        del update_data['password']
+    
+    # Convert datetime fields
+    if 'move_in_date' in update_data and update_data['move_in_date']:
+        update_data['move_in_date'] = update_data['move_in_date'].isoformat()
+    if 'move_out_date' in update_data and update_data['move_out_date']:
+        update_data['move_out_date'] = update_data['move_out_date'].isoformat()
+    
+    if update_data:
+        await db.residents.update_one({"id": resident_id}, {"$set": update_data})
+    
+    updated_resident = await db.residents.find_one({"id": resident_id}, {"_id": 0, "hashed_password": 0})
+    
+    if isinstance(updated_resident.get('created_at'), str):
+        updated_resident['created_at'] = datetime.fromisoformat(updated_resident['created_at'])
+    if isinstance(updated_resident.get('move_in_date'), str):
+        updated_resident['move_in_date'] = datetime.fromisoformat(updated_resident['move_in_date'])
+    if updated_resident.get('move_out_date') and isinstance(updated_resident.get('move_out_date'), str):
+        updated_resident['move_out_date'] = datetime.fromisoformat(updated_resident['move_out_date'])
+    
+    return Resident(**updated_resident)
+
+@api_router.delete("/residents/{resident_id}")
+async def delete_resident(resident_id: str, current_user: User = Depends(get_current_building_admin)):
+    result = await db.residents.delete_one({"id": resident_id, "building_id": current_user.building_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Resident not found")
+    return {"message": "Resident deleted successfully"}
+
+# ============ DUE ROUTES (Building Admin) ============
+
+@api_router.get("/dues", response_model=List[Due])
+async def get_dues(current_user: User = Depends(get_current_building_admin)):
+    dues = await db.dues.find({"building_id": current_user.building_id}, {"_id": 0}).to_list(1000)
+    for due in dues:
+        if isinstance(due.get('created_at'), str):
+            due['created_at'] = datetime.fromisoformat(due['created_at'])
+        if isinstance(due.get('due_date'), str):
+            due['due_date'] = datetime.fromisoformat(due['due_date'])
+        if due.get('paid_date') and isinstance(due.get('paid_date'), str):
+            due['paid_date'] = datetime.fromisoformat(due['paid_date'])
+    return dues
+
+@api_router.post("/dues", response_model=Due)
+async def create_due(due_data: DueCreate, current_user: User = Depends(get_current_building_admin)):
+    if due_data.building_id != current_user.building_id:
+        raise HTTPException(status_code=403, detail="Cannot create due for another building")
+    
+    due_id = str(uuid.uuid4())
+    new_due = Due(
+        id=due_id,
+        building_id=due_data.building_id,
+        apartment_id=due_data.apartment_id,
+        resident_id=due_data.resident_id,
+        month=due_data.month,
+        amount=due_data.amount,
+        description=due_data.description,
+        due_date=due_data.due_date,
+        status=due_data.status,
+        created_at=datetime.now(timezone.utc)
+    )
+    
+    due_doc = new_due.model_dump()
+    due_doc['created_at'] = due_doc['created_at'].isoformat()
+    due_doc['due_date'] = due_doc['due_date'].isoformat()
+    
+    await db.dues.insert_one(due_doc)
+    
+    return new_due
+
+@api_router.put("/dues/{due_id}", response_model=Due)
+async def update_due(due_id: str, due_data: DueUpdate, current_user: User = Depends(get_current_building_admin)):
+    existing_due = await db.dues.find_one({"id": due_id, "building_id": current_user.building_id})
+    if not existing_due:
+        raise HTTPException(status_code=404, detail="Due not found")
+    
+    update_data = {k: v for k, v in due_data.model_dump().items() if v is not None}
+    
+    # Convert datetime fields
+    if 'due_date' in update_data and update_data['due_date']:
+        update_data['due_date'] = update_data['due_date'].isoformat()
+    if 'paid_date' in update_data and update_data['paid_date']:
+        update_data['paid_date'] = update_data['paid_date'].isoformat()
+    
+    if update_data:
+        await db.dues.update_one({"id": due_id}, {"$set": update_data})
+    
+    updated_due = await db.dues.find_one({"id": due_id}, {"_id": 0})
+    
+    if isinstance(updated_due.get('created_at'), str):
+        updated_due['created_at'] = datetime.fromisoformat(updated_due['created_at'])
+    if isinstance(updated_due.get('due_date'), str):
+        updated_due['due_date'] = datetime.fromisoformat(updated_due['due_date'])
+    if updated_due.get('paid_date') and isinstance(updated_due.get('paid_date'), str):
+        updated_due['paid_date'] = datetime.fromisoformat(updated_due['paid_date'])
+    
+    return Due(**updated_due)
+
+@api_router.delete("/dues/{due_id}")
+async def delete_due(due_id: str, current_user: User = Depends(get_current_building_admin)):
+    result = await db.dues.delete_one({"id": due_id, "building_id": current_user.building_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Due not found")
+    return {"message": "Due deleted successfully"}
+
+# ============ ANNOUNCEMENT ROUTES (Building Admin) ============
+
+@api_router.get("/announcements", response_model=List[Announcement])
+async def get_announcements(current_user: User = Depends(get_current_building_admin)):
+    announcements = await db.announcements.find({"building_id": current_user.building_id}, {"_id": 0}).to_list(1000)
+    for announcement in announcements:
+        if isinstance(announcement.get('created_at'), str):
+            announcement['created_at'] = datetime.fromisoformat(announcement['created_at'])
+    return announcements
+
+@api_router.post("/announcements", response_model=Announcement)
+async def create_announcement(announcement_data: AnnouncementCreate, current_user: User = Depends(get_current_building_admin)):
+    if announcement_data.building_id != current_user.building_id:
+        raise HTTPException(status_code=403, detail="Cannot create announcement for another building")
+    
+    announcement_id = str(uuid.uuid4())
+    new_announcement = Announcement(
+        id=announcement_id,
+        building_id=announcement_data.building_id,
+        title=announcement_data.title,
+        content=announcement_data.content,
+        type=announcement_data.type,
+        is_active=announcement_data.is_active,
+        created_at=datetime.now(timezone.utc)
+    )
+    
+    announcement_doc = new_announcement.model_dump()
+    announcement_doc['created_at'] = announcement_doc['created_at'].isoformat()
+    await db.announcements.insert_one(announcement_doc)
+    
+    return new_announcement
+
+@api_router.put("/announcements/{announcement_id}", response_model=Announcement)
+async def update_announcement(announcement_id: str, announcement_data: AnnouncementUpdate, current_user: User = Depends(get_current_building_admin)):
+    existing_announcement = await db.announcements.find_one({"id": announcement_id, "building_id": current_user.building_id})
+    if not existing_announcement:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    
+    update_data = {k: v for k, v in announcement_data.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.announcements.update_one({"id": announcement_id}, {"$set": update_data})
+    
+    updated_announcement = await db.announcements.find_one({"id": announcement_id}, {"_id": 0})
+    
+    if isinstance(updated_announcement.get('created_at'), str):
+        updated_announcement['created_at'] = datetime.fromisoformat(updated_announcement['created_at'])
+    
+    return Announcement(**updated_announcement)
+
+@api_router.delete("/announcements/{announcement_id}")
+async def delete_announcement(announcement_id: str, current_user: User = Depends(get_current_building_admin)):
+    result = await db.announcements.delete_one({"id": announcement_id, "building_id": current_user.building_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    return {"message": "Announcement deleted successfully"}
+
+# ============ REQUEST ROUTES (Building Admin) ============
+
+@api_router.get("/requests", response_model=List[Request])
+async def get_requests(current_user: User = Depends(get_current_building_admin)):
+    requests = await db.requests.find({"building_id": current_user.building_id}, {"_id": 0}).to_list(1000)
+    for request in requests:
+        if isinstance(request.get('created_at'), str):
+            request['created_at'] = datetime.fromisoformat(request['created_at'])
+        if request.get('resolved_at') and isinstance(request.get('resolved_at'), str):
+            request['resolved_at'] = datetime.fromisoformat(request['resolved_at'])
+    return requests
+
+@api_router.post("/requests", response_model=Request)
+async def create_request(request_data: RequestCreate, current_user: User = Depends(get_current_building_admin)):
+    if request_data.building_id != current_user.building_id:
+        raise HTTPException(status_code=403, detail="Cannot create request for another building")
+    
+    request_id = str(uuid.uuid4())
+    new_request = Request(
+        id=request_id,
+        building_id=request_data.building_id,
+        apartment_id=request_data.apartment_id,
+        resident_id=request_data.resident_id,
+        type=request_data.type,
+        category=request_data.category,
+        title=request_data.title,
+        description=request_data.description,
+        priority=request_data.priority,
+        status=request_data.status,
+        created_at=datetime.now(timezone.utc)
+    )
+    
+    request_doc = new_request.model_dump()
+    request_doc['created_at'] = request_doc['created_at'].isoformat()
+    await db.requests.insert_one(request_doc)
+    
+    return new_request
+
+@api_router.put("/requests/{request_id}", response_model=Request)
+async def update_request(request_id: str, request_data: RequestUpdate, current_user: User = Depends(get_current_building_admin)):
+    existing_request = await db.requests.find_one({"id": request_id, "building_id": current_user.building_id})
+    if not existing_request:
+        raise HTTPException(status_code=404, detail="Request not found")
+    
+    update_data = {k: v for k, v in request_data.model_dump().items() if v is not None}
+    
+    # If status is being changed to resolved, set resolved_at
+    if update_data.get('status') == 'resolved' and not existing_request.get('resolved_at'):
+        update_data['resolved_at'] = datetime.now(timezone.utc).isoformat()
+    
+    if update_data:
+        await db.requests.update_one({"id": request_id}, {"$set": update_data})
+    
+    updated_request = await db.requests.find_one({"id": request_id}, {"_id": 0})
+    
+    if isinstance(updated_request.get('created_at'), str):
+        updated_request['created_at'] = datetime.fromisoformat(updated_request['created_at'])
+    if updated_request.get('resolved_at') and isinstance(updated_request.get('resolved_at'), str):
+        updated_request['resolved_at'] = datetime.fromisoformat(updated_request['resolved_at'])
+    
+    return Request(**updated_request)
+
+@api_router.delete("/requests/{request_id}")
+async def delete_request(request_id: str, current_user: User = Depends(get_current_building_admin)):
+    result = await db.requests.delete_one({"id": request_id, "building_id": current_user.building_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Request not found")
+    return {"message": "Request deleted successfully"}
+
+# ============ BUILDING MANAGER DASHBOARD ============
+
+@api_router.get("/building-manager/dashboard", response_model=BuildingManagerDashboardStats)
+async def get_building_manager_dashboard(current_user: User = Depends(get_current_building_admin)):
+    building_id = current_user.building_id
+    
+    # Get apartment stats
+    all_apartments = await db.apartments.find({"building_id": building_id}, {"_id": 0}).to_list(1000)
+    total_apartments = len(all_apartments)
+    occupied_apartments = len([a for a in all_apartments if a.get('status') in ['rented', 'owner_occupied']])
+    empty_apartments = total_apartments - occupied_apartments
+    
+    # Get resident count
+    total_residents = await db.residents.count_documents({"building_id": building_id, "is_active": True})
+    
+    # Get dues stats
+    all_dues = await db.dues.find({"building_id": building_id}, {"_id": 0}).to_list(1000)
+    pending_dues = len([d for d in all_dues if d.get('status') == 'unpaid'])
+    total_due_amount = sum(d.get('amount', 0) for d in all_dues if d.get('status') == 'unpaid')
+    collected_amount = sum(d.get('amount', 0) for d in all_dues if d.get('status') == 'paid')
+    
+    # Get pending requests
+    pending_requests = await db.requests.count_documents({
+        "building_id": building_id,
+        "status": {"$in": ["pending", "in_progress"]}
+    })
+    
+    return BuildingManagerDashboardStats(
+        total_apartments=total_apartments,
+        occupied_apartments=occupied_apartments,
+        empty_apartments=empty_apartments,
+        total_residents=total_residents,
+        pending_dues=pending_dues,
+        pending_requests=pending_requests,
+        total_due_amount=total_due_amount,
+        collected_amount=collected_amount
+    )
+
 # Include router
 app.include_router(api_router)
 
