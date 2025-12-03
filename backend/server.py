@@ -153,6 +153,169 @@ class SystemSettings(BaseModel):
     email_from: Optional[str] = None
     updated_at: datetime
 
+# ============ BUILDING MANAGER MODELS ============
+
+class BlockBase(BaseModel):
+    building_id: str
+    name: str  # A, B, C, etc.
+    floor_count: int
+    apartment_per_floor: int
+
+class BlockCreate(BlockBase):
+    pass
+
+class BlockUpdate(BaseModel):
+    name: Optional[str] = None
+    floor_count: Optional[int] = None
+    apartment_per_floor: Optional[int] = None
+
+class Block(BlockBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    created_at: datetime
+
+class ApartmentBase(BaseModel):
+    building_id: str
+    block_id: str
+    floor: int
+    door_number: str  # e.g., "1", "2", "A", "B"
+    apartment_number: str  # Full number like "A-301"
+    square_meters: Optional[float] = None
+    room_count: Optional[str] = None  # "2+1", "3+1", etc.
+    status: str = "empty"  # empty, rented, owner_occupied
+
+class ApartmentCreate(ApartmentBase):
+    pass
+
+class ApartmentUpdate(BaseModel):
+    floor: Optional[int] = None
+    door_number: Optional[str] = None
+    square_meters: Optional[float] = None
+    room_count: Optional[str] = None
+    status: Optional[str] = None
+
+class Apartment(ApartmentBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    created_at: datetime
+
+class ResidentBase(BaseModel):
+    building_id: str
+    apartment_id: str
+    full_name: str
+    phone: str
+    email: Optional[EmailStr] = None
+    type: str  # owner, tenant
+    tc_number: Optional[str] = None  # Turkish ID number
+    move_in_date: Optional[datetime] = None
+    move_out_date: Optional[datetime] = None
+    is_active: bool = True
+
+class ResidentCreate(ResidentBase):
+    password: str  # For mobile app login
+
+class ResidentUpdate(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    type: Optional[str] = None
+    tc_number: Optional[str] = None
+    move_in_date: Optional[datetime] = None
+    move_out_date: Optional[datetime] = None
+    is_active: Optional[bool] = None
+    password: Optional[str] = None
+
+class Resident(ResidentBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    created_at: datetime
+
+class ResidentInDB(Resident):
+    hashed_password: str
+
+class DueBase(BaseModel):
+    building_id: str
+    apartment_id: str
+    resident_id: str
+    month: str  # Format: "2024-01"
+    amount: float
+    description: str
+    due_date: datetime
+    status: str = "unpaid"  # unpaid, paid, overdue
+
+class DueCreate(DueBase):
+    pass
+
+class DueUpdate(BaseModel):
+    amount: Optional[float] = None
+    description: Optional[str] = None
+    due_date: Optional[datetime] = None
+    status: Optional[str] = None
+    paid_date: Optional[datetime] = None
+
+class Due(DueBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    paid_date: Optional[datetime] = None
+    created_at: datetime
+
+class AnnouncementBase(BaseModel):
+    building_id: str
+    title: str
+    content: str
+    type: str = "general"  # general, urgent, maintenance, event
+    is_active: bool = True
+
+class AnnouncementCreate(AnnouncementBase):
+    pass
+
+class AnnouncementUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+    type: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class Announcement(AnnouncementBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    created_at: datetime
+
+class RequestBase(BaseModel):
+    building_id: str
+    apartment_id: str
+    resident_id: str
+    type: str  # complaint, maintenance, request
+    category: str  # plumbing, electrical, cleaning, security, other
+    title: str
+    description: str
+    priority: str = "normal"  # low, normal, high, urgent
+    status: str = "pending"  # pending, in_progress, resolved, rejected
+
+class RequestCreate(RequestBase):
+    pass
+
+class RequestUpdate(BaseModel):
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    response: Optional[str] = None
+
+class Request(RequestBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    response: Optional[str] = None
+    resolved_at: Optional[datetime] = None
+    created_at: datetime
+
+class BuildingManagerDashboardStats(BaseModel):
+    total_apartments: int
+    occupied_apartments: int
+    empty_apartments: int
+    total_residents: int
+    pending_dues: int
+    pending_requests: int
+    total_due_amount: float
+    collected_amount: float
+
 # ============ HELPER FUNCTIONS ============
 
 def verify_password(plain_password, hashed_password):
