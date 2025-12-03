@@ -365,6 +365,19 @@ async def get_current_superadmin(current_user: User = Depends(get_current_user))
         )
     return current_user
 
+async def get_current_building_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user.role != "building_admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Building admin access required"
+        )
+    if not current_user.building_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Building admin must be associated with a building"
+        )
+    return current_user
+
 # ============ AUTH ROUTES ============
 
 @api_router.post("/auth/login", response_model=Token)
