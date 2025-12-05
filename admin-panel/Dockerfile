@@ -3,7 +3,8 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json* ./
+COPY package.json ./
+COPY package-lock.json* ./
 
 # Install dependencies with legacy peer deps flag
 RUN npm install --legacy-peer-deps

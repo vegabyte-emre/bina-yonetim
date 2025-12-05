@@ -3,10 +3,11 @@ FROM node:18-alpine AS build
 WORKDIR /app
 
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json ./
+COPY yarn.lock* ./
 
-# Install dependencies
-RUN yarn install --frozen-lockfile
+# Install dependencies (yarn.lock varsa frozen-lockfile, yoksa normal install)
+RUN if [ -f yarn.lock ]; then yarn install --frozen-lockfile; else yarn install; fi
 
 # Copy source code
 COPY . .
