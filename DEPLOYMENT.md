@@ -240,6 +240,7 @@ REACT_APP_BACKEND_URL=http://YOUR_VPS_IP:8001
   - ✅ `bina-mongodb` (yeşil)
   - ✅ `bina-backend` (yeşil)
   - ✅ `bina-superadmin` (yeşil)
+  - ✅ `bina-admin-panel` (yeşil)
 
 **Terminal'de:**
 ```bash
