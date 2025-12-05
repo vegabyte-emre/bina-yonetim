@@ -428,6 +428,35 @@ class ResidentLoginRequest(BaseModel):
     phone: str
     password: str
 
+
+@api_router.post("/auth/resident-login-v2", response_model=Token)
+async def resident_login_v2(login_data: ResidentLoginRequest):
+    """New version for debugging"""
+    # Find resident by phone
+    resident = await db.residents.find_one({"phone": login_data.phone, "is_active": True}, {"_id": 0})
+    
+    if not resident:
+        raise HTTPException(
+            status_code=404,
+            detail=f"DEBUG: Telefon '{login_data.phone}' bulunamadı"
+        )
+    
+    # Verify password
+    if not pwd_context.verify(login_data.password, resident.get("hashed_password", "")):
+        raise HTTPException(
+            status_code=401,
+            detail="DEBUG: Şifre yanlış"
+        )
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": resident["id"], "role": "resident", "building_id": resident.get("building_id")},
+        expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
 @api_router.post("/auth/resident-login", response_model=Token)
 async def resident_login(login_data: ResidentLoginRequest):
     # Find resident by phone
