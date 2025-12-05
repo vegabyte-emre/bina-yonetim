@@ -865,6 +865,19 @@ async def get_apartments(current_user: User = Depends(get_current_building_admin
             apartment['created_at'] = datetime.fromisoformat(apartment['created_at'])
     return apartments
 
+
+@api_router.get("/apartments/{apartment_id}", response_model=Apartment)
+async def get_apartment_by_id(apartment_id: str):
+    """Get a single apartment by ID - accessible by authenticated users"""
+    apartment = await db.apartments.find_one({"id": apartment_id}, {"_id": 0})
+    if not apartment:
+        raise HTTPException(status_code=404, detail="Apartment not found")
+    
+    if isinstance(apartment.get('created_at'), str):
+        apartment['created_at'] = datetime.fromisoformat(apartment['created_at'])
+    
+    return Apartment(**apartment)
+
 @api_router.post("/apartments", response_model=Apartment)
 async def create_apartment(apartment_data: ApartmentCreate, current_user: User = Depends(get_current_building_admin)):
     if apartment_data.building_id != current_user.building_id:
