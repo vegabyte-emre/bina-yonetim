@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Home, Filter } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Select } from '../components/ui/select';
 import { toast } from 'sonner';
 import axios from 'axios';
 
