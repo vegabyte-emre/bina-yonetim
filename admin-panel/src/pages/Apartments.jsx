@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Filter } from 'lucide-react';
+import { Home, Filter, Plus, X, Save } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -9,11 +10,22 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Apartments = () => {
   const [apartments, setApartments] = useState([]);
+  const [blocks, setBlocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, empty, rented, owner_occupied
+  const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({
+    apartment_number: '',
+    block_id: '',
+    floor: 1,
+    area_sqm: 100,
+    room_count: '2+1',
+    status: 'empty'
+  });
 
   useEffect(() => {
     fetchApartments();
+    fetchBlocks();
   }, []);
 
   const fetchApartments = async () => {
@@ -28,6 +40,49 @@ const Apartments = () => {
       toast.error('Daireler yüklenemedi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBlocks = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/blocks`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBlocks(response.data);
+    } catch (error) {
+      console.error('Bloklar yüklenemedi:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      await axios.post(`${API_URL}/api/apartments`, {
+        ...formData,
+        building_id: user.building_id
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('Daire başarıyla eklendi!');
+      setShowModal(false);
+      setFormData({
+        apartment_number: '',
+        block_id: '',
+        floor: 1,
+        area_sqm: 100,
+        room_count: '2+1',
+        status: 'empty'
+      });
+      fetchApartments();
+    } catch (error) {
+      console.error('Daire eklenemedi:', error);
+      toast.error(error.response?.data?.detail || 'Daire eklenemedi');
     }
   };
 
