@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserCheck, UserX } from 'lucide-react';
+import { Users, UserCheck, UserX, Plus, X, Save, Eye, EyeOff } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -9,11 +10,24 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const Residents = () => {
   const [residents, setResidents] = useState([]);
+  const [apartments, setApartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, owner, tenant
+  const [showModal, setShowModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    password: '',
+    type: 'tenant',
+    apartment_id: '',
+    is_active: true
+  });
 
   useEffect(() => {
     fetchResidents();
+    fetchApartments();
   }, []);
 
   const fetchResidents = async () => {
@@ -28,6 +42,56 @@ const Residents = () => {
       toast.error('Sakinler yüklenemedi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchApartments = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/api/apartments`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setApartments(response.data);
+    } catch (error) {
+      console.error('Daireler yüklenemedi:', error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Phone format validation
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    let formattedPhone = formData.phone;
+    
+    if (phoneDigits.length === 10) {
+      formattedPhone = `+90 ${phoneDigits.substring(0, 3)} ${phoneDigits.substring(3, 6)} ${phoneDigits.substring(6, 8)} ${phoneDigits.substring(8, 10)}`;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${API_URL}/api/residents`, {
+        ...formData,
+        phone: formattedPhone
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success('Sakin başarıyla eklendi!');
+      setShowModal(false);
+      setFormData({
+        full_name: '',
+        email: '',
+        phone: '',
+        password: '',
+        type: 'tenant',
+        apartment_id: '',
+        is_active: true
+      });
+      fetchResidents();
+    } catch (error) {
+      console.error('Sakin eklenemedi:', error);
+      toast.error(error.response?.data?.detail || 'Sakin eklenemedi');
     }
   };
 
