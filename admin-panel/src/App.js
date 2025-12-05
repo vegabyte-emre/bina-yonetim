@@ -40,6 +40,17 @@ function LoginPage({ setIsAuthenticated }) {
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
+        
+        // Fetch user info
+        const userResponse = await fetch(`${API_URL}/api/users/me`, {
+          headers: { 'Authorization': `Bearer ${data.access_token}` }
+        });
+        
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          localStorage.setItem('user', JSON.stringify(userData));
+        }
+        
         setIsAuthenticated(true);
       } else {
         const errorData = await response.json();
