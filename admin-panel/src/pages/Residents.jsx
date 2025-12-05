@@ -60,19 +60,22 @@ const Residents = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Phone format validation
+    // Phone format: just digits (5523356797)
     const phoneDigits = formData.phone.replace(/\D/g, '');
-    let formattedPhone = formData.phone;
     
-    if (phoneDigits.length === 10) {
-      formattedPhone = `+90 ${phoneDigits.substring(0, 3)} ${phoneDigits.substring(3, 6)} ${phoneDigits.substring(6, 8)} ${phoneDigits.substring(8, 10)}`;
+    if (phoneDigits.length !== 10) {
+      toast.error('Telefon numarası 10 haneli olmalıdır');
+      return;
     }
 
     try {
       const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      
       await axios.post(`${API_URL}/api/residents`, {
         ...formData,
-        phone: formattedPhone
+        phone: phoneDigits,
+        building_id: user.building_id
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
