@@ -809,6 +809,19 @@ async def get_blocks(current_user: User = Depends(get_current_building_admin)):
             block['created_at'] = datetime.fromisoformat(block['created_at'])
     return blocks
 
+
+@api_router.get("/blocks/{block_id}", response_model=Block)
+async def get_block_by_id(block_id: str):
+    """Get a single block by ID - accessible by authenticated users"""
+    block = await db.blocks.find_one({"id": block_id}, {"_id": 0})
+    if not block:
+        raise HTTPException(status_code=404, detail="Block not found")
+    
+    if isinstance(block.get('created_at'), str):
+        block['created_at'] = datetime.fromisoformat(block['created_at'])
+    
+    return Block(**block)
+
 @api_router.post("/blocks", response_model=Block)
 async def create_block(block_data: BlockCreate, current_user: User = Depends(get_current_building_admin)):
     if block_data.building_id != current_user.building_id:
