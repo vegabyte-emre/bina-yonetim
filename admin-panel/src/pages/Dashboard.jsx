@@ -16,12 +16,15 @@ const Dashboard = () => {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('Fetching dashboard stats from:', `${API_URL}/api/building-manager/dashboard`);
       const response = await axios.get(`${API_URL}/api/building-manager/dashboard`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log('Dashboard stats received:', response.data);
       setStats(response.data);
     } catch (error) {
       console.error('Dashboard yüklenemedi:', error);
+      console.error('Error details:', error.response?.data);
     } finally {
       setLoading(false);
     }
