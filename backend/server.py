@@ -430,24 +430,23 @@ class ResidentLoginRequest(BaseModel):
 
 @api_router.post("/auth/resident-login", response_model=Token)
 async def resident_login(login_data: ResidentLoginRequest):
-    # Debug logging
-    print(f"[RESIDENT LOGIN] Gelen telefon: '{login_data.phone}' (uzunluk: {len(login_data.phone)})")
-    
     # Find resident by phone
     resident = await db.residents.find_one({"phone": login_data.phone, "is_active": True}, {"_id": 0})
     
     if not resident:
-        print(f"[RESIDENT LOGIN] ❌ Telefon bulunamadı: '{login_data.phone}'")
+        # Debug: Check what phones exist
+        all_phones = await db.residents.find({}, {"phone": 1, "_id": 0}).to_list(5)
+        phone_list = [p.get('phone') for p in all_phones]
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Telefon numarası veya şifre hatalı"
+            detail=f"Telefon bulunamadı. Gelen: '{login_data.phone}'. DB'de: {phone_list[:3]}"
         )
     
     # Verify password
     if not pwd_context.verify(login_data.password, resident.get("hashed_password", "")):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Telefon numarası veya şifre hatalı"
+            detail="Şifre yanlış"
         )
     
     # Create access token
