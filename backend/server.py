@@ -411,6 +411,12 @@ async def get_current_resident(token: str = Depends(oauth2_scheme)):
 
 # ============ AUTH ROUTES ============
 
+
+@api_router.get("/residents/me", response_model=Resident)
+async def get_current_resident_info(current_resident: Resident = Depends(get_current_resident)):
+    """Get current logged-in resident information"""
+    return current_resident
+
 # Mobile App - Resident Login
 class ResidentLoginRequest(BaseModel):
     phone: str
