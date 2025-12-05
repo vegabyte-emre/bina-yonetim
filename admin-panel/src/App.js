@@ -152,7 +152,7 @@ function App() {
               <Layout setIsAuthenticated={setIsAuthenticated}>
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
-                  <Route path="/blocks" element={<div className="text-center py-12 text-gray-500">Bloklar sayfası yapım aşamasında</div>} />
+                  <Route path="/blocks" element={<Blocks />} />
                   <Route path="/apartments" element={<div className="text-center py-12 text-gray-500">Daireler sayfası yapım aşamasında</div>} />
                   <Route path="/residents" element={<div className="text-center py-12 text-gray-500">Sakinler sayfası yapım aşamasında</div>} />
                   <Route path="/dues" element={<div className="text-center py-12 text-gray-500">Aidatlar sayfası yapım aşamasında</div>} />
