@@ -417,6 +417,12 @@ async def get_current_resident_info(current_resident: Resident = Depends(get_cur
     """Get current logged-in resident information"""
     return current_resident
 
+@api_router.get("/users/me", response_model=User)
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    """Get current logged-in user information"""
+    return current_user
+
+
 # Mobile App - Resident Login
 class ResidentLoginRequest(BaseModel):
     phone: str
