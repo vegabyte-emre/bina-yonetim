@@ -413,6 +413,19 @@ const Buildings = () => {
                     <span className="text-sm text-gray-500">Yönetici</span>
                     <span className="text-sm font-medium text-gray-900">{building.admin_name}</span>
                   </div>
+                  <div className="mt-3">
+                    <Button
+                      onClick={() => {
+                        const adminPanelUrl = window.location.protocol + '//' + window.location.hostname + ':3001';
+                        window.open(adminPanelUrl, '_blank');
+                      }}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm"
+                      size="sm"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Yönetici Panelini Aç
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
