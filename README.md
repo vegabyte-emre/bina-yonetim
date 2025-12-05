@@ -75,10 +75,29 @@ docker exec -it bina-backend python seed_data.py
 ## 📖 Detaylı Dokümantasyon
 
 - **[Deployment Rehberi](DEPLOYMENT.md)** - Portainer ile production kurulum
+- **[Github Deployment](GITHUB_DEPLOY.md)** - Github ile otomatik deployment ✨ YENİ
+- **[Portainer Hızlı Başlangıç](PORTAINER_DEPLOY_GUIDE.md)** - Adım adım kurulum
 - **[API Dokümantasyonu](http://localhost:8001/docs)** - Swagger UI
 - **[Güvenlik](DEPLOYMENT.md#güvenlik-ayarları)** - Güvenlik yapılandırmaları
 
 ## 🐳 Portainer ile Deployment
+
+### Seçenek 1: Github ile Deploy (Tavsiye edilir) ✨
+
+```bash
+# 1. Projeyi Github'a push edin
+git remote add origin https://github.com/YOUR_USERNAME/bina-yonetim.git
+git push -u origin main
+
+# 2. Portainer'da Stack oluşturun
+# Repository sekmesini seçin
+# Github URL'inizi girin
+# Deploy!
+```
+
+Detaylı adımlar: **[GITHUB_DEPLOY.md](GITHUB_DEPLOY.md)**
+
+### Seçenek 2: Manuel Upload
 
 VPS'e production deployment için [DEPLOYMENT.md](DEPLOYMENT.md) dosyasını okuyun.
 
@@ -89,7 +108,7 @@ VPS'e production deployment için [DEPLOYMENT.md](DEPLOYMENT.md) dosyasını oku
 4. Environment variables ekleyin
 5. Deploy butonuna tıklayın!
 
-Detaylı adımlar için: **[DEPLOYMENT.md](DEPLOYMENT.md)**
+Detaylı adımlar için: **[PORTAINER_DEPLOY_GUIDE.md](PORTAINER_DEPLOY_GUIDE.md)**
 
 ## 📁 Proje Yapısı
 
