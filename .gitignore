@@ -70,4 +70,7 @@ temp/
 
 # Emergent specific
 .emergent/
-test_result.md
+test_result.md-e 
+# Environment files
+*.env
+*.env.*
