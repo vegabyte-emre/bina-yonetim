@@ -2,11 +2,14 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
+# Install build dependencies for native modules
+RUN apk add --no-cache python3 make g++ git
+
 # Copy package files
 COPY package.json ./
 
-# Install dependencies without lockfile
-RUN npm install --legacy-peer-deps
+# Clean install with legacy peer deps
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -14,6 +17,7 @@ COPY . .
 # Build arguments
 ARG REACT_APP_BACKEND_URL
 ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
+ENV NODE_ENV=production
 
 # Build application
 RUN npm run build
