@@ -3,6 +3,7 @@
 .env.local
 .env.production
 *.env
+!.env.example
 
 # Dependencies
 node_modules/
@@ -11,6 +12,13 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+*.so
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
 
 # Build outputs
 build/
@@ -59,59 +67,7 @@ temp/
 # Backup files
 *.bak
 *.backup
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+
+# Emergent specific
+.emergent/
+test_result.md
