@@ -23,6 +23,12 @@ async def seed_database():
     await db.buildings.delete_many({})
     await db.subscription_plans.delete_many({})
     await db.system_settings.delete_many({})
+    await db.blocks.delete_many({})
+    await db.apartments.delete_many({})
+    await db.residents.delete_many({})
+    await db.dues.delete_many({})
+    await db.announcements.delete_many({})
+    await db.requests.delete_many({})
     
     print("👤 Süperadmin oluşturuluyor...")
     # Create superadmin
