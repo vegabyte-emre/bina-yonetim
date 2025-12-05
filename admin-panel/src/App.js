@@ -160,11 +160,11 @@ function App() {
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/blocks" element={<Blocks />} />
                   <Route path="/apartments" element={<Apartments />} />
-                  <Route path="/residents" element={<div className="text-center py-12 text-gray-500">Sakinler sayfası yapım aşamasında</div>} />
-                  <Route path="/dues" element={<div className="text-center py-12 text-gray-500">Aidatlar sayfası yapım aşamasında</div>} />
-                  <Route path="/announcements" element={<div className="text-center py-12 text-gray-500">Duyurular sayfası yapım aşamasında</div>} />
-                  <Route path="/requests" element={<div className="text-center py-12 text-gray-500">Talepler sayfası yapım aşamasında</div>} />
-                  <Route path="/settings" element={<div className="text-center py-12 text-gray-500">Ayarlar sayfası yapım aşamasında</div>} />
+                  <Route path="/residents" element={<Residents />} />
+                  <Route path="/dues" element={<Dues />} />
+                  <Route path="/announcements" element={<Announcements />} />
+                  <Route path="/requests" element={<Requests />} />
+                  <Route path="/settings" element={<Settings />} />
                 </Routes>
               </Layout>
             </ProtectedRoute>
