@@ -257,7 +257,8 @@ Deployment tamamlandıktan sonra:
 
 | Servis | URL | Açıklama |
 |--------|-----|----------|
-| **Süperadmin Panel** | `http://YOUR_VPS_IP:3000` | Web yönetim paneli |
+| **Süperadmin Panel** | `http://YOUR_VPS_IP:3000` | Sistem yöneticisi paneli |
+| **Bina Yöneticisi Panel** | `http://YOUR_VPS_IP:3001` | Bina yöneticileri için panel |
 | **Backend API** | `http://YOUR_VPS_IP:8001/api` | REST API |
 | **Portainer** | `http://YOUR_VPS_IP:9000` | Container yönetimi |
 | **MongoDB** | `YOUR_VPS_IP:27017` | Veritabanı (sadece internal) |
@@ -277,11 +278,16 @@ python seed_data.py
 exit
 ```
 
-**Varsayılan Süperadmin:**
+**Varsayılan Süperadmin (Port 3000):**
 - E-posta: `admin@test.com`
 - Şifre: `admin123`
 
-⚠️ **ÜRETİMDE MU TAKILARAK ŞIFREYI DEĞİŞTİRİN!**
+**Varsayılan Bina Yöneticileri (Port 3001):**
+- Mavi Rezidans: `ahmet@mavirezidans.com` / `admin123`
+- Yeşil Park Sitesi: `mehmet@yesilpark.com` / `admin123`
+- Sarı Bahçe: `ayse@saribahce.com` / `admin123`
+
+⚠️ **ÜRETİMDE MUTLAKA ŞİFRELERİ DEĞİŞTİRİN!**
 
 ---
 
