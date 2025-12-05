@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import Blocks from './pages/Blocks';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
