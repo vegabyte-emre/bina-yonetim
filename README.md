@@ -172,13 +172,23 @@ Yaygın sorunlar ve çözümleri için [DEPLOYMENT.md](DEPLOYMENT.md#sorun-gider
 
 MIT License
 
-## 🙏 Katkıda Bulunanlar
+## 🎯 Proje Durumu
 
-- Backend API ✅
-- Süperadmin Panel ✅
-- Docker Deployment ✅
-- Bina Yönetici Panel 🔨 (Geliştiriliyor)
+- ✅ Backend API (FastAPI + MongoDB)
+- ✅ Süperadmin Panel (Port 3000)
+- ✅ Bina Yöneticisi Panel (Port 3001) ✨ YENİ
+- ✅ Docker + Portainer Deployment
+- ✅ Github Integration
+- 🔨 Mobil Uygulama (Planlanan)
+
+## 🚀 Deployment Seçenekleri
+
+| Yöntem | Zorluk | Otomatik Güncelleme | Tavsiye |
+|--------|--------|---------------------|---------|
+| **Github + Portainer** | Kolay | ✅ Evet | ⭐ En iyi |
+| **Manuel Upload** | Çok Kolay | ❌ Hayır | Test için |
+| **SSH + Docker Compose** | Orta | ❌ Hayır | Advanced |
 
 ---
 
-**Not:** Bu proje Docker + Portainer ile kolay deployment için optimize edilmiştir. VPS'e kurulum için sadece Portainer web arayüzü yeterlidir, terminal bilgisi gerektirmez!
+**Not:** Bu proje Docker + Portainer + Github ile kolay deployment için optimize edilmiştir. VPS'e kurulum için sadece Portainer web arayüzü yeterlidir, terminal bilgisi opsiyoneldir!
