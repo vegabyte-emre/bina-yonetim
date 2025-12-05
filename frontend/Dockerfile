@@ -2,11 +2,14 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
+
 # Copy package files
 COPY package.json ./
 
-# Install dependencies without lockfile
-RUN yarn install
+# Install dependencies using npm (more reliable than yarn in alpine)
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -16,7 +19,7 @@ ARG REACT_APP_BACKEND_URL
 ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
 
 # Build application
-RUN yarn build
+RUN npm run build
 
 # Production stage
 FROM nginx:alpine
