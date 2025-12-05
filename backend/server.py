@@ -434,19 +434,16 @@ async def resident_login(login_data: ResidentLoginRequest):
     resident = await db.residents.find_one({"phone": login_data.phone, "is_active": True}, {"_id": 0})
     
     if not resident:
-        # Debug: Check what phones exist
-        all_phones = await db.residents.find({}, {"phone": 1, "_id": 0}).to_list(5)
-        phone_list = [p.get('phone') for p in all_phones]
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Telefon bulunamadı. Gelen: '{login_data.phone}'. DB'de: {phone_list[:3]}"
+            detail="HATA_1: Telefon bulunamadı"
         )
     
     # Verify password
     if not pwd_context.verify(login_data.password, resident.get("hashed_password", "")):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Şifre yanlış"
+            detail="HATA_2: Şifre yanlış"
         )
     
     # Create access token
