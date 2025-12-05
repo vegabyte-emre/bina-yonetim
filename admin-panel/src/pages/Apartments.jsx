@@ -63,8 +63,14 @@ const Apartments = () => {
       const user = JSON.parse(localStorage.getItem('user'));
       
       await axios.post(`${API_URL}/api/apartments`, {
-        ...formData,
-        building_id: user.building_id
+        building_id: user.building_id,
+        block_id: formData.block_id,
+        apartment_number: formData.apartment_number,
+        floor: formData.floor,
+        door_number: formData.apartment_number, // Using apartment_number as door_number
+        square_meters: formData.area_sqm,
+        room_count: formData.room_count,
+        status: formData.status
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
