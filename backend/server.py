@@ -430,10 +430,14 @@ class ResidentLoginRequest(BaseModel):
 
 @api_router.post("/auth/resident-login", response_model=Token)
 async def resident_login(login_data: ResidentLoginRequest):
+    # Debug logging
+    print(f"[RESIDENT LOGIN] Gelen telefon: '{login_data.phone}' (uzunluk: {len(login_data.phone)})")
+    
     # Find resident by phone
     resident = await db.residents.find_one({"phone": login_data.phone, "is_active": True}, {"_id": 0})
     
     if not resident:
+        print(f"[RESIDENT LOGIN] ❌ Telefon bulunamadı: '{login_data.phone}'")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Telefon numarası veya şifre hatalı"
