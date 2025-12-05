@@ -309,6 +309,9 @@ ufw allow 9443/tcp
 # Süperadmin Panel
 ufw allow 3000/tcp
 
+# Bina Yöneticisi Panel
+ufw allow 3001/tcp
+
 # Backend API
 ufw allow 8001/tcp
 
