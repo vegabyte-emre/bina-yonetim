@@ -5,6 +5,11 @@ import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Blocks from './pages/Blocks';
 import Apartments from './pages/Apartments';
+import Residents from './pages/Residents';
+import Dues from './pages/Dues';
+import Announcements from './pages/Announcements';
+import Requests from './pages/Requests';
+import Settings from './pages/Settings';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
