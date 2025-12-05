@@ -116,20 +116,160 @@ const Apartments = () => {
           <h1 className="text-2xl font-bold text-gray-900">Daireler</h1>
           <p className="mt-1 text-sm text-gray-600">{apartments.length} daire kayıtlı</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Filter className="h-5 w-5 text-gray-500" />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        <div className="flex items-center gap-3">
+          <div className="flex items-center space-x-2">
+            <Filter className="h-5 w-5 text-gray-500" />
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            >
+              <option value="all">Tümü ({apartments.length})</option>
+              <option value="owner_occupied">Mal Sahibi ({apartments.filter(a => a.status === 'owner_occupied').length})</option>
+              <option value="rented">Kiracı ({apartments.filter(a => a.status === 'rented').length})</option>
+              <option value="empty">Boş ({apartments.filter(a => a.status === 'empty').length})</option>
+            </select>
+          </div>
+          <Button 
+            onClick={() => setShowModal(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white"
           >
-            <option value="all">Tümü ({apartments.length})</option>
-            <option value="owner_occupied">Mal Sahibi ({apartments.filter(a => a.status === 'owner_occupied').length})</option>
-            <option value="rented">Kiracı ({apartments.filter(a => a.status === 'rented').length})</option>
-            <option value="empty">Boş ({apartments.filter(a => a.status === 'empty').length})</option>
-          </select>
+            <Plus className="h-4 w-4 mr-2" />
+            Yeni Daire Ekle
+          </Button>
         </div>
       </div>
+
+      {/* Add Apartment Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowModal(false)}></div>
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-10">
+            <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white">
+              <h2 className="text-xl font-bold text-gray-900">Yeni Daire Ekle</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Daire No *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.apartment_number}
+                    onChange={(e) => setFormData({...formData, apartment_number: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Örn: 101"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Blok *
+                  </label>
+                  <select
+                    required
+                    value={formData.block_id}
+                    onChange={(e) => setFormData({...formData, block_id: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">Blok Seçin</option>
+                    {blocks.map((block) => (
+                      <option key={block.id} value={block.id}>
+                        {block.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Kat
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.floor}
+                    onChange={(e) => setFormData({...formData, floor: parseInt(e.target.value)})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    min="0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Alan (m²)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.area_sqm}
+                    onChange={(e) => setFormData({...formData, area_sqm: parseInt(e.target.value)})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    min="1"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Oda Sayısı
+                  </label>
+                  <select
+                    value={formData.room_count}
+                    onChange={(e) => setFormData({...formData, room_count: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="1+0">1+0</option>
+                    <option value="1+1">1+1</option>
+                    <option value="2+1">2+1</option>
+                    <option value="3+1">3+1</option>
+                    <option value="4+1">4+1</option>
+                    <option value="5+1">5+1</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Durum
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({...formData, status: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="empty">Boş</option>
+                    <option value="rented">Kiracı</option>
+                    <option value="owner_occupied">Mal Sahibi</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t">
+                <Button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  variant="outline"
+                >
+                  İptal
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Kaydet
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {filteredApartments.length === 0 ? (
         <Card className="border-0 shadow-md">
