@@ -380,6 +380,38 @@ async def get_current_building_admin(current_user: User = Depends(get_current_us
 
 # ============ AUTH ROUTES ============
 
+# Mobile App - Resident Login
+class ResidentLoginRequest(BaseModel):
+    phone: str
+    password: str
+
+@api_router.post("/auth/resident-login", response_model=Token)
+async def resident_login(login_data: ResidentLoginRequest):
+    # Find resident by phone
+    resident = await db.residents.find_one({"phone": login_data.phone, "is_active": True}, {"_id": 0})
+    
+    if not resident:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Telefon numarası veya şifre hatalı"
+        )
+    
+    # Verify password
+    if not pwd_context.verify(login_data.password, resident.get("hashed_password", "")):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Telefon numarası veya şifre hatalı"
+        )
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": resident["id"], "role": "resident", "building_id": resident.get("building_id")},
+        expires_delta=access_token_expires
+    )
+    
+    return {"access_token": access_token, "token_type": "bearer"}
+
 @api_router.post("/auth/login", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     user_doc = await db.users.find_one({"email": form_data.username}, {"_id": 0})
