@@ -1204,6 +1204,12 @@ async def startup_db():
     await db.users.create_index("id", unique=True)
     await db.buildings.create_index("id", unique=True)
     await db.subscription_plans.create_index("id", unique=True)
+    await db.blocks.create_index("id", unique=True)
+    await db.apartments.create_index("id", unique=True)
+    await db.residents.create_index("id", unique=True)
+    await db.dues.create_index("id", unique=True)
+    await db.announcements.create_index("id", unique=True)
+    await db.requests.create_index("id", unique=True)
 
 @app.on_event("shutdown")
 async def shutdown_db():
