@@ -38,6 +38,9 @@ const Dashboard = () => {
     );
   }
 
+  // Debug
+  console.log('Dashboard rendering with stats:', stats);
+  
   const statCards = [
     {
       title: 'Toplam Daire',
