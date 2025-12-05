@@ -4,10 +4,9 @@ WORKDIR /app
 
 # Copy package files
 COPY package.json ./
-COPY yarn.lock* ./
 
-# Install dependencies (yarn.lock varsa frozen-lockfile, yoksa normal install)
-RUN if [ -f yarn.lock ]; then yarn install --frozen-lockfile; else yarn install; fi
+# Install dependencies without lockfile
+RUN yarn install
 
 # Copy source code
 COPY . .
