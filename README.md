@@ -113,27 +113,32 @@ Detaylı adımlar için: **[PORTAINER_DEPLOY_GUIDE.md](PORTAINER_DEPLOY_GUIDE.md
 ## 📁 Proje Yapısı
 
 ```
-bina-yonetim/
+/app/
 ├── backend/                    # FastAPI backend
 │   ├── Dockerfile
-│   ├── server.py              # Ana API
+│   ├── server.py              # Ana API + Resident Login
 │   ├── seed_data.py           # Test verileri
 │   └── requirements.txt
-├── frontend/                   # React frontend (Süperadmin - Port 3000)
+├── frontend/                   # React (Süperadmin - Port 3000)
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   ├── src/
 │   └── package.json
-├── admin-panel/                # React frontend (Bina Yöneticisi - Port 3001) ✨ YENİ
+├── admin-panel/                # React (Bina Yöneticisi - Port 3001) ✨
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   ├── src/
 │   └── package.json
+├── mobile/                     # React Native (Expo) ✨ YENİ
+│   └── frontend/
+│       ├── app/               # Sakinler için mobil uygulama
+│       ├── package.json
+│       └── .env
 ├── docker-compose.yml          # Docker orchestration
 ├── .env.example                # Environment template
 ├── .gitignore                  # Git ignore rules
 ├── DEPLOYMENT.md               # Detaylı deployment rehberi
-├── GITHUB_DEPLOY.md            # Github deployment rehberi ✨ YENİ
+├── GITHUB_DEPLOY.md            # Github deployment rehberi
 ├── PORTAINER_DEPLOY_GUIDE.md   # Hızlı başlangıç
 └── README.md                   # Bu dosya
 ```
