@@ -378,6 +378,37 @@ async def get_current_building_admin(current_user: User = Depends(get_current_us
         )
     return current_user
 
+async def get_current_resident(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        user_role: str = payload.get("role")
+        
+        if user_id is None or user_role != "resident":
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    
+    # Find resident by ID
+    resident_doc = await db.residents.find_one({"id": user_id}, {"_id": 0})
+    if resident_doc is None:
+        raise credentials_exception
+    
+    # Convert datetime strings if needed
+    if isinstance(resident_doc.get('created_at'), str):
+        resident_doc['created_at'] = datetime.fromisoformat(resident_doc['created_at'])
+    if isinstance(resident_doc.get('move_in_date'), str):
+        resident_doc['move_in_date'] = datetime.fromisoformat(resident_doc['move_in_date'])
+    if resident_doc.get('move_out_date') and isinstance(resident_doc.get('move_out_date'), str):
+        resident_doc['move_out_date'] = datetime.fromisoformat(resident_doc['move_out_date'])
+    
+    return Resident(**resident_doc)
+
 # ============ AUTH ROUTES ============
 
 # Mobile App - Resident Login
