@@ -318,6 +318,12 @@ class BuildingManagerDashboardStats(BaseModel):
 
 # ============ HELPER FUNCTIONS ============
 
+
+@api_router.get("/test-reload")
+async def test_reload():
+    """Test if code reload works - VERSION 3"""
+    return {"message": "VERSION 3 - Code reload working!", "timestamp": str(datetime.now(timezone.utc))}
+
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
