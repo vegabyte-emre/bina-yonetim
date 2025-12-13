@@ -707,6 +707,88 @@ async def delete_user(user_id: str, current_user: User = Depends(get_current_sup
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User deleted successfully"}
 
+# ============ REGISTRATION REQUEST ROUTES ============
+
+class RegistrationRequest(BaseModel):
+    building_name: str
+    manager_name: str
+    email: EmailStr
+    phone: str
+    address: str
+    apartment_count: str
+    status: str = "pending"  # pending, approved, rejected
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+@api_router.post("/registration-requests")
+async def create_registration_request(request_data: RegistrationRequest):
+    """Yeni kayıt başvurusu oluştur (public endpoint)"""
+    # Check if email already exists
+    existing = await db.registration_requests.find_one({"email": request_data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Bu email ile zaten bir başvuru mevcut")
+    
+    request_doc = request_data.model_dump()
+    request_doc['id'] = str(uuid.uuid4())
+    request_doc['created_at'] = request_doc['created_at'].isoformat()
+    
+    await db.registration_requests.insert_one(request_doc)
+    
+    return {"success": True, "message": "Başvurunuz alındı", "request_id": request_doc['id']}
+
+@api_router.get("/registration-requests")
+async def get_registration_requests(current_user: User = Depends(get_current_superadmin)):
+    """Tüm kayıt başvurularını listele (superadmin only)"""
+    requests = await db.registration_requests.find({}, {"_id": 0}).to_list(1000)
+    return requests
+
+@api_router.put("/registration-requests/{request_id}/approve")
+async def approve_registration(request_id: str, current_user: User = Depends(get_current_superadmin)):
+    """Başvuruyu onayla ve building + user oluştur"""
+    request_doc = await db.registration_requests.find_one({"id": request_id})
+    if not request_doc:
+        raise HTTPException(status_code=404, detail="Başvuru bulunamadı")
+    
+    # Create building
+    building_id = str(uuid.uuid4())
+    building = {
+        "id": building_id,
+        "name": request_doc["building_name"],
+        "address": request_doc["address"],
+        "total_apartments": int(request_doc["apartment_count"]),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.buildings.insert_one(building)
+    
+    # Create user (building admin)
+    user_id = str(uuid.uuid4())
+    temp_password = "changeme123"  # Temporary password
+    user = {
+        "id": user_id,
+        "email": request_doc["email"],
+        "full_name": request_doc["manager_name"],
+        "hashed_password": pwd_context.hash(temp_password),
+        "role": "building_admin",
+        "building_id": building_id,
+        "phone": request_doc["phone"],
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user)
+    
+    # Update request status
+    await db.registration_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "approved", "approved_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {
+        "success": True,
+        "message": "Başvuru onaylandı",
+        "building_id": building_id,
+        "user_id": user_id,
+        "temp_password": temp_password
+    }
+
 # ============ SUBSCRIPTION ROUTES ============
 
 @api_router.get("/subscriptions", response_model=List[SubscriptionPlan])
