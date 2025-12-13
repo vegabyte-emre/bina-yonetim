@@ -5,6 +5,7 @@ import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
 import Buildings from '@/pages/Buildings';
 import Users from '@/pages/Users';
+import RegistrationRequests from '@/pages/RegistrationRequests';
 import Subscriptions from '@/pages/Subscriptions';
 import Settings from '@/pages/Settings';
 import Layout from '@/components/Layout';
