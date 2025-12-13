@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
+import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Blocks from './pages/Blocks';
 import Apartments from './pages/Apartments';
