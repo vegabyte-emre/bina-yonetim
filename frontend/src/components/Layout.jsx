@@ -19,6 +19,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/buildings', icon: Building2, label: 'Binalar' },
     { path: '/users', icon: Users, label: 'Kullanıcılar' },
+    { path: '/registration-requests', icon: FileText, label: 'Başvurular' },
     { path: '/subscriptions', icon: CreditCard, label: 'Abonelikler' },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
