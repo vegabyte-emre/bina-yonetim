@@ -159,3 +159,26 @@ credentials:
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+  - task: "Firebase Push Notifications - Topic Based"
+    implemented: true
+    working: true
+    file: "/app/backend/routes/firebase_push.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Firebase Admin SDK entegrasyonu tamamlandı. Topic-based push notification sistemi çalışıyor. Her bina için ayrı topic (building_{id}) oluşturuluyor. Sakinler giriş yaptığında topic'e abone oluyor, çıkış yaptığında ayrılıyor. Duyuru gönderildiğinde sadece ilgili binanın sakinleri bildirimi alıyor."
+
+  - task: "Mobile App - Push Notification Service"
+    implemented: true
+    working: "NA"
+    file: "/app/mobile/frontend/services/pushNotificationService.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Mobil uygulama için pushNotificationService.ts oluşturuldu. expo-notifications paketi eklendi. AuthContext giriş/çıkışta topic subscription yönetimi yapıyor. Test için yeni APK build gerekiyor."
