@@ -789,6 +789,21 @@ async def approve_registration(request_id: str, current_user: User = Depends(get
         "temp_password": temp_password
     }
 
+@api_router.put("/registration-requests/{request_id}/reject")
+async def reject_registration(request_id: str, current_user: User = Depends(get_current_superadmin)):
+    """Başvuruyu reddet"""
+    request_doc = await db.registration_requests.find_one({"id": request_id})
+    if not request_doc:
+        raise HTTPException(status_code=404, detail="Başvuru bulunamadı")
+    
+    # Update request status
+    await db.registration_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": "rejected", "rejected_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"success": True, "message": "Başvuru reddedildi"}
+
 # ============ SUBSCRIPTION ROUTES ============
 
 @api_router.get("/subscriptions", response_model=List[SubscriptionPlan])
