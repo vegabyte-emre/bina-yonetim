@@ -1316,7 +1316,9 @@ async def get_building_manager_dashboard(current_user: User = Depends(get_curren
         collected_amount=collected_amount
     )
 
-# Include router
+# Include routers
+from routes import push_notifications
+app.include_router(push_notifications.router)
 app.include_router(api_router)
 
 app.add_middleware(
