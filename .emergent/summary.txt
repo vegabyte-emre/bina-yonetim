@@ -1,83 +1,102 @@
 <analysis>**original_problem_statement:**
-The user wants to build a Building Management System. This involves a Superadmin Panel (port 3000), a Building Manager Admin Panel (port 3001), and a Mobile App for residents.
+The user wants to build a Building Management System with three components:
+1.  **Superadmin Panel (Port 3000):** For overall system administration.
+2.  **Building Manager Admin Panel (Port 3001):** For individual building managers.
+3.  **Mobile App:** For residents.
 
 **PRODUCT REQUIREMENTS:**
 
-*   **Mobile App (Working):** The critical login-redirect loop has been fixed and the user has confirmed the app is now usable.
-    *   **Pending Work:** Remove all remaining mock/test data and fully integrate with backend APIs. A bug in the Create Request feature needs to be fixed. The app icon and splash screen need a design refresh.
-*   **Building Manager Panel (Port 3001 - In Progress):**
-    *   A public-facing landing page needs to be created for new managers to register. The registration must go to the Superadmin for approval.
-    *   Implement new features: a professional announcement system (with image uploads & push notifications), a detailed financial report page, and modules for Surveys, Voting, Meetings, and Decisions.
-    *   Make dashboard cards clickable and fix a UI bug on the Blocks page.
-    *   Ensure all currency symbols are ₺ (Turkish Lira).
-*   **Superadmin Panel (Port 3000 - In Progress):**
-    *   A new page is required to display registration requests from new managers and allow the Superadmin to approve or reject them.
+*   **Superadmin Panel (Port 3000):**
+    *   Display registration requests from new managers and allow approval/rejection. (Completed in this session).
+    *   Implement a modern, responsive, glassmorphism UI. (Completed in this session).
+    *   Future: 2FA, IP/session logging.
+
+*   **Building Manager Panel (Port 3001):**
+    *   Create a public-facing, Apple-style landing page for new manager registration.
+    *   Implement a modern, responsive, glassmorphism UI for the logged-in dashboard. (Completed in this session).
+    *   Fix a bug where a white screen appears after login. (Completed in this session).
+    *   Implement features: Announcements with push notifications (In Progress), Financial Reports, Surveys, Voting, Meetings, Decisions.
+    *   Make dashboard cards clickable.
+    *   Ensure all currency symbols are ₺.
+
+*   **Mobile App (For Residents):**
+    *   Fix a critical login-redirect loop bug.
+    *   Integrate backend data for Profile, Announcements, etc., removing all mock data.
+    *   Fix the Create Request feature, which fails to get user info.
+    *   Implement double-tap back to exit and functional logout buttons.
+    *   Implement a new splash screen (using the yönetioo logo) that stays for 3 seconds.
+    *   Design a new app icon using the yönetioo logo.
+    *   Integrate Firebase Push Notifications to receive building-specific announcements. (Completed in this session).
 
 **User's preferred language**: Turkish
 
 **what currently exists?**
-*   A FastAPI backend with endpoints for all three parts of the system. New endpoints for manager registration and push notifications have been added.
-*   A functional React frontend for the **Superadmin Panel** (port 3000).
-*   A heavily modified React frontend for the **Building Manager Panel** (port 3001), which now includes a non-functional landing page and placeholders for many new features.
-*   A **working** React Native mobile app. The primary blocker (login loop) is resolved. Work is now focused on data integration and feature completion.
+*   A FastAPI backend with endpoints for authentication, manager registration approval, and Firebase push notifications.
+*   A functional React frontend for the **Superadmin Panel (port 3000)** with a new glassmorphism UI. The manager approval feature is fully working.
+*   A React frontend for the **Building Manager Panel (port 3001)**. The logged-in dashboard has a new glassmorphism UI. The public-facing  is undergoing a complete redesign.
+*   A React Native mobile app. Push notifications via Firebase are integrated, but a recurring login loop bug has reappeared, making the app unusable. Several new APKs have been built to address this and other issues, with the latest one pending user testing.
 
 **Last working item**:
-*   **Last item agent was working:** The user pointed out that the new Registration Requests page () was created for the Superadmin panel but was never added to the application's router or navigation menu, making it inaccessible. The agent acknowledged the mistake and was in the process of editing  to add the required route.
+*   **Last item agent was working:** The user was unhappy with the  on the Building Manager Panel (port 3001) and requested a complete redesign in the style of Apple's website. The agent acknowledged this and began the implementation by overwriting  with a new structure.
 *   **Status:** IN PROGRESS
 *   **Agent Testing Done:** N
-*   **Which testing method agent to use?** Frontend testing agent or screenshot tool to verify that the Başvurular (Requests) page is visible and accessible in the Superadmin panel's (port 3000) navigation menu.
+*   **Which testing method agent to use?** Screenshot tool to verify the new Apple-style design of the landing page on port 3001.
 *   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-*   **Issue 1: Superadmin cannot see or approve new manager registrations (P0)**
-    *   **Description:** The user tested the new manager registration form on the port 3001 landing page and correctly noted that the submissions do not appear anywhere for the Superadmin to approve. This is because the UI for this flow is incomplete.
-    -   **Attempted fixes:** The agent created  but failed to integrate it into the Superadmin application.
-    -   **Next debug checklist:**
-        1.  Edit  to add a route for the  component.
-        2.  Edit the Superadmin panel's layout/sidebar component to add a navigation link to the new Başvurular (Requests) page.
-        3.  Implement the data-fetching logic in  to get pending requests from the backend.
-        4.  Implement the Approve and Reject functionality.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None
+*   **Issue 1: Redesign Landing Page (port 3001) to Apple-Style (P0)**
+    *   **Description:** The current landing page for unauthenticated users on port 3001 needs a complete visual overhaul to match the modern, premium aesthetic of Apple's website, as requested by the user.
+    *   **Attempted fixes:** The agent started by overwriting  with new code.
+    *   **Next debug checklist:**
+        1.  Complete the implementation of the new  using advanced CSS, animations, and high-quality visuals.
+        2.  Use the  tool to verify the design matches the user's Apple-style request.
+        3.  Ensure the registration form is still functional within the new design.
+    *   **Status:** IN PROGRESS
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** frontend
+    *   **Blocked on other issue:** None
 
-*   **Issue 2: Mobile app shows test data and Create Request feature is broken (P1)**
-    *   **Description:** The user reported two issues with the mobile app after the login was fixed: 1) Pages like Profile still show hardcoded test data instead of the logged-in user's data. 2) The Create Request feature fails with a generic error message.
-    -   **Attempted fixes:** The agent edited multiple files (, , , ) to replace mock data with live API calls and initiated a new build.
-    -   **Next debug checklist:**
-        1.  Await user feedback on the latest build to confirm if the data integration is now correct.
-        2.  If the Create Request error persists, debug the  request in  and the corresponding backend endpoint to identify the failure point.
-    -   **Status:** USER VERIFICATION PENDING
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** frontend (via APK)
-    -   **Blocked on other issue:** None
+*   **Issue 2: Mobile App Login Loop (P0)**
+    *   **Description:** After integrating push notifications, the user reported the app logs in, shows the home screen, and then immediately logs out. This is a critical, recurring blocker.
+    *   **Attempted fixes:** The agent identified that a failure in the push notification subscription service was causing the entire authentication context to fail. A fix was implemented to make the auth flow more resilient by wrapping the subscription logic in a  block so it no longer affects the login state. A new APK was built.
+    *   **Next debug checklist:**
+        1.  Await user feedback on the latest APK to confirm the login loop is resolved.
+        2.  If the issue persists, thoroughly debug the  and  to trace the exact point of failure during the  process.
+    *   **Status:** USER VERIFICATION PENDING
+    *   **Is recurring issue?** Y
+    *   **Should Test frontend/backend/both after fix?** frontend (via APK)
+    *   **Blocked on other issue:** This blocks all other mobile app tasks.
 
-*   **Issue 3: Landing Page on Port 3001 is not displayed correctly (P2)**
-    *   **Description:** When a non-authenticated user visits the root of the admin panel (port 3001), they are incorrectly shown the login page instead of the new public-facing landing page.
-    -   **Attempted fixes:** The agent created  and modified the routing logic in  several times, but the issue persists, likely due to a combination of faulty routing logic and browser caching of auth tokens.
-    -   **Next debug checklist:**
-        1.  Thoroughly review the  configuration in , especially the interaction between  and the root path ().
-        2.  Ensure the logic correctly differentiates between authenticated and non-authenticated users for the root path.
-        3.  Test using an incognito browser window to rule out  caching issues.
-    -   **Status:** IN PROGRESS
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on other issue:** None
+*   **Issue 3: Mobile App Data and Functionality Bugs (P1)**
+    *   **Description:** The user reported several bugs: Profile page data is not loading, building-specific announcements are not displayed, the Create Request feature fails, and exit/logout buttons are non-functional.
+    *   **Attempted fixes:** The agent implemented fixes for all these issues, but user verification was blocked by the login loop (Issue 2).
+    *   **Next debug checklist:** Once Issue 2 is confirmed fixed, re-verify all these functionalities with the user.
+    *   **Status:** USER VERIFICATION PENDING
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** frontend (via APK)
+    *   **Blocked on other issue:** Issue 2: Mobile App Login Loop
+
+*   **Issue 4: Mobile App Icon & Splash Screen (P2)**
+    *   **Description:** The user was not satisfied with the previous app icon (YÖ) and splash screen. They requested using a specific logo they provided and ensuring the splash screen is visible for 3 seconds.
+    *   **Attempted fixes:** The agent downloaded the user's logo, generated new icon/splash assets, and updated  and  to implement the 3-second delay.
+    *   **Next debug checklist:** Await user feedback on the latest APK to confirm the icon and splash screen are correct.
+    *   **Status:** USER VERIFICATION PENDING
+    *   **Is recurring issue?** N
+    *   **Should Test frontend/backend/both after fix?** frontend (via APK)
+    *   **Blocked on other issue:** Issue 2: Mobile App Login Loop
 
 **In progress Task List**:
-*   **Task 1: Complete New Feature Skeletons on Admin Panel (P1)**
-    *   **Where to resume:** Placeholder pages (, , , , ) and a new  have been created and added to the router.
-    *   **What will be achieved with this?** These pages will be transformed from empty placeholders into functional features.
-    *   **Status:** IN PROGRESS
+*   **Task 1: Complete New Feature Skeletons on Admin Panel (P2)**
+    *   **Where to resume:** Placeholder pages (, , , , ) exist.
+    *   **What will be achieved with this?** These pages will be transformed into functional features.
+    *   **Status:** NOT STARTED
     *   **Should Test frontend/backend/both after fix?** both
-    *   **Blocked on something:** Requires backend API endpoints for each module.
+    *   **Blocked on something:** Requires corresponding backend API endpoints for each module.
 
 **Upcoming and Future Tasks**
 **Upcoming Tasks:**
 *   **P1: Implement Backend for New Admin Panel Modules:** Create the necessary API endpoints to support CRUD operations for Surveys, Voting, Meetings, Decisions, and to fetch data for the Financial Report.
-*   **P2: Finalize Push Notification System:** Connect the Send Notification switch in the new Announcements UI to the backend endpoint (), which should then send a notification via the Expo Push Notification service. The mobile app must be updated to handle receiving these notifications.
-*   **P3: Implement Image Upload for Announcements:** The backend needs a file upload endpoint and storage mechanism. The frontend needs to be updated to handle the image selection and upload process.
+*   **P2: Make Admin Dashboard Cards Clickable:** The summary cards on the admin panel dashboard should navigate to the respective pages.
 
 **Future Tasks:**
 *   Implement deferred Superadmin features: Two-factor authentication (2FA), IP and session logging.
@@ -85,102 +104,112 @@ The user wants to build a Building Management System. This involves a Superadmin
 *   Create Docker + Portainer deployment instructions.
 
 **Completed work in this session**
-*   **Mobile App Login Fix:** Resolved the critical and persistent login-redirect loop, making the mobile app functional.
-*   **Mobile App UI/UX Update:** Refreshed the app's icon and splash screen and cleaned up the login page UI.
-*   **Admin Panel Landing Page:** Created a modern, public-facing landing page on port 3001 with a registration form for new building managers.
-*   **Admin Panel New Features (UI Skeletons):**
-    *   Added placeholder pages for Financial Reports, Surveys, Voting, Meetings, and Decisions.
-    *   Designed a new, professional UI for the Announcements page.
-    *   Made dashboard summary cards clickable.
-    *   Fixed a UI bug causing a black screen when adding a new Block.
-*   **Backend API Expansion:**
-    *   Added an endpoint to handle new manager registration requests.
-    -   Added placeholder endpoints to manage and send Expo push notifications.
+- **Superadmin Registration Approval Flow:** The Başvurular (Requests) page was made accessible by adding a route and sidebar link. The entire flow (listing, approving, rejecting manager requests) was implemented and tested.
+- **Firebase Push Notification Integration:** A full-stack integration was completed. The backend uses the Firebase Admin SDK for topic-based messaging, and the mobile app subscribes to its building's topic upon login to receive targeted announcements.
+- **Mobile App Login Stability Fix:** Made the authentication process resilient to failures in the push notification subscription service to prevent logout loops. A new APK was built for verification.
+- **Admin & Superadmin Panel UI/UX Overhaul:**
+    - Implemented a modern, responsive, glassmorphism design for the logged-in areas of both the Superadmin Panel (3000) and Building Manager Panel (3001).
+    - Fixed the white screen on login bug for the Building Manager Panel (3001).
+- **Mobile App Fixes (Pending Verification):**
+    - Integrated live backend data for the Profile and Announcements pages.
+    - Fixed the  feature.
+    - Implemented logout functionality and double-tap to exit.
+- **Mobile App Branding:** Generated a new app icon and splash screen using the user-provided yönetioo logo and configured a 3-second splash screen delay.
+- **Mobile App Login Bug Debugged:** Traced a Telefon bulunamadı error to the agent using the wrong database name ( instead of ) and an incorrect field name ( instead of ) when creating test users.
 
 **Earlier issues found/mentioned but not fixed**
-*   **Backend Hot Reload is Not Working:** This issue was noted in the initial handoff. The agent worked around it by manually restarting the backend service after each change, but the root cause was not investigated.
+*   **Backend Hot Reload is Not Working:** This issue from the previous handoff was never investigated. The agent continues to manually restart the backend service after each change.
 
 **Known issue recurrence from previous fork**
 - **Issue recurrence in previous fork**: Mobile App Login Loop.
-- **Recurrence count**: High (occurred multiple times across forks).
-- **Status**: RESOLVED (The user has confirmed the app is now working correctly).
+- **Recurrence count**: High. Marked 'RESOLVED' in the last handoff but reappeared in this session.
+- **Status**: USER VERIFICATION PENDING (A fix was implemented and a new APK was built).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-*   **Frontend (Admin/Superadmin):** React, React Router, Tailwind CSS, shadcn/ui.
-*   **Frontend (Mobile):** React Native, Expo, Expo Router, React Context for authentication.
+*   **Frontend (Admin/Superadmin):** React, React Router, Tailwind CSS, Glassmorphism UI.
+*   **Frontend (Mobile):** React Native, Expo, Expo Router, React Context.
 *   **Backend:** FastAPI, Python.
-*   **Authentication:** JWT stored in browser  and mobile .
+*   **Notifications:** Firebase Cloud Messaging (FCM) with Topic-Based Messaging.
+*   **Authentication:** JWT stored in  / .
 
 **key DB schema**
-  - No changes were made to the database schema in this session.
+- **residents:** The agent discovered a discrepancy where test users were being created with a  field, but the login endpoint was querying for . This was manually corrected.
+- **Database Name:** The agent caused a login bug by creating test users in a  database while the backend was configured to use . This was corrected by creating the test user in the correct database.
 
 **changes in tech stack**
-  - None.
+- **Firebase Cloud Messaging:** Added for push notifications.
 
 **All files of reference**
-*   : Needs to be edited to add the route for .
-*   : The file for the Superadmin approval page.
-*   : Contains the buggy routing logic for the landing page.
-*   : Contains the Create Request logic that is reportedly failing.
-*   : Contains the new backend endpoints for registration and push notifications.
+*   : **Currently being rewritten** for an Apple-style design.
+*   : Critical file for the mobile login flow; recently modified to fix the recurring login loop.
+*   : New service to handle native FCM token retrieval and topic subscription.
+*   : New backend router for sending notifications via Firebase.
+*    & : Files modified for the new glassmorphism UI on the admin panel.
+*    & : Files modified for the new glassmorphism UI on the superadmin panel.
+*   : Contains configuration for the mobile app's package name, splash screen, icon, and Firebase settings.
+*   : Contains logic for controlling the splash screen display duration.
 
 **Areas that need refactoring**:
-*   The placeholder pages in  need to be implemented with actual UI and logic.
-*   The routing logic in  is fragile and needs to be fixed to correctly show the .
+*   The file  was created when the agent mistakenly tried to use Expo's push service. It is now obsolete and should be deleted to avoid confusion.
+*   The mobile authentication flow in  is clearly brittle as it has broken multiple times. It needs a thorough review to ensure stability.
 
 **key api endpoints**
-*   **POST **: (New) Endpoint for new managers to submit registration requests.
-*   **POST **: (New) Endpoint for sending push notifications.
-*   **POST **: Endpoint for creating requests in the mobile app, which is currently failing.
+*   **POST **: (New) Sends a notification to a building-specific Firebase topic.
+*   **POST **: (New) Subscribes a device's FCM token to a building-specific topic.
+*   **POST **: The endpoint for mobile app login. Was failing due to database/field name mismatches during testing.
 
 **Critical Info for New Agent**
-*   Your immediate priority is to fix the Superadmin panel. The  page has been created but is not accessible. You must add it to the router and navigation menu in the  directory (port 3000).
-*   The mobile app's critical login loop is **RESOLVED**. Do not attempt to refactor the login flow again. Current mobile tasks are bug fixes (Create Request) and removing any remaining hardcoded data.
-*   The admin panel's (port 3001) landing page is not displaying correctly for new visitors. This is the next major bug to address after fixing the Superadmin panel.
-*   The user has requested many new features for the admin panel. Skeletons for these exist, but they require full implementation on both the frontend and backend.
+*   **Highest Priority:** The user wants the Building Manager Panel's public landing page (port 3001) redesigned to an Apple-style. This is your immediate task.
+*   **Mobile App is BROKEN:** The login loop is a severe, recurring issue. A new APK with a potential fix has been built. You must wait for user feedback on this build before touching any other mobile app code. The stability of  is paramount.
+*   **Design Separation:** Be very clear about which application you are styling. Frontend for the user sometimes means the Superadmin Panel (port 3000) and sometimes the Building Manager Panel (port 3001). The user has now clarified that the glassmorphism design on port 3001 (logged-in state) is good, but the unauthenticated  needs the separate Apple-style design.
+*   **Database Awareness:** Be vigilant about which database you are writing to. The agent wasted time debugging a login issue caused by creating test users in the wrong MongoDB database ( vs. ).
 
 **documents created in this job**
-  - 
-  - 
+- 
+- 
+- 
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending user messages**
-1.  **User:** Asks how the agent sends code to Expo for building (via GitHub?). **Status:** Answered.
-2.  **User:** Asks agent to review the entire app structure, clean cache, and update app icon/splash screen while the build is running. **Status:** Completed.
-3.  **User:** Reports the latest build still has the login loop. **Status:** Resolved in a subsequent build.
-4.  **User:** If the next build fails, suggests starting the mobile app from scratch. **Status:** Not needed, the next build succeeded.
-5.  **User:** Confirms the app is **WORKING!** Asks to clean up the login page, integrate real data, and fix the icon/splash. **Status:** Completed.
-6.  **User:** Reports new bugs: test data is still visible, and Create Request is failing. **Status:** In progress (fixes were implemented, pending user verification).
-7.  **User:** Provides a large list of new features for the admin panel (port 3001). **Status:** In progress.
-8.  **User:** Confused why the agent edited the  while the mobile build was running. **Status:** Misunderstanding cleared up.
-9.  **User:** Tests the new landing page and reports that manager registrations are not appearing for the Superadmin to approve. **Status:** New issue raised (P0).
-10. **User:** Correctly points out that the  page was created but not added to the Superadmin panel. **Status:** This is the current, active task.
+1.  **User:** Reports mobile login loop is back. **Status:** IN PROGRESS (fix implemented, new APK built).
+2.  **User:** Lists multiple mobile app bugs (Profile data, Announcements, Create Request, Exit buttons). **Status:** IN PROGRESS (fixes implemented, pending verification).
+3.  **User:** Requests new mobile splash screen and icon (yönetioo logo), and 3-second splash delay. **Status:** IN PROGRESS (implemented, pending verification).
+4.  **User:** Reports white screen on login for the admin panel (3001) and asks for a responsive header with logo. **Status:** COMPLETED.
+5.  **User:** Asks agent not to wait for Expo builds to complete. **Status:** Acknowledged.
+6.  **User:** Clarifies that a previous screenshot was of the Admin Panel's mobile view, not the native app. **Status:** Acknowledged.
+7.  **User:** Reports Telefon Bulunamadı error on mobile login. **Status:** COMPLETED (root cause was wrong DB/field name, fixed).
+8.  **User:** Provides new logo and reiterates requests for splash screen/icon. **Status:** COMPLETED (implemented in new build).
+9.  **User:** Asks for a glassmorphism design (blue/navy, rounded buttons) for the **frontend** (clarified as port 3001). **Status:** The agent initially applied this to port 3000, then correctly to port 3001's logged-in state.
+10. **User:** Clarifies the redesign request: the **logged-in** part of 3001 is fine, but the **public landing page** should be completely redone in an Apple style. **Status:** This is the current, active task.
 
 **Project Health Check:**
-*   **Working:** Superadmin Panel (port 3000), Building Manager Panel (port 3001 - core features), Mobile App (login is stable).
+*   **Working:** Superadmin Panel (port 3000), Building Manager Panel (port 3001 - logged-in features).
 *   **Broken:**
-    *   The Superadmin approval flow for new managers is incomplete.
-    *   Routing to the new Landing Page on port 3001 does not work for non-authenticated users.
-    *   The Create Request feature in the mobile app is failing.
-*   **Mocked:** Several new pages in the admin panel (Financials, Surveys, etc.) are placeholders without functionality.
+    *   **Mobile App:** Unusable due to a recurring login loop. Verification of the latest fix is pending.
+*   **In Progress:**
+    *   Building Manager Panel (port 3001) Landing Page is being completely redesigned.
 
 **3rd Party Integrations**
 *   **Expo Application Services (EAS):** Used for building the mobile app APK.
-*   **Expo Push Notifications:** Partially implemented for sending announcements.
+*   **Firebase Cloud Messaging (FCM):** Implemented for sending building-specific push notifications from the backend to the mobile app.
 *   **Planned:** Netgsm (SMS), PayTR/Iyzico (Payments).
 
 **Testing status**
-  - Testing agent used after significant changes: NO
-  - Troubleshoot agent used after agent stuck in loop: YES (For resolving the mobile app login loop).
-  - Test files created: []
-  - Known regressions: The underlying cause of the backend hot-reload failure was never investigated.
+- Testing agent used after significant changes: YES (for backend registration endpoints).
+- Troubleshoot agent used after agent stuck in loop: NO.
+- Test files created: None.
+- Known regressions: The mobile app login loop returned after being fixed in a previous job.
 
 **Credentials to test flow:**
 *   **Superadmin Panel:**  (email: , password: )
 *   **Building Manager Panel:**  (email: , password: )
-*   **Mobile App:** (Phone: , Password: )
+*   **Mobile App:** (Phone: , Password: ) - A test user exists in the correct  database.
 
 **What agent forgot to execute**
-*   The agent created the  file for the Superadmin panel but forgot to add the corresponding route in  and the navigation link in the layout, which prevented the page from being accessible. This is the immediate task to be completed.</analysis>
+*   The agent initially applied the glassmorphism redesign to the wrong frontend (port 3000 instead of 3001) before being corrected by the user.
+*   The agent first implemented push notifications using Expo's own service (), which was incorrect for the user's Firebase requirement. This was later corrected to use native FCM tokens, but the unused file () remains.</analysis>
