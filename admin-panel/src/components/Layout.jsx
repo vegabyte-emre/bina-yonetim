@@ -16,7 +16,7 @@ const Layout = ({ setIsAuthenticated }) => {
   };
 
   const menuItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/blocks', icon: Building, label: 'Bloklar' },
     { path: '/apartments', icon: Home, label: 'Daireler' },
     { path: '/residents', icon: Users, label: 'Sakinler' },
