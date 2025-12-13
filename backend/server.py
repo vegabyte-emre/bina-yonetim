@@ -748,13 +748,24 @@ async def approve_registration(request_id: str, current_user: User = Depends(get
     if not request_doc:
         raise HTTPException(status_code=404, detail="Başvuru bulunamadı")
     
-    # Create building
+    # Create building with all required fields
     building_id = str(uuid.uuid4())
     building = {
         "id": building_id,
         "name": request_doc["building_name"],
         "address": request_doc["address"],
-        "total_apartments": int(request_doc["apartment_count"]),
+        "city": "Belirtilmemiş",  # Default value
+        "district": "Belirtilmemiş",  # Default value
+        "block_count": 1,
+        "apartment_count": int(request_doc["apartment_count"]),
+        "currency": "TRY",
+        "aidat_amount": 0.0,
+        "admin_name": request_doc["manager_name"],
+        "admin_email": request_doc["email"],
+        "admin_phone": request_doc["phone"],
+        "is_active": True,
+        "subscription_status": "trial",
+        "subscription_end_date": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat(),
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.buildings.insert_one(building)
