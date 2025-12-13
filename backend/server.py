@@ -1426,7 +1426,9 @@ async def get_building_manager_dashboard(current_user: User = Depends(get_curren
 
 # Include routers
 from routes import push_notifications
+from routes import firebase_push
 app.include_router(push_notifications.router)
+app.include_router(firebase_push.router)
 app.include_router(api_router)
 
 app.add_middleware(
