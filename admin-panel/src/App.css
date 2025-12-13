@@ -2,20 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Fade in animation */
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
 }
 
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Disable zoom on mobile */
+html {
+  touch-action: manipulation;
+}
+
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+/* Modern form elements */
+input, textarea, select {
+  border-radius: 0.75rem !important;
+}
+
+/* Modern buttons */
+button {
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Card glassmorphism effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -27,12 +78,65 @@
   }
 }
 
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
 /* Card hover effect */
 .card-hover {
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Table styling */
+table {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+th {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* Modern select */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Focus states */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Badge styles */
+.badge {
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }
