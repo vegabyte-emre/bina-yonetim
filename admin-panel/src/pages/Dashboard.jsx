@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Home, Users, DollarSign, AlertCircle, FileText } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
