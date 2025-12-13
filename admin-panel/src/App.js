@@ -155,21 +155,26 @@ function App() {
     <Router>
       <Toaster position="top-right" richColors />
       <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={!isAuthenticated ? <LandingPage /> : <Navigate to="/dashboard" replace />} />
+        
         <Route 
           path="/login" 
           element={
             isAuthenticated ? 
-              <Navigate to="/" replace /> : 
+              <Navigate to="/dashboard" replace /> : 
               <LoginPage setIsAuthenticated={setIsAuthenticated} />
           } 
         />
+        
+        {/* Protected Routes */}
         <Route
           path="/*"
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <Layout setIsAuthenticated={setIsAuthenticated}>
                 <Routes>
-                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/blocks" element={<Blocks />} />
                   <Route path="/apartments" element={<Apartments />} />
                   <Route path="/residents" element={<Residents />} />
