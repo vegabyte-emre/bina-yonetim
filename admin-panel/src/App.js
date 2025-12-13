@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
@@ -22,6 +22,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Login Page Component
 function LoginPage({ setIsAuthenticated }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -58,6 +59,8 @@ function LoginPage({ setIsAuthenticated }) {
         }
         
         setIsAuthenticated(true);
+        // Login sonrası dashboard'a yönlendir
+        navigate('/dashboard', { replace: true });
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Giriş başarısız');
@@ -70,16 +73,13 @@ function LoginPage({ setIsAuthenticated }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-2xl mb-4">
-            <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900">Bina Yöneticisi Paneli</h1>
-          <p className="text-gray-600 mt-2">Lütfen giriş yapın</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            yönetioo
+          </h1>
+          <p className="text-gray-600 mt-2">Bina Yönetim Paneli</p>
         </div>
 
         {error && (
@@ -95,7 +95,7 @@ function LoginPage({ setIsAuthenticated }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               placeholder="ornek@email.com"
               required
             />
@@ -107,7 +107,7 @@ function LoginPage({ setIsAuthenticated }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
               placeholder="••••••••"
               required
             />
@@ -116,14 +116,14 @@ function LoginPage({ setIsAuthenticated }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium py-3 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p><strong>Demo Hesaplar:</strong></p>
+          <p><strong>Demo Hesap:</strong></p>
           <p className="mt-1">ahmet@mavirezidans.com / admin123</p>
         </div>
       </div>
@@ -150,8 +150,11 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <p className="mt-4 text-white font-medium">Yükleniyor...</p>
+        </div>
       </div>
     );
   }
@@ -161,35 +164,32 @@ function App() {
       <Toaster position="top-right" richColors />
       <Routes>
         {/* Public Routes */}
-        {!isAuthenticated && (
-          <>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
-          </>
-        )}
+        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />} />
         
         {/* Protected Routes - with Layout */}
-        {isAuthenticated && (
-          <Route element={<Layout setIsAuthenticated={setIsAuthenticated} />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/blocks" element={<Blocks />} />
-            <Route path="/apartments" element={<Apartments />} />
-            <Route path="/residents" element={<Residents />} />
-            <Route path="/dues" element={<Dues />} />
-            <Route path="/announcements" element={<Announcements />} />
-            <Route path="/requests" element={<Requests />} />
-            <Route path="/financial-report" element={<FinancialReport />} />
-            <Route path="/surveys" element={<Surveys />} />
-            <Route path="/voting" element={<Voting />} />
-            <Route path="/meetings" element={<Meetings />} />
-            <Route path="/decisions" element={<Decisions />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-        )}
+        <Route element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <Layout setIsAuthenticated={setIsAuthenticated} />
+          </ProtectedRoute>
+        }>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/blocks" element={<Blocks />} />
+          <Route path="/apartments" element={<Apartments />} />
+          <Route path="/residents" element={<Residents />} />
+          <Route path="/dues" element={<Dues />} />
+          <Route path="/announcements" element={<Announcements />} />
+          <Route path="/requests" element={<Requests />} />
+          <Route path="/financial-report" element={<FinancialReport />} />
+          <Route path="/surveys" element={<Surveys />} />
+          <Route path="/voting" element={<Voting />} />
+          <Route path="/meetings" element={<Meetings />} />
+          <Route path="/decisions" element={<Decisions />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
         
-        {/* Redirect to login if not authenticated and trying to access protected route */}
-        {!isAuthenticated && <Route path="*" element={<Navigate to="/login" replace />} />}
+        {/* Catch all - redirect to login or dashboard */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
       </Routes>
     </Router>
   );
