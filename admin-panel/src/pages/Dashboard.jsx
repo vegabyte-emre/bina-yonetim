@@ -111,7 +111,11 @@ const Dashboard = () => {
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow">
+            <Card 
+              key={index} 
+              className={`border-0 shadow-md hover:shadow-lg transition-shadow ${stat.onClick ? 'cursor-pointer' : ''}`}
+              onClick={stat.onClick}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
