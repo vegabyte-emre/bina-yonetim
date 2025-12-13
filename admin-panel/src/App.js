@@ -179,6 +179,11 @@ function App() {
             <Route path="/dues" element={<Dues />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/requests" element={<Requests />} />
+            <Route path="/financial-report" element={<FinancialReport />} />
+            <Route path="/surveys" element={<Surveys />} />
+            <Route path="/voting" element={<Voting />} />
+            <Route path="/meetings" element={<Meetings />} />
+            <Route path="/decisions" element={<Decisions />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         )}
