@@ -135,15 +135,15 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Registration request submission from landing page"
-    - "Superadmin viewing and approving requests"
+    - "Apple Style Landing Page on Port 3001"
+    - "Registration form submission flow"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "I have implemented the Superadmin Registration Requests page. Added route to App.js and 'Başvurular' link to sidebar. Page is at /registration-requests. Backend APIs exist at /api/registration-requests. Please test: 1) Submit a registration request via POST, 2) Login as superadmin (admin@test.com / admin123) and check if request appears, 3) Test approve/reject functionality."
+    message: "I have implemented a new Apple-style landing page for the Building Manager Panel (port 3001). The design includes: 1) Hero section with animated dashboard mockup preview, 2) Interactive feature showcase with 4-second auto-rotate, 3) Features grid with hover effects, 4) Pricing cards with highlighted 'Popular' tier, 5) Demo credentials section, 6) Responsive signup form. Please test: 1) Visual appearance matches Apple design (clean typography, white bg, blue accents), 2) Navigation and scroll-to-section functionality, 3) Registration form submission to /api/registration-requests, 4) Mobile responsiveness."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: All registration request APIs are working correctly. Tested complete flow: registration creation, superadmin authentication, request listing, approval, and rejection. Core functionality is solid. Minor issue: Building creation in approve function has validation errors (missing required fields like city, district, admin_name, etc.) but doesn't affect the main registration workflow. The approve/reject functionality works as expected."
 
