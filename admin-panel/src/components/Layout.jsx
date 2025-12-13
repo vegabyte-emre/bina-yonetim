@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { LayoutDashboard, Building, Home, Users, DollarSign, Bell, FileText, Settings, LogOut, Menu, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-const Layout = ({ children, setIsAuthenticated }) => {
+const Layout = ({ setIsAuthenticated }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
