@@ -106,8 +106,8 @@ const AnnouncementsNew = () => {
       const token = localStorage.getItem('token');
       const userData = JSON.parse(localStorage.getItem('user'));
       
-      // Expo Push API ile bildirim gönder (bina bazlı)
-      const response = await axios.post(`${API_URL}/api/expo-push/send-announcement`, {
+      // Firebase topic-based push notification gönder
+      const response = await axios.post(`${API_URL}/api/firebase/send-announcement`, {
         building_id: userData.building_id,
         announcement_id: announcement.id,
         title: announcement.title,
@@ -117,12 +117,7 @@ const AnnouncementsNew = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      const result = response.data;
-      if (result.sent_count > 0) {
-        toast.success(`Bildirim ${result.sent_count} cihaza gönderildi!`);
-      } else {
-        toast.info(result.message || 'Bu binada aktif cihaz bulunamadı');
-      }
+      toast.success('Bildirim Firebase üzerinden gönderildi!');
     } catch (error) {
       console.error('Bildirim gönderilemedi:', error);
       
