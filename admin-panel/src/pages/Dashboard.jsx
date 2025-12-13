@@ -76,7 +76,8 @@ const Dashboard = () => {
       icon: Users,
       color: 'bg-purple-500',
       lightColor: 'bg-purple-50',
-      textColor: 'text-purple-600'
+      textColor: 'text-purple-600',
+      onClick: () => navigate('/residents')
     },
     {
       title: 'Bekleyen Aidat',
@@ -84,7 +85,8 @@ const Dashboard = () => {
       icon: DollarSign,
       color: 'bg-red-500',
       lightColor: 'bg-red-50',
-      textColor: 'text-red-600'
+      textColor: 'text-red-600',
+      onClick: () => navigate('/dues')
     },
     {
       title: 'Bekleyen Talep',
@@ -92,7 +94,8 @@ const Dashboard = () => {
       icon: FileText,
       color: 'bg-orange-500',
       lightColor: 'bg-orange-50',
-      textColor: 'text-orange-600'
+      textColor: 'text-orange-600',
+      onClick: () => navigate('/requests')
     }
   ];
 
