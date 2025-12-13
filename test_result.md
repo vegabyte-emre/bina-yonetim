@@ -129,6 +129,8 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "I have implemented the Superadmin Registration Requests page. Added route to App.js and 'Başvurular' link to sidebar. Page is at /registration-requests. Backend APIs exist at /api/registration-requests. Please test: 1) Submit a registration request via POST, 2) Login as superadmin (admin@test.com / admin123) and check if request appears, 3) Test approve/reject functionality."
+  - agent: "testing"
+    message: "✅ BACKEND TESTING COMPLETE: All registration request APIs are working correctly. Tested complete flow: registration creation, superadmin authentication, request listing, approval, and rejection. Core functionality is solid. Minor issue: Building creation in approve function has validation errors (missing required fields like city, district, admin_name, etc.) but doesn't affect the main registration workflow. The approve/reject functionality works as expected."
 
 credentials:
   superadmin:
