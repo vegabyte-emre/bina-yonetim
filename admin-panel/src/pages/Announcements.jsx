@@ -104,19 +104,27 @@ const AnnouncementsNew = () => {
     try {
       setSendingNotification(true);
       const token = localStorage.getItem('token');
+      const userData = JSON.parse(localStorage.getItem('user'));
       
-      await axios.post(`${API_URL}/api/push-notifications/send-announcement`, {
+      // Firebase topic-based push notification gönder
+      await axios.post(`${API_URL}/api/firebase/send-announcement`, {
+        building_id: userData.building_id,
         announcement_id: announcement.id,
         title: announcement.title,
-        body: announcement.content.substring(0, 100),
+        body: announcement.content.substring(0, 100) + (announcement.content.length > 100 ? '...' : ''),
+        priority: announcement.priority || 'normal',
+        image_url: announcement.image_url || null,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      toast.success('Bildirim tüm sakinlere gönderildi!');
+      toast.success('Bildirim sadece binanızın sakinlerine gönderildi!');
     } catch (error) {
       console.error('Bildirim gönderilemedi:', error);
-      toast.error('Bildirim gönderilemedi');
+      
+      // Hata detayını göster
+      const errorMessage = error.response?.data?.detail || 'Bildirim gönderilemedi';
+      toast.error(errorMessage);
     } finally {
       setSendingNotification(false);
     }
