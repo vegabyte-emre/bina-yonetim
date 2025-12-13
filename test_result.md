@@ -137,9 +137,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Apple Style Landing Page on Port 3001"
-    - "Registration form submission flow"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
