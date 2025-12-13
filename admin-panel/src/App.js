@@ -156,37 +156,30 @@ function App() {
       <Toaster position="top-right" richColors />
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={!isAuthenticated ? <LandingPage /> : <Navigate to="/dashboard" replace />} />
+        {!isAuthenticated && (
+          <>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
+          </>
+        )}
         
-        <Route 
-          path="/login" 
-          element={
-            isAuthenticated ? 
-              <Navigate to="/dashboard" replace /> : 
-              <LoginPage setIsAuthenticated={setIsAuthenticated} />
-          } 
-        />
+        {/* Protected Routes - with Layout */}
+        {isAuthenticated && (
+          <Route element={<Layout setIsAuthenticated={setIsAuthenticated} />}>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/blocks" element={<Blocks />} />
+            <Route path="/apartments" element={<Apartments />} />
+            <Route path="/residents" element={<Residents />} />
+            <Route path="/dues" element={<Dues />} />
+            <Route path="/announcements" element={<Announcements />} />
+            <Route path="/requests" element={<Requests />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+        )}
         
-        {/* Protected Routes */}
-        <Route
-          path="/*"
-          element={
-            <ProtectedRoute isAuthenticated={isAuthenticated}>
-              <Layout setIsAuthenticated={setIsAuthenticated}>
-                <Routes>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/blocks" element={<Blocks />} />
-                  <Route path="/apartments" element={<Apartments />} />
-                  <Route path="/residents" element={<Residents />} />
-                  <Route path="/dues" element={<Dues />} />
-                  <Route path="/announcements" element={<Announcements />} />
-                  <Route path="/requests" element={<Requests />} />
-                  <Route path="/settings" element={<Settings />} />
-                </Routes>
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Redirect to login if not authenticated and trying to access protected route */}
+        {!isAuthenticated && <Route path="*" element={<Navigate to="/login" replace />} />}
       </Routes>
     </Router>
   );
