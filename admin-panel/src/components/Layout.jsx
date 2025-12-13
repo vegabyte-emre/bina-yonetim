@@ -139,7 +139,7 @@ const Layout = ({ setIsAuthenticated }) => {
         {/* Page content */}
         <main className="flex-1">
           <div className="py-6 px-4 sm:px-6 lg:px-8">
-            {children}
+            <Outlet />
           </div>
         </main>
       </div>
