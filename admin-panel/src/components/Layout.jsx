@@ -20,9 +20,14 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/blocks', icon: Building, label: 'Bloklar' },
     { path: '/apartments', icon: Home, label: 'Daireler' },
     { path: '/residents', icon: Users, label: 'Sakinler' },
-    { path: '/dues', icon: DollarSign, label: 'Aidatlar' },
+    { path: '/dues', icon: DollarSign, label: 'Aidat' },
     { path: '/announcements', icon: Bell, label: 'Duyurular' },
     { path: '/requests', icon: FileText, label: 'Talepler' },
+    { path: '/financial-report', icon: TrendingUp, label: 'Tahsilat Özeti' },
+    { path: '/surveys', icon: BarChart3, label: 'Anketler' },
+    { path: '/voting', icon: ThumbsUp, label: 'Oylamalar' },
+    { path: '/meetings', icon: Calendar, label: 'Toplantılar' },
+    { path: '/decisions', icon: CheckSquare, label: 'Kararlar' },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
 
