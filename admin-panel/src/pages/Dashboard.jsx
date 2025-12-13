@@ -50,7 +50,8 @@ const Dashboard = () => {
       icon: Home,
       color: 'bg-blue-500',
       lightColor: 'bg-blue-50',
-      textColor: 'text-blue-600'
+      textColor: 'text-blue-600',
+      onClick: () => navigate('/apartments')
     },
     {
       title: 'Dolu Daire',
@@ -58,7 +59,8 @@ const Dashboard = () => {
       icon: Building,
       color: 'bg-green-500',
       lightColor: 'bg-green-50',
-      textColor: 'text-green-600'
+      textColor: 'text-green-600',
+      onClick: () => navigate('/apartments')
     },
     {
       title: 'Boş Daire',
