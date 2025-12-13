@@ -10,6 +10,11 @@ import Residents from './pages/Residents';
 import Dues from './pages/Dues';
 import Announcements from './pages/Announcements';
 import Requests from './pages/Requests';
+import FinancialReport from './pages/FinancialReport';
+import Surveys from './pages/Surveys';
+import Voting from './pages/Voting';
+import Meetings from './pages/Meetings';
+import Decisions from './pages/Decisions';
 import Settings from './pages/Settings';
 import './App.css';
 
