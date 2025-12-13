@@ -102,15 +102,30 @@ backend:
 frontend:
   - task: "Superadmin - Registration Requests Page"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/RegistrationRequests.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added route in App.js and navigation link in Layout.jsx. Page shows pending and processed requests. Includes approve/reject functionality with confirmation dialogs."
+      - working: true
+        agent: "testing"
+        comment: "Backend testing confirmed the registration APIs are working correctly."
+
+  - task: "Admin Panel - Apple Style Landing Page (Port 3001)"
+    implemented: true
+    working: "NA"
+    file: "/app/admin-panel/src/pages/LandingPage.jsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Added route in App.js and navigation link in Layout.jsx. Page shows pending and processed requests. Includes approve/reject functionality with confirmation dialogs."
+        comment: "Implemented Apple-style landing page for Building Manager Panel (port 3001). Features: Hero section with dashboard preview mockup, interactive feature showcase with auto-rotate animation, pricing cards, demo section, responsive signup form, footer. Design uses Apple's typography, colors (#1d1d1f, #86868b, #0071e3), and layout principles."
 
 metadata:
   created_by: "main_agent"
