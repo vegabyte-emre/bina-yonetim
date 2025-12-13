@@ -150,7 +150,7 @@ const Blocks = () => {
               Yeni Blok
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-white z-50">
             <DialogHeader>
               <DialogTitle>{editMode ? 'Blok Düzenle' : 'Yeni Blok Ekle'}</DialogTitle>
             </DialogHeader>
