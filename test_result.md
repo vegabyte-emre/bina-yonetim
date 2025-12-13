@@ -80,6 +80,59 @@
 #    - For persistent issues, use websearch tool to find solutions
 #    - Pay special attention to tasks in the stuck_tasks list
 #    - When you fix an issue with a stuck task, don't reset the stuck_count until the testing agent confirms it's working
+
+user_problem_statement: "Superadmin panelinde (port 3000) 'Başvurular' sayfası eklenmeli. Port 3001'deki landing page'den gelen kayıt başvuruları bu sayfada görüntülenebilmeli ve onaylanabilmeli."
+
+backend:
+  - task: "Registration request endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/registration-requests - Public endpoint for new registration requests. GET /api/registration-requests - Get all requests (superadmin only). PUT /api/registration-requests/{id}/approve - Approve request. PUT /api/registration-requests/{id}/reject - Reject request."
+
+frontend:
+  - task: "Superadmin - Registration Requests Page"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/RegistrationRequests.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added route in App.js and navigation link in Layout.jsx. Page shows pending and processed requests. Includes approve/reject functionality with confirmation dialogs."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Registration request submission from landing page"
+    - "Superadmin viewing and approving requests"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "I have implemented the Superadmin Registration Requests page. Added route to App.js and 'Başvurular' link to sidebar. Page is at /registration-requests. Backend APIs exist at /api/registration-requests. Please test: 1) Submit a registration request via POST, 2) Login as superadmin (admin@test.com / admin123) and check if request appears, 3) Test approve/reject functionality."
+
+credentials:
+  superadmin:
+    email: "admin@test.com"
+    password: "admin123"
+    panel_url: "http://localhost:3000"
+
 #
 # 4. Provide Context to Testing Agent:
 #    - When calling the testing agent, provide clear instructions about:
