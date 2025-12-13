@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobil App Preview - Login Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f9fafb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .phone-frame {
+      width: 375px;
+      height: 667px;
+      background: white;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      overflow: hidden;
+      position: relative;
+    }
+    .status-bar {
+      height: 40px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 12px;
+    }
+    .screen {
+      height: calc(100% - 40px);
+      overflow-y: auto;
+      padding: 24px;
+      background: #f9fafb;
+    }
+    .logo {
+      width: 100px;
+      height: 100px;
+      background: #eff6ff;
+      border-radius: 50px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+    }
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 40px;
+    }
+    .form-container {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .input-group {
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 0 16px;
+    }
+    input {
+      flex: 1;
+      height: 48px;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      outline: none;
+    }
+    .icon {
+      margin-right: 12px;
+      color: #6b7280;
+    }
+    .login-btn {
+      width: 100%;
+      height: 52px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .login-btn:hover {
+      background: #1d4ed8;
+    }
+    .info-box {
+      display: flex;
+      align-items: center;
+      background: #eff6ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: #1e40af;
+    }
+    .test-users {
+      margin-top: 24px;
+      padding: 16px;
+      background: #fef3c7;
+      border-radius: 12px;
+      border: 1px solid #fbbf24;
+    }
+    .test-users-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #92400e;
+      margin-bottom: 8px;
+    }
+    .test-user-item {
+      font-size: 13px;
+      color: #78350f;
+      margin: 4px 0;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 12px;
+      display: none;
+    }
+    .result.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    .result.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span>9:41</span>
+      <span>📶 📱 🔋</span>
+    </div>
+    <div class="screen">
+      <div class="logo">🏢</div>
+      <h1>Bina Yönetim Sistemi</h1>
+      <p class="subtitle">Hoş Geldiniz</p>
+      
+      <div class="form-container">
+        <div class="input-group">
+          <label>Telefon Numarası</label>
+          <div class="input-wrapper">
+            <span class="icon">📱</span>
+            <input type="tel" id="phone" placeholder="5XX XXX XX XX" value="5523356797">
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label>Şifre</label>
+          <div class="input-wrapper">
+            <span class="icon">🔒</span>
+            <input type="password" id="password" placeholder="Şifrenizi girin" value="123456">
+          </div>
+        </div>
+        
+        <button class="login-btn" onclick="testLogin()">Giriş Yap</button>
+        
+        <div class="info-box">
+          <span style="margin-right: 8px;">ℹ️</span>
+          <span>Hesabınız bina yöneticiniz tarafından oluşturulmuş olmalıdır.</span>
+        </div>
+      </div>
+      
+      <div class="test-users">
+        <div class="test-users-title">Test Kullanıcıları:</div>
+        <div class="test-user-item">• Tel: 5523356797 / Şifre: 123456</div>
+        <div class="test-user-item">• Tel: 5321111111 / Şifre: resident123</div>
+      </div>
+      
+      <div id="result" class="result"></div>
+      <div id="loading" class="loading" style="display: none;">
+        Giriş yapılıyor...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://72.62.58.82:8001';
+    
+    async function testLogin() {
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('password').value;
+      const resultDiv = document.getElementById('result');
+      const loadingDiv = document.getElementById('loading');
+      
+      resultDiv.style.display = 'none';
+      loadingDiv.style.display = 'block';
+      
+      try {
+        // Format phone number
+        let formattedPhone = phone.trim().replace(/\D/g, '');
+        if (formattedPhone.startsWith('0')) {
+          formattedPhone = formattedPhone.substring(1);
+        }
+        if (formattedPhone.startsWith('90') && formattedPhone.length === 12) {
+          formattedPhone = formattedPhone.substring(2);
+        }
+        
+        console.log('📡 Login request:', { phone: formattedPhone, password: '***' });
+        
+        const response = await fetch(`${API_URL}/api/auth/resident-login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            phone: formattedPhone,
+            password: password,
+          }),
+        });
+        
+        const data = await response.json();
+        console.log('📦 Response:', data);
+        
+        loadingDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        
+        if (response.ok && data.access_token) {
+          // Save to localStorage (web equivalent of AsyncStorage)
+          localStorage.setItem('auth_token', data.access_token);
+          
+          // Get user data
+          const userResponse = await fetch(`${API_URL}/api/residents/me`, {
+            headers: {
+              'Authorization': `Bearer ${data.access_token}`,
+            },
+          });
+          
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            localStorage.setItem('user_data', JSON.stringify(userData));
+            
+            resultDiv.className = 'result success';
+            resultDiv.innerHTML = `
+              ✅ GİRİŞ BAŞARILI!<br><br>
+              <strong>Kullanıcı:</strong> ${userData.full_name}<br>
+              <strong>Telefon:</strong> ${userData.phone}<br>
+              <strong>Email:</strong> ${userData.email}<br>
+              <strong>Tip:</strong> ${userData.type}<br><br>
+              <small>Token localStorage'a kaydedildi.</small><br>
+              <small><strong>Bu test APK'da aynı şekilde çalışmalı!</strong></small>
+            `;
+          }
+        } else {
+          resultDiv.className = 'result error';
+          resultDiv.innerHTML = `❌ GİRİŞ BAŞARISIZ<br><br>${data.detail || 'Bir hata oluştu'}`;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        loadingDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = `❌ BAĞLANTI HATASI<br><br>${error.message}`;
+      }
+    }
+    
+    // Auto-fill if token exists
+    window.onload = function() {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        console.log('✅ Token found in localStorage:', token.substring(0, 30) + '...');
+      }
+    };
+  </script>
+</body>
+</html>
