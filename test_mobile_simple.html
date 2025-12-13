@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mobile App Login Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; max-width: 400px; margin: 50px auto; padding: 20px; }
+    input { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
+    button { width: 100%; padding: 15px; background: #2563eb; color: white; border: none; font-size: 16px; cursor: pointer; }
+    .result { margin-top: 20px; padding: 15px; border-radius: 8px; }
+    .success { background: #d1fae5; color: #065f46; }
+    .error { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <h2>🏢 Mobil App Login Test</h2>
+  <input id="phone" type="tel" placeholder="Telefon (5523356797)" value="5523356797">
+  <input id="password" type="password" placeholder="Şifre (123456)" value="123456">
+  <button onclick="testLogin()">GİRİŞ YAP</button>
+  <div id="result"></div>
+  
+  <script>
+    async function testLogin() {
+      const phone = document.getElementById('phone').value.replace(/\D/g, '');
+      const password = document.getElementById('password').value;
+      const resultDiv = document.getElementById('result');
+      
+      resultDiv.innerHTML = 'Giriş yapılıyor...';
+      
+      try {
+        const response = await fetch('http://72.62.58.82:8001/api/auth/resident-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, password }),
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.access_token) {
+          localStorage.setItem('auth_token', data.access_token);
+          const userResp = await fetch('http://72.62.58.82:8001/api/residents/me', {
+            headers: { 'Authorization': 'Bearer ' + data.access_token },
+          });
+          const user = await userResp.json();
+          
+          resultDiv.className = 'result success';
+          resultDiv.innerHTML = `✅ GİRİŞ BAŞARILI!<br>
+            Ad: ${user.full_name}<br>
+            Tel: ${user.phone}<br>
+            Type: ${user.type}<br><br>
+            <strong>Token localStorage'a kaydedildi!</strong><br>
+            Bu APK'da da aynı mantıkla çalışmalı.`;
+        } else {
+          resultDiv.className = 'result error';
+          resultDiv.innerHTML = '❌ Hata: ' + (data.detail || 'Bilinmeyen hata');
+        }
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '❌ Bağlantı hatası: ' + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
