@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://propman.preview.emergentagent.com/api"
+BASE_URL = "https://propertymate-18.preview.emergentagent.com/api"
 SUPERADMIN_EMAIL = "admin@test.com"
 SUPERADMIN_PASSWORD = "admin123"
 

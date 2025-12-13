@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Building, Users, Bell, FileText, TrendingUp, Shield, 
   Smartphone, Clock, CheckCircle, ArrowRight, Mail, Phone, 
-  MapPin, Zap, DollarSign, Star, ChevronDown, Play, Menu, X
+  MapPin, Zap, DollarSign, Star, ChevronDown, Play, Menu, X,
+  Sparkles, Lock, Globe, BarChart3, MessageSquare, CreditCard
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
@@ -15,6 +16,7 @@ const LandingPage = () => {
   const [loading, setLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
   const [formData, setFormData] = useState({
     building_name: '',
     manager_name: '',
@@ -33,39 +35,13 @@ const LandingPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const features = [
-    {
-      icon: Building,
-      title: 'Akıllı Daire Yönetimi',
-      description: 'Blok, kat ve daire bilgilerini tek platformda yönetin. Anlık güncelleme ve kolay erişim.'
-    },
-    {
-      icon: Users,
-      title: 'Sakin Portalı',
-      description: 'Kiracı ve mal sahipleri için özel portal. Tüm bilgiler parmaklarınızın ucunda.'
-    },
-    {
-      icon: DollarSign,
-      title: 'Otomatik Aidat',
-      description: 'Akıllı aidat takibi, otomatik hatırlatmalar ve detaylı ödeme raporları.'
-    },
-    {
-      icon: Bell,
-      title: 'Anlık Bildirimler',
-      description: 'Push notification ile tüm sakinlere anında ulaşın. Hiçbir duyuruyu kaçırmayın.'
-    }
-  ];
-
-  const allFeatures = [
-    { icon: Building, text: 'Sınırsız daire yönetimi' },
-    { icon: Users, text: 'Sakin ve aidat takibi' },
-    { icon: Bell, text: 'Push bildirimler' },
-    { icon: FileText, text: 'Talep yönetimi' },
-    { icon: TrendingUp, text: 'Detaylı raporlama' },
-    { icon: Shield, text: 'Güvenli altyapı' },
-    { icon: Smartphone, text: 'Mobil uygulama' },
-    { icon: Clock, text: '7/24 destek' },
-  ];
+  // Auto-rotate features
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % 4);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,79 +76,92 @@ const LandingPage = () => {
     setMobileMenuOpen(false);
   };
 
+  const features = [
+    {
+      icon: Building,
+      title: 'Akıllı Bina Yönetimi',
+      description: 'Tüm binalarınızı tek bir platformdan yönetin.',
+      gradient: 'from-blue-500 to-cyan-400'
+    },
+    {
+      icon: CreditCard,
+      title: 'Otomatik Aidat Takibi',
+      description: 'Ödemeler anında takip edilsin, hatırlatmalar otomatik gitsin.',
+      gradient: 'from-emerald-500 to-teal-400'
+    },
+    {
+      icon: Bell,
+      title: 'Anlık Bildirimler',
+      description: 'Push notification ile tüm sakinlere anında ulaşın.',
+      gradient: 'from-orange-500 to-amber-400'
+    },
+    {
+      icon: BarChart3,
+      title: 'Detaylı Raporlar',
+      description: 'Gelir-gider analizleri, grafikler ve finansal raporlar.',
+      gradient: 'from-purple-500 to-pink-400'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#fbfbfd] overflow-x-hidden">
       {/* Navigation - Apple Style */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm' : 'bg-transparent'
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled 
+          ? 'bg-[#fbfbfd]/80 backdrop-blur-2xl border-b border-gray-200/50' 
+          : 'bg-transparent'
       }`}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-[980px] mx-auto px-6">
+          <div className="flex items-center justify-between h-12">
             {/* Logo */}
             <div className="flex items-center">
-              <span className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="text-xl font-semibold text-[#1d1d1f]">
                 yönetioo
               </span>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <button onClick={() => scrollToSection('features')} className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
+              <button onClick={() => scrollToSection('features')} className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors">
                 Özellikler
               </button>
-              <button onClick={() => scrollToSection('pricing')} className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
+              <button onClick={() => scrollToSection('pricing')} className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors">
                 Fiyatlandırma
               </button>
-              <button onClick={() => scrollToSection('demo')} className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">
+              <button onClick={() => scrollToSection('demo')} className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors">
                 Demo
               </button>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              <button 
-                onClick={() => navigate('/login')}
-                className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
-              >
+              <button onClick={() => navigate('/login')} className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors">
                 Giriş Yap
-              </button>
-              <button 
-                onClick={() => scrollToSection('signup')}
-                className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all hover:shadow-lg hover:shadow-blue-200"
-              >
-                Ücretsiz Başla
               </button>
             </div>
 
             {/* Mobile menu button */}
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-lg text-[#1d1d1f] hover:bg-black/5 transition-colors"
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-xl border-b shadow-lg">
-            <div className="px-6 py-4 space-y-4">
-              <button onClick={() => scrollToSection('features')} className="block w-full text-left text-gray-700 hover:text-blue-600 py-2">
+          <div className="md:hidden absolute top-12 left-0 right-0 bg-[#fbfbfd]/95 backdrop-blur-2xl border-b border-gray-200/50">
+            <div className="px-6 py-4 space-y-1">
+              <button onClick={() => scrollToSection('features')} className="block w-full text-left text-[#1d1d1f] hover:text-blue-600 py-3 text-sm">
                 Özellikler
               </button>
-              <button onClick={() => scrollToSection('pricing')} className="block w-full text-left text-gray-700 hover:text-blue-600 py-2">
+              <button onClick={() => scrollToSection('pricing')} className="block w-full text-left text-[#1d1d1f] hover:text-blue-600 py-3 text-sm">
                 Fiyatlandırma
               </button>
-              <button onClick={() => scrollToSection('demo')} className="block w-full text-left text-gray-700 hover:text-blue-600 py-2">
+              <button onClick={() => scrollToSection('demo')} className="block w-full text-left text-[#1d1d1f] hover:text-blue-600 py-3 text-sm">
                 Demo
               </button>
-              <div className="pt-4 border-t space-y-3">
-                <button onClick={() => navigate('/login')} className="block w-full text-center py-2.5 text-gray-700 border rounded-full hover:bg-gray-50">
+              <div className="pt-3 border-t border-gray-200">
+                <button onClick={() => navigate('/login')} className="block w-full text-left text-[#1d1d1f] py-3 text-sm">
                   Giriş Yap
-                </button>
-                <button onClick={() => scrollToSection('signup')} className="block w-full text-center py-2.5 text-white bg-blue-600 rounded-full hover:bg-blue-700">
-                  Ücretsiz Başla
                 </button>
               </div>
             </div>
@@ -181,226 +170,287 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section - Apple Style */}
-      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 via-white to-white"></div>
-        
-        <div className="relative max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-4xl mx-auto">
-            {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-medium mb-8">
-              <Zap size={16} className="mr-2" />
-              Türkiye'nin En Modern Bina Yönetim Sistemi
-            </div>
+      <section className="relative pt-28 pb-8 md:pt-32 md:pb-12">
+        <div className="max-w-[980px] mx-auto px-6 text-center">
+          {/* Headline */}
+          <h1 className="text-[40px] md:text-[56px] lg:text-[80px] font-semibold text-[#1d1d1f] tracking-[-0.015em] leading-[1.05] mb-4">
+            Bina yönetiminde
+          </h1>
+          <h1 className="text-[40px] md:text-[56px] lg:text-[80px] font-semibold bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 bg-clip-text text-transparent tracking-[-0.015em] leading-[1.05] mb-6">
+            yeni nesil.
+          </h1>
+          
+          {/* Subheadline */}
+          <p className="text-lg md:text-xl text-[#86868b] max-w-2xl mx-auto mb-8 leading-relaxed">
+            Modern arayüz. Güçlü özellikler. Mutlu sakinler.
+          </p>
 
-            {/* Main Headline */}
-            <h1 className="text-5xl md:text-7xl font-semibold text-gray-900 tracking-tight leading-tight mb-6">
-              Bina yönetiminde
-              <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                yeni nesil deneyim.
-              </span>
-            </h1>
-
-            {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-gray-500 font-light max-w-2xl mx-auto mb-10 leading-relaxed">
-              Modern arayüz, güçlü özellikler. Apartman ve site yönetimini 
-              dijitalleştirin, sakinlerinizi mutlu edin.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button 
-                onClick={() => scrollToSection('signup')}
-                className="w-full sm:w-auto px-8 py-4 text-lg font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all hover:shadow-xl hover:shadow-blue-200 transform hover:scale-105"
-              >
-                Ücretsiz Deneyin
-              </button>
-              <button 
-                onClick={() => scrollToSection('demo')}
-                className="w-full sm:w-auto px-8 py-4 text-lg font-medium text-gray-700 bg-gray-100 rounded-full hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-              >
-                <Play size={20} className="text-blue-600" />
-                Demo İzle
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="mt-16 grid grid-cols-3 gap-8 max-w-xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-semibold text-gray-900">500+</div>
-                <div className="text-sm text-gray-500 mt-1">Aktif Bina</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-semibold text-gray-900">50K+</div>
-                <div className="text-sm text-gray-500 mt-1">Mutlu Sakin</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-semibold text-gray-900">99.9%</div>
-                <div className="text-sm text-gray-500 mt-1">Uptime</div>
-              </div>
-            </div>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+            <button 
+              onClick={() => scrollToSection('signup')}
+              className="group px-7 py-3 bg-[#0071e3] text-white text-sm font-normal rounded-full hover:bg-[#0077ed] transition-all duration-300"
+            >
+              Ücretsiz Deneyin
+              <ArrowRight size={16} className="inline ml-2 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button 
+              onClick={() => scrollToSection('demo')}
+              className="px-7 py-3 text-[#0071e3] text-sm font-normal hover:underline transition-all"
+            >
+              Demo hesabı ile dene →
+            </button>
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <ChevronDown size={32} className="text-gray-300" />
+        {/* Hero Visual - Floating Dashboard Preview */}
+        <div className="max-w-6xl mx-auto px-6 mt-8">
+          <div className="relative">
+            {/* Glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 via-transparent to-transparent blur-3xl -z-10"></div>
+            
+            {/* Dashboard mockup */}
+            <div className="relative bg-gradient-to-b from-gray-900 to-gray-800 rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border border-gray-700/50">
+              {/* Browser bar */}
+              <div className="flex items-center gap-2 px-4 py-3 bg-gray-800/80 border-b border-gray-700/50">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="px-4 py-1 bg-gray-700/50 rounded-md text-xs text-gray-400">
+                    yonetioo.com/dashboard
+                  </div>
+                </div>
+              </div>
+              
+              {/* Dashboard content */}
+              <div className="p-4 md:p-8 bg-gradient-to-br from-slate-900 via-blue-900/20 to-slate-900">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+                  {[
+                    { label: 'Toplam Daire', value: '156', icon: Building, color: 'blue' },
+                    { label: 'Aktif Sakin', value: '142', icon: Users, color: 'emerald' },
+                    { label: 'Bu Ay Tahsilat', value: '₺45.2K', icon: CreditCard, color: 'purple' },
+                    { label: 'Açık Talepler', value: '8', icon: MessageSquare, color: 'orange' },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl p-3 md:p-4 border border-white/10">
+                      <div className={`w-8 h-8 md:w-10 md:h-10 rounded-lg bg-${stat.color}-500/20 flex items-center justify-center mb-2 md:mb-3`}>
+                        <stat.icon size={16} className={`text-${stat.color}-400`} />
+                      </div>
+                      <p className="text-lg md:text-2xl font-semibold text-white">{stat.value}</p>
+                      <p className="text-xs text-gray-400">{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Chart placeholder */}
+                <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 md:p-6 border border-white/10">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-white font-medium text-sm md:text-base">Aylık Gelir Grafiği</h3>
+                    <span className="text-emerald-400 text-xs md:text-sm">+12.5%</span>
+                  </div>
+                  <div className="flex items-end gap-2 h-24 md:h-32">
+                    {[40, 65, 45, 80, 55, 90, 70, 85, 60, 95, 75, 100].map((h, i) => (
+                      <div key={i} className="flex-1 bg-gradient-to-t from-blue-600 to-cyan-400 rounded-t opacity-80 hover:opacity-100 transition-opacity" style={{ height: `${h}%` }}></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 tracking-tight mb-4">
-              Her şey tek platformda.
+      <section id="features" className="py-20 md:py-28 bg-white">
+        <div className="max-w-[980px] mx-auto px-6">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-[32px] md:text-[48px] font-semibold text-[#1d1d1f] tracking-tight mb-4">
+              Her şey düşünüldü.
             </h2>
-            <p className="text-xl text-gray-500">
-              Bina yönetimi için ihtiyacınız olan tüm araçlar, modern ve kullanımı kolay bir arayüzde.
+            <p className="text-lg text-[#86868b] max-w-xl mx-auto">
+              Yıllarca bina yönetimi deneyimini, en modern teknolojilerle birleştirdik.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="group p-8 rounded-3xl bg-gray-50 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50 transition-all duration-500 hover:shadow-xl hover:shadow-blue-100/50 cursor-pointer"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-white shadow-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
-                  <feature.icon size={28} className="text-blue-600" />
+          {/* Interactive Feature Showcase */}
+          <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+            {/* Feature List */}
+            <div className="space-y-4">
+              {features.map((feature, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveFeature(index)}
+                  className={`w-full text-left p-5 md:p-6 rounded-2xl transition-all duration-500 ${
+                    activeFeature === index 
+                      ? 'bg-white shadow-xl shadow-gray-200/50 scale-[1.02]' 
+                      : 'bg-transparent hover:bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center flex-shrink-0 ${
+                      activeFeature === index ? 'scale-110' : ''
+                    } transition-transform duration-500`}>
+                      <feature.icon size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-[#1d1d1f] mb-1">{feature.title}</h3>
+                      <p className="text-[#86868b] text-sm leading-relaxed">{feature.description}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Feature Visual */}
+            <div className="relative">
+              <div className={`absolute inset-0 bg-gradient-to-br ${features[activeFeature].gradient} opacity-10 blur-3xl rounded-full transition-all duration-700`}></div>
+              <div className="relative bg-white rounded-3xl shadow-2xl shadow-gray-200/50 p-6 md:p-8 border border-gray-100 overflow-hidden">
+                <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center">
+                  <div className={`w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-gradient-to-br ${features[activeFeature].gradient} flex items-center justify-center shadow-lg transition-all duration-500`}>
+                    {React.createElement(features[activeFeature].icon, { size: 48, className: "text-white" })}
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-500 leading-relaxed">{feature.description}</p>
+                <div className="mt-6 text-center">
+                  <h4 className="text-xl font-semibold text-[#1d1d1f] mb-2">{features[activeFeature].title}</h4>
+                  <p className="text-[#86868b]">{features[activeFeature].description}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* All Features Grid */}
+      <section className="py-20 bg-[#f5f5f7]">
+        <div className="max-w-[980px] mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-[32px] md:text-[40px] font-semibold text-[#1d1d1f] tracking-tight mb-4">
+              Güçlü özellikler. Basit kullanım.
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: Building, text: 'Sınırsız bina', desc: 'Tüm binalarınız tek platformda' },
+              { icon: Users, text: 'Sakin yönetimi', desc: 'Kiracı ve mal sahipleri' },
+              { icon: Bell, text: 'Push bildirimler', desc: 'Anında iletişim' },
+              { icon: FileText, text: 'Talep sistemi', desc: 'Takip ve raporlama' },
+              { icon: TrendingUp, text: 'Detaylı raporlar', desc: 'Gelir-gider analizi' },
+              { icon: Shield, text: 'Güvenli altyapı', desc: 'SSL & şifreleme' },
+              { icon: Smartphone, text: 'Mobil uygulama', desc: 'iOS & Android' },
+              { icon: Clock, text: '7/24 destek', desc: 'Her zaman yanınızda' },
+            ].map((item, index) => (
+              <div key={index} className="bg-white rounded-2xl p-5 hover:shadow-lg transition-all duration-300 group cursor-default">
+                <div className="w-10 h-10 rounded-xl bg-[#f5f5f7] group-hover:bg-blue-50 flex items-center justify-center mb-3 transition-colors">
+                  <item.icon size={20} className="text-[#1d1d1f] group-hover:text-blue-600 transition-colors" />
+                </div>
+                <h3 className="font-semibold text-[#1d1d1f] mb-1">{item.text}</h3>
+                <p className="text-sm text-[#86868b]">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Feature List Section */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 tracking-tight mb-6">
-                Güçlü özellikler,
-                <span className="block text-blue-600">basit kullanım.</span>
-              </h2>
-              <p className="text-xl text-gray-500 mb-10 leading-relaxed">
-                Yıllarca bina yönetimi deneyimimizi, en modern teknolojilerle birleştirdik. 
-                Sonuç: Kullanımı kolay, özellikleri güçlü bir platform.
-              </p>
-
-              <div className="grid grid-cols-2 gap-4">
-                {allFeatures.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <item.icon size={20} className="text-blue-600" />
-                    </div>
-                    <span className="text-gray-700 font-medium">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-3xl transform rotate-3 opacity-10"></div>
-              <div className="relative bg-white rounded-3xl shadow-2xl shadow-blue-100/50 p-8 border border-gray-100">
-                <div className="aspect-video bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 cursor-pointer hover:scale-110 transition-transform shadow-lg shadow-blue-200">
-                      <Play size={32} className="text-white ml-1" />
-                    </div>
-                    <p className="text-gray-500">Platform Tanıtım Videosu</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Pricing Section */}
-      <section id="pricing" className="py-24 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 tracking-tight mb-4">
+      <section id="pricing" className="py-20 md:py-28 bg-white">
+        <div className="max-w-[980px] mx-auto px-6">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-[32px] md:text-[48px] font-semibold text-[#1d1d1f] tracking-tight mb-4">
               Şeffaf fiyatlandırma.
             </h2>
-            <p className="text-xl text-gray-500">
-              İhtiyacınıza uygun planı seçin. Tüm planlarda 14 gün ücretsiz deneme.
+            <p className="text-lg text-[#86868b]">
+              Tüm planlarda 14 gün ücretsiz deneme. Kredi kartı gerekmez.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* Starter */}
-            <div className="rounded-3xl border border-gray-200 p-8 hover:shadow-xl hover:shadow-gray-100 transition-all duration-500">
-              <div className="text-gray-500 font-medium mb-2">Başlangıç</div>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-5xl font-semibold text-gray-900">₺499</span>
-                <span className="text-gray-500">/ay</span>
+            <div className="rounded-2xl bg-white border border-gray-200 p-6 md:p-8 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+              <div className="mb-6">
+                <h3 className="text-[#86868b] text-sm font-medium mb-2">Başlangıç</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[40px] font-semibold text-[#1d1d1f]">₺499</span>
+                  <span className="text-[#86868b]">/ay</span>
+                </div>
+                <p className="text-sm text-[#86868b] mt-2">Küçük apartmanlar için</p>
               </div>
-              <p className="text-gray-500 mb-8">Küçük apartmanlar için ideal</p>
               
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-3 mb-8">
                 {['50 daireye kadar', 'Temel özellikler', 'Mobil uygulama', 'E-posta desteği'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-600">
-                    <CheckCircle size={20} className="text-green-500 flex-shrink-0" />
+                  <li key={i} className="flex items-center gap-3 text-sm text-[#1d1d1f]">
+                    <CheckCircle size={18} className="text-[#86868b] flex-shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
               
-              <button className="w-full py-3 rounded-full border-2 border-gray-200 text-gray-700 font-medium hover:border-blue-600 hover:text-blue-600 transition-colors">
+              <button 
+                onClick={() => scrollToSection('signup')}
+                className="w-full py-3 rounded-xl border-2 border-[#0071e3] text-[#0071e3] font-medium hover:bg-[#0071e3] hover:text-white transition-all"
+              >
                 Başla
               </button>
             </div>
 
             {/* Pro - Popular */}
-            <div className="rounded-3xl bg-gradient-to-b from-blue-600 to-indigo-700 p-8 text-white shadow-xl shadow-blue-200 transform md:-translate-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-blue-200 font-medium">Profesyonel</span>
-                <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">Popüler</span>
+            <div className="rounded-2xl bg-[#1d1d1f] p-6 md:p-8 text-white relative overflow-hidden transform md:-translate-y-4 shadow-xl">
+              <div className="absolute top-4 right-4">
+                <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">Popüler</span>
               </div>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-5xl font-semibold">₺999</span>
-                <span className="text-blue-200">/ay</span>
-              </div>
-              <p className="text-blue-100 mb-8">Büyüyen siteler için</p>
               
-              <ul className="space-y-4 mb-8">
+              <div className="mb-6">
+                <h3 className="text-white/60 text-sm font-medium mb-2">Profesyonel</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[40px] font-semibold">₺999</span>
+                  <span className="text-white/60">/ay</span>
+                </div>
+                <p className="text-sm text-white/60 mt-2">Büyüyen siteler için</p>
+              </div>
+              
+              <ul className="space-y-3 mb-8">
                 {['200 daireye kadar', 'Tüm özellikler', 'Push bildirimler', 'Öncelikli destek', 'Detaylı raporlar'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-blue-50">
-                    <CheckCircle size={20} className="text-green-400 flex-shrink-0" />
+                  <li key={i} className="flex items-center gap-3 text-sm text-white/90">
+                    <CheckCircle size={18} className="text-blue-400 flex-shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
               
-              <button className="w-full py-3 rounded-full bg-white text-blue-600 font-medium hover:bg-blue-50 transition-colors">
+              <button 
+                onClick={() => scrollToSection('signup')}
+                className="w-full py-3 rounded-xl bg-[#0071e3] text-white font-medium hover:bg-[#0077ed] transition-all"
+              >
                 Başla
               </button>
             </div>
 
             {/* Enterprise */}
-            <div className="rounded-3xl border border-gray-200 p-8 hover:shadow-xl hover:shadow-gray-100 transition-all duration-500">
-              <div className="text-gray-500 font-medium mb-2">Kurumsal</div>
-              <div className="flex items-baseline gap-1 mb-4">
-                <span className="text-5xl font-semibold text-gray-900">₺1999</span>
-                <span className="text-gray-500">/ay</span>
+            <div className="rounded-2xl bg-white border border-gray-200 p-6 md:p-8 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+              <div className="mb-6">
+                <h3 className="text-[#86868b] text-sm font-medium mb-2">Kurumsal</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[40px] font-semibold text-[#1d1d1f]">₺1999</span>
+                  <span className="text-[#86868b]">/ay</span>
+                </div>
+                <p className="text-sm text-[#86868b] mt-2">Büyük siteler için</p>
               </div>
-              <p className="text-gray-500 mb-8">Büyük siteler ve kompleksler</p>
               
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-3 mb-8">
                 {['Sınırsız daire', 'Tüm özellikler', 'API erişimi', 'Özel destek', 'SLA garantisi'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-600">
-                    <CheckCircle size={20} className="text-green-500 flex-shrink-0" />
+                  <li key={i} className="flex items-center gap-3 text-sm text-[#1d1d1f]">
+                    <CheckCircle size={18} className="text-[#86868b] flex-shrink-0" />
                     {item}
                   </li>
                 ))}
               </ul>
               
-              <button className="w-full py-3 rounded-full border-2 border-gray-200 text-gray-700 font-medium hover:border-blue-600 hover:text-blue-600 transition-colors">
+              <button 
+                onClick={() => scrollToSection('signup')}
+                className="w-full py-3 rounded-xl border-2 border-[#0071e3] text-[#0071e3] font-medium hover:bg-[#0071e3] hover:text-white transition-all"
+              >
                 İletişime Geç
               </button>
             </div>
@@ -409,223 +459,247 @@ const LandingPage = () => {
       </section>
 
       {/* Demo Section */}
-      <section id="demo" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 tracking-tight mb-4">
-              Canlı demo ile keşfedin.
+      <section id="demo" className="py-20 bg-[#f5f5f7]">
+        <div className="max-w-[980px] mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-[32px] md:text-[40px] font-semibold text-[#1d1d1f] tracking-tight mb-4">
+              Hemen deneyin.
             </h2>
-            <p className="text-xl text-gray-500 mb-10">
-              Demo hesabı ile tüm özellikleri ücretsiz deneyin.
+            <p className="text-lg text-[#86868b]">
+              Demo hesapları ile tüm özellikleri keşfedin.
             </p>
+          </div>
 
-            <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
-              <div className="grid md:grid-cols-2 gap-8 text-left">
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900 text-lg">Yönetici Paneli</h3>
-                  <div className="p-4 bg-gray-50 rounded-2xl">
-                    <p className="text-sm text-gray-500 mb-2">E-posta</p>
-                    <p className="font-mono text-gray-900">ahmet@mavirezidans.com</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-2xl">
-                    <p className="text-sm text-gray-500 mb-2">Şifre</p>
-                    <p className="font-mono text-gray-900">admin123</p>
-                  </div>
-                  <button 
-                    onClick={() => navigate('/login')}
-                    className="w-full py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    Panele Giriş Yap
-                  </button>
+          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+            {/* Manager Panel */}
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-all">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                  <Building size={24} className="text-white" />
                 </div>
-
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900 text-lg">Mobil Uygulama</h3>
-                  <div className="p-4 bg-gray-50 rounded-2xl">
-                    <p className="text-sm text-gray-500 mb-2">Telefon</p>
-                    <p className="font-mono text-gray-900">5523356797</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-2xl">
-                    <p className="text-sm text-gray-500 mb-2">Şifre</p>
-                    <p className="font-mono text-gray-900">123456</p>
-                  </div>
-                  <button className="w-full py-3 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                    <Smartphone size={20} />
-                    APK İndir
-                  </button>
+                <div>
+                  <h3 className="font-semibold text-[#1d1d1f]">Yönetici Paneli</h3>
+                  <p className="text-sm text-[#86868b]">Web uygulaması</p>
                 </div>
               </div>
+              
+              <div className="space-y-3 mb-6">
+                <div className="p-4 bg-[#f5f5f7] rounded-xl">
+                  <p className="text-xs text-[#86868b] mb-1">E-posta</p>
+                  <p className="font-mono text-sm text-[#1d1d1f]">ahmet@mavirezidans.com</p>
+                </div>
+                <div className="p-4 bg-[#f5f5f7] rounded-xl">
+                  <p className="text-xs text-[#86868b] mb-1">Şifre</p>
+                  <p className="font-mono text-sm text-[#1d1d1f]">admin123</p>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => navigate('/login')}
+                className="w-full py-3 bg-[#0071e3] text-white rounded-xl font-medium hover:bg-[#0077ed] transition-all"
+              >
+                Panele Giriş Yap
+              </button>
+            </div>
+
+            {/* Mobile App */}
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-all">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                  <Smartphone size={24} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#1d1d1f]">Mobil Uygulama</h3>
+                  <p className="text-sm text-[#86868b]">Android APK</p>
+                </div>
+              </div>
+              
+              <div className="space-y-3 mb-6">
+                <div className="p-4 bg-[#f5f5f7] rounded-xl">
+                  <p className="text-xs text-[#86868b] mb-1">Telefon</p>
+                  <p className="font-mono text-sm text-[#1d1d1f]">5523356797</p>
+                </div>
+                <div className="p-4 bg-[#f5f5f7] rounded-xl">
+                  <p className="text-xs text-[#86868b] mb-1">Şifre</p>
+                  <p className="font-mono text-sm text-[#1d1d1f]">123456</p>
+                </div>
+              </div>
+              
+              <button className="w-full py-3 bg-[#1d1d1f] text-white rounded-xl font-medium hover:bg-black transition-all flex items-center justify-center gap-2">
+                <Smartphone size={18} />
+                APK İndir
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Signup Form Section */}
-      <section id="signup" className="py-24 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-semibold text-gray-900 tracking-tight mb-4">
-                Hemen başlayın.
-              </h2>
-              <p className="text-xl text-gray-500">
-                Formu doldurun, 24 saat içinde sizinle iletişime geçelim.
-              </p>
-            </div>
+      <section id="signup" className="py-20 md:py-28 bg-white">
+        <div className="max-w-[580px] mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-[32px] md:text-[40px] font-semibold text-[#1d1d1f] tracking-tight mb-4">
+              Hemen başlayın.
+            </h2>
+            <p className="text-lg text-[#86868b]">
+              Formu doldurun, 24 saat içinde sizinle iletişime geçelim.
+            </p>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Bina/Site Adı *</label>
-                  <input
-                    type="text"
-                    value={formData.building_name}
-                    onChange={(e) => setFormData({...formData, building_name: e.target.value})}
-                    className="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                    placeholder="Örn: Mavi Rezidans"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Yönetici Adı Soyadı *</label>
-                  <input
-                    type="text"
-                    value={formData.manager_name}
-                    onChange={(e) => setFormData({...formData, manager_name: e.target.value})}
-                    className="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                    placeholder="Adınız ve soyadınız"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">E-posta *</label>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                    placeholder="ornek@email.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Telefon *</label>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    className="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                    placeholder="05XX XXX XX XX"
-                    required
-                  />
-                </div>
-              </div>
-
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Adres *</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Bina/Site Adı</label>
                 <input
                   type="text"
-                  value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  className="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                  placeholder="Bina adresi"
+                  value={formData.building_name}
+                  onChange={(e) => setFormData({...formData, building_name: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#f5f5f7] border-0 rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:ring-2 focus:ring-[#0071e3] focus:bg-white transition-all"
+                  placeholder="Örn: Mavi Rezidans"
                   required
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Daire Sayısı *</label>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Yönetici Adı Soyadı</label>
                 <input
-                  type="number"
-                  value={formData.apartment_count}
-                  onChange={(e) => setFormData({...formData, apartment_count: e.target.value})}
-                  className="w-full px-5 py-4 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                  placeholder="Toplam daire sayısı"
+                  type="text"
+                  value={formData.manager_name}
+                  onChange={(e) => setFormData({...formData, manager_name: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#f5f5f7] border-0 rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:ring-2 focus:ring-[#0071e3] focus:bg-white transition-all"
+                  placeholder="Adınız ve soyadınız"
                   required
                 />
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-4 bg-blue-600 text-white text-lg font-medium rounded-2xl hover:bg-blue-700 transition-all hover:shadow-xl hover:shadow-blue-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Gönderiliyor...
-                  </span>
-                ) : (
-                  'Ücretsiz Başvuru Yap'
-                )}
-              </button>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">E-posta</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#f5f5f7] border-0 rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:ring-2 focus:ring-[#0071e3] focus:bg-white transition-all"
+                  placeholder="ornek@email.com"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Telefon</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  className="w-full px-4 py-3 bg-[#f5f5f7] border-0 rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:ring-2 focus:ring-[#0071e3] focus:bg-white transition-all"
+                  placeholder="05XX XXX XX XX"
+                  required
+                />
+              </div>
+            </div>
 
-              <p className="text-center text-sm text-gray-500">
-                Başvurunuz onaylandıktan sonra 14 gün ücretsiz deneme başlar.
-              </p>
-            </form>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Adres</label>
+              <input
+                type="text"
+                value={formData.address}
+                onChange={(e) => setFormData({...formData, address: e.target.value})}
+                className="w-full px-4 py-3 bg-[#f5f5f7] border-0 rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:ring-2 focus:ring-[#0071e3] focus:bg-white transition-all"
+                placeholder="Bina adresi"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#1d1d1f] mb-2">Daire Sayısı</label>
+              <input
+                type="number"
+                value={formData.apartment_count}
+                onChange={(e) => setFormData({...formData, apartment_count: e.target.value})}
+                className="w-full px-4 py-3 bg-[#f5f5f7] border-0 rounded-xl text-[#1d1d1f] placeholder-[#86868b] focus:ring-2 focus:ring-[#0071e3] focus:bg-white transition-all"
+                placeholder="Toplam daire sayısı"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 bg-[#0071e3] text-white font-medium rounded-xl hover:bg-[#0077ed] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Gönderiliyor...
+                </span>
+              ) : (
+                'Ücretsiz Başvuru Yap'
+              )}
+            </button>
+
+            <p className="text-center text-sm text-[#86868b]">
+              Başvurunuz onaylandıktan sonra 14 gün ücretsiz deneme başlar.
+            </p>
+          </form>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
+      <footer className="bg-[#f5f5f7] py-12 border-t border-gray-200">
+        <div className="max-w-[980px] mx-auto px-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <span className="text-2xl font-semibold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                yönetioo
-              </span>
-              <p className="text-gray-400 mt-4">
-                Modern bina yönetim sistemi. Apartman ve site yönetimini kolaylaştırıyoruz.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4">Ürün</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#features" className="hover:text-white transition-colors">Özellikler</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">Fiyatlandırma</a></li>
-                <li><a href="#demo" className="hover:text-white transition-colors">Demo</a></li>
+              <h4 className="text-xs font-semibold text-[#1d1d1f] mb-4">Ürün</h4>
+              <ul className="space-y-3">
+                {['Özellikler', 'Fiyatlandırma', 'Demo', 'Güncellemeler'].map((item, i) => (
+                  <li key={i}>
+                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
+                  </li>
+                ))}
               </ul>
             </div>
-            
             <div>
-              <h4 className="font-semibold mb-4">Destek</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Yardım Merkezi</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">İletişim</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">SSS</a></li>
+              <h4 className="text-xs font-semibold text-[#1d1d1f] mb-4">Şirket</h4>
+              <ul className="space-y-3">
+                {['Hakkımızda', 'Blog', 'Kariyer', 'İletişim'].map((item, i) => (
+                  <li key={i}>
+                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
+                  </li>
+                ))}
               </ul>
             </div>
-            
             <div>
-              <h4 className="font-semibold mb-4">İletişim</h4>
-              <ul className="space-y-3 text-gray-400">
-                <li className="flex items-center gap-2">
-                  <Mail size={18} />
-                  info@yonetioo.com
-                </li>
-                <li className="flex items-center gap-2">
-                  <Phone size={18} />
-                  0850 XXX XX XX
-                </li>
+              <h4 className="text-xs font-semibold text-[#1d1d1f] mb-4">Destek</h4>
+              <ul className="space-y-3">
+                {['Yardım Merkezi', 'SSS', 'Dökümanlar', 'API'].map((item, i) => (
+                  <li key={i}>
+                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-[#1d1d1f] mb-4">Yasal</h4>
+              <ul className="space-y-3">
+                {['Gizlilik', 'Kullanım Koşulları', 'KVKK', 'Çerezler'].map((item, i) => (
+                  <li key={i}>
+                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-400 text-sm">© 2024 Yönetioo. Tüm hakları saklıdır.</p>
-            <div className="flex items-center gap-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Gizlilik Politikası</a>
-              <a href="#" className="hover:text-white transition-colors">Kullanım Koşulları</a>
-              <a href="#" className="hover:text-white transition-colors">KVKK</a>
+          <div className="pt-8 border-t border-gray-300">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <p className="text-xs text-[#86868b]">
+                Copyright © 2024 Yönetioo. Tüm hakları saklıdır.
+              </p>
+              <div className="flex items-center gap-4">
+                <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f]">Türkiye</a>
+              </div>
             </div>
           </div>
         </div>
