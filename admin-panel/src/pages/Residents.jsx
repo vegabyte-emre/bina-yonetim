@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserCheck, UserX, Plus, X, Save, Eye, EyeOff } from 'lucide-react';
+import { Users, UserCheck, UserX, Plus, X, Save, Eye, EyeOff, Edit2, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -12,9 +12,10 @@ const Residents = () => {
   const [residents, setResidents] = useState([]);
   const [apartments, setApartments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, owner, tenant
+  const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [editingResident, setEditingResident] = useState(null);
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -22,6 +23,7 @@ const Residents = () => {
     password: '',
     type: 'tenant',
     apartment_id: '',
+    tc_number: '',
     is_active: true
   });
 
@@ -57,6 +59,36 @@ const Residents = () => {
     }
   };
 
+  const openAddModal = () => {
+    setEditingResident(null);
+    setFormData({
+      full_name: '',
+      email: '',
+      phone: '',
+      password: '',
+      type: 'tenant',
+      apartment_id: '',
+      tc_number: '',
+      is_active: true
+    });
+    setShowModal(true);
+  };
+
+  const openEditModal = (resident) => {
+    setEditingResident(resident);
+    setFormData({
+      full_name: resident.full_name,
+      email: resident.email || '',
+      phone: resident.phone,
+      password: '', // Don't show existing password
+      type: resident.type,
+      apartment_id: resident.apartment_id || '',
+      tc_number: resident.tc_number || '',
+      is_active: resident.is_active
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -72,16 +104,46 @@ const Residents = () => {
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user'));
       
-      await axios.post(`${API_URL}/api/residents`, {
-        ...formData,
-        phone: phoneDigits,
-        building_id: user.building_id
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      if (editingResident) {
+        // Update existing resident
+        const updateData = {
+          full_name: formData.full_name,
+          email: formData.email || null,
+          phone: phoneDigits,
+          type: formData.type,
+          apartment_id: formData.apartment_id || null,
+          tc_number: formData.tc_number || null,
+          is_active: formData.is_active
+        };
+        
+        // Only include password if it's provided
+        if (formData.password && formData.password.length >= 6) {
+          updateData.password = formData.password;
+        }
+        
+        await axios.put(`${API_URL}/api/residents/${editingResident.id}`, updateData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Sakin başarıyla güncellendi!');
+      } else {
+        // Create new resident
+        if (!formData.password || formData.password.length < 6) {
+          toast.error('Şifre en az 6 karakter olmalıdır');
+          return;
+        }
+        
+        await axios.post(`${API_URL}/api/residents`, {
+          ...formData,
+          phone: phoneDigits,
+          building_id: user.building_id
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Sakin başarıyla eklendi!');
+      }
       
-      toast.success('Sakin başarıyla eklendi!');
       setShowModal(false);
+      setEditingResident(null);
       setFormData({
         full_name: '',
         email: '',
@@ -89,13 +151,37 @@ const Residents = () => {
         password: '',
         type: 'tenant',
         apartment_id: '',
+        tc_number: '',
         is_active: true
       });
       fetchResidents();
     } catch (error) {
-      console.error('Sakin eklenemedi:', error);
-      toast.error(error.response?.data?.detail || 'Sakin eklenemedi');
+      console.error('İşlem başarısız:', error);
+      toast.error(error.response?.data?.detail || 'İşlem başarısız');
     }
+  };
+
+  const handleDelete = async (residentId) => {
+    if (!window.confirm('Bu sakini silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/api/residents/${residentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Sakin silindi');
+      fetchResidents();
+    } catch (error) {
+      console.error('Silme başarısız:', error);
+      toast.error(error.response?.data?.detail || 'Silme başarısız');
+    }
+  };
+
+  const getApartmentNumber = (apartmentId) => {
+    const apt = apartments.find(a => a.id === apartmentId);
+    return apt?.apartment_number || '-';
   };
 
   const filteredResidents = residents.filter(resident => {
@@ -129,7 +215,7 @@ const Residents = () => {
             <option value="tenant">Kiracı ({residents.filter(r => r.type === 'tenant').length})</option>
           </select>
           <Button 
-            onClick={() => setShowModal(true)}
+            onClick={openAddModal}
             className="bg-purple-600 hover:bg-purple-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -138,13 +224,15 @@ const Residents = () => {
         </div>
       </div>
 
-      {/* Add Resident Modal */}
+      {/* Add/Edit Resident Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="fixed inset-0 bg-black/50" onClick={() => setShowModal(false)}></div>
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-10">
             <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10 rounded-t-xl">
-              <h2 className="text-xl font-bold text-gray-900">Yeni Sakin Ekle</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                {editingResident ? 'Sakin Düzenle' : 'Yeni Sakin Ekle'}
+              </h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -171,11 +259,10 @@ const Residents = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    E-posta *
+                    E-posta
                   </label>
                   <input
                     type="email"
-                    required
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
@@ -200,17 +287,17 @@ const Residents = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Şifre (Mobil Giriş) *
+                    {editingResident ? 'Yeni Şifre (Boş bırakılırsa değişmez)' : 'Şifre (Mobil Giriş) *'}
                   </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
-                      required
+                      required={!editingResident}
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent pr-10"
-                      placeholder="Minimum 6 karakter"
-                      minLength={6}
+                      placeholder={editingResident ? "Değiştirmek için yeni şifre girin" : "Minimum 6 karakter"}
+                      minLength={editingResident ? 0 : 6}
                     />
                     <button
                       type="button"
@@ -221,6 +308,20 @@ const Residents = () => {
                     </button>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">Mobil uygulama giriş şifresi</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    TC Kimlik No
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.tc_number}
+                    onChange={(e) => setFormData({...formData, tc_number: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="11 haneli TC Kimlik No"
+                    maxLength={11}
+                  />
                 </div>
 
                 <div>
@@ -237,20 +338,19 @@ const Residents = () => {
                   </select>
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Daire *
+                    Daire
                   </label>
                   <select
-                    required
                     value={formData.apartment_id}
                     onChange={(e) => setFormData({...formData, apartment_id: e.target.value})}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   >
-                    <option value="">Daire Seçin</option>
+                    <option value="">Daire Seçin (Opsiyonel)</option>
                     {apartments.map((apt) => (
                       <option key={apt.id} value={apt.id}>
-                        Daire {apt.apartment_number} - {apt.block_id}
+                        Daire {apt.apartment_number}
                       </option>
                     ))}
                   </select>
@@ -283,7 +383,7 @@ const Residents = () => {
                   className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  Kaydet
+                  {editingResident ? 'Güncelle' : 'Kaydet'}
                 </Button>
               </div>
             </form>
@@ -314,10 +414,16 @@ const Residents = () => {
                     E-posta
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Daire
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Tip
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Durum
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    İşlemler
                   </th>
                 </tr>
               </thead>
@@ -337,6 +443,9 @@ const Residents = () => {
                       <span className="text-sm text-gray-900">{resident.email || '-'}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">{getApartmentNumber(resident.apartment_id)}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <Badge className={resident.type === 'owner' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}>
                         {resident.type === 'owner' ? 'Mal Sahibi' : 'Kiracı'}
                       </Badge>
@@ -348,6 +457,24 @@ const Residents = () => {
                         <UserX className="h-5 w-5 text-red-500" />
                       )}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEditModal(resident)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Düzenle"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(resident.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Sil"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -355,6 +482,38 @@ const Residents = () => {
           </div>
         </div>
       )}
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-0 shadow-md">
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Toplam Sakin</p>
+              <p className="text-2xl font-bold text-purple-600">{residents.length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-md">
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Mal Sahipleri</p>
+              <p className="text-2xl font-bold text-green-600">
+                {residents.filter(r => r.type === 'owner').length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-0 shadow-md">
+          <CardContent className="p-4">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">Kiracılar</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {residents.filter(r => r.type === 'tenant').length}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
