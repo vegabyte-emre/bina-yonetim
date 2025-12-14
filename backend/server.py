@@ -219,6 +219,7 @@ class ResidentUpdate(BaseModel):
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     type: Optional[str] = None
+    apartment_id: Optional[str] = None
     tc_number: Optional[str] = None
     move_in_date: Optional[datetime] = None
     move_out_date: Optional[datetime] = None
