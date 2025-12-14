@@ -201,7 +201,7 @@ class Apartment(ApartmentBase):
 
 class ResidentBase(BaseModel):
     building_id: str
-    apartment_id: str
+    apartment_id: Optional[str] = None
     full_name: str
     phone: str
     email: Optional[EmailStr] = None
