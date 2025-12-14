@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Filter, Plus, X, Save } from 'lucide-react';
+import { Home, Filter, Plus, X, Save, Edit2, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -12,8 +12,9 @@ const Apartments = () => {
   const [apartments, setApartments] = useState([]);
   const [blocks, setBlocks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, empty, rented, owner_occupied
+  const [filter, setFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
+  const [editingApartment, setEditingApartment] = useState(null);
   const [formData, setFormData] = useState({
     apartment_number: '',
     block_id: '',
@@ -55,6 +56,32 @@ const Apartments = () => {
     }
   };
 
+  const openAddModal = () => {
+    setEditingApartment(null);
+    setFormData({
+      apartment_number: '',
+      block_id: '',
+      floor: 1,
+      area_sqm: 100,
+      room_count: '2+1',
+      status: 'empty'
+    });
+    setShowModal(true);
+  };
+
+  const openEditModal = (apartment) => {
+    setEditingApartment(apartment);
+    setFormData({
+      apartment_number: apartment.apartment_number,
+      block_id: apartment.block_id,
+      floor: apartment.floor,
+      area_sqm: apartment.square_meters || 100,
+      room_count: apartment.room_count || '2+1',
+      status: apartment.status
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -62,21 +89,37 @@ const Apartments = () => {
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user'));
       
-      await axios.post(`${API_URL}/api/apartments`, {
-        building_id: user.building_id,
-        block_id: formData.block_id,
-        apartment_number: formData.apartment_number,
-        floor: formData.floor,
-        door_number: formData.apartment_number, // Using apartment_number as door_number
-        square_meters: formData.area_sqm,
-        room_count: formData.room_count,
-        status: formData.status
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      if (editingApartment) {
+        // Update existing apartment
+        await axios.put(`${API_URL}/api/apartments/${editingApartment.id}`, {
+          floor: formData.floor,
+          door_number: formData.apartment_number,
+          square_meters: formData.area_sqm,
+          room_count: formData.room_count,
+          status: formData.status
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Daire başarıyla güncellendi!');
+      } else {
+        // Create new apartment
+        await axios.post(`${API_URL}/api/apartments`, {
+          building_id: user.building_id,
+          block_id: formData.block_id,
+          apartment_number: formData.apartment_number,
+          floor: formData.floor,
+          door_number: formData.apartment_number,
+          square_meters: formData.area_sqm,
+          room_count: formData.room_count,
+          status: formData.status
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success('Daire başarıyla eklendi!');
+      }
       
-      toast.success('Daire başarıyla eklendi!');
       setShowModal(false);
+      setEditingApartment(null);
       setFormData({
         apartment_number: '',
         block_id: '',
@@ -87,8 +130,26 @@ const Apartments = () => {
       });
       fetchApartments();
     } catch (error) {
-      console.error('Daire eklenemedi:', error);
-      toast.error(error.response?.data?.detail || 'Daire eklenemedi');
+      console.error('İşlem başarısız:', error);
+      toast.error(error.response?.data?.detail || 'İşlem başarısız');
+    }
+  };
+
+  const handleDelete = async (apartmentId) => {
+    if (!window.confirm('Bu daireyi silmek istediğinizden emin misiniz?')) {
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/api/apartments/${apartmentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success('Daire silindi');
+      fetchApartments();
+    } catch (error) {
+      console.error('Silme başarısız:', error);
+      toast.error(error.response?.data?.detail || 'Silme başarısız');
     }
   };
 
@@ -100,6 +161,11 @@ const Apartments = () => {
     };
     const s = statusMap[status] || { label: status, class: 'bg-gray-100 text-gray-700' };
     return <Badge className={s.class}>{s.label}</Badge>;
+  };
+
+  const getBlockName = (blockId) => {
+    const block = blocks.find(b => b.id === blockId);
+    return block?.name || '-';
   };
 
   const filteredApartments = apartments.filter(apt => {
@@ -137,7 +203,7 @@ const Apartments = () => {
             </select>
           </div>
           <Button 
-            onClick={() => setShowModal(true)}
+            onClick={openAddModal}
             className="bg-purple-600 hover:bg-purple-700 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -146,13 +212,15 @@ const Apartments = () => {
         </div>
       </div>
 
-      {/* Add Apartment Modal */}
+      {/* Add/Edit Apartment Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
           <div className="fixed inset-0 bg-black/50" onClick={() => setShowModal(false)}></div>
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto relative z-10">
             <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white">
-              <h2 className="text-xl font-bold text-gray-900">Yeni Daire Ekle</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                {editingApartment ? 'Daire Düzenle' : 'Yeni Daire Ekle'}
+              </h2>
               <button
                 onClick={() => setShowModal(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -174,6 +242,7 @@ const Apartments = () => {
                     onChange={(e) => setFormData({...formData, apartment_number: e.target.value})}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     placeholder="Örn: 101"
+                    disabled={!!editingApartment}
                   />
                 </div>
 
@@ -186,6 +255,7 @@ const Apartments = () => {
                     value={formData.block_id}
                     onChange={(e) => setFormData({...formData, block_id: e.target.value})}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    disabled={!!editingApartment}
                   >
                     <option value="">Blok Seçin</option>
                     {blocks.map((block) => (
@@ -269,7 +339,7 @@ const Apartments = () => {
                   className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  Kaydet
+                  {editingApartment ? 'Güncelle' : 'Kaydet'}
                 </Button>
               </div>
             </form>
@@ -295,6 +365,9 @@ const Apartments = () => {
                     Daire No
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Blok
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Kat
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -305,6 +378,9 @@ const Apartments = () => {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Durum
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    İşlemler
                   </th>
                 </tr>
               </thead>
@@ -318,6 +394,9 @@ const Apartments = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">{getBlockName(apt.block_id)}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm text-gray-900">{apt.floor}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -328,6 +407,24 @@ const Apartments = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(apt.status)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEditModal(apt)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Düzenle"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(apt.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Sil"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
