@@ -202,3 +202,27 @@ credentials:
       - working: "NA"
         agent: "main"
         comment: "Mobil uygulama için pushNotificationService.ts oluşturuldu. expo-notifications paketi eklendi. AuthContext giriş/çıkışta topic subscription yönetimi yapıyor. Test için yeni APK build gerekiyor."
+
+  - task: "Building Manager Panel - Residents (Sakinler) Edit Functionality"
+    implemented: true
+    working: true
+    file: "/app/admin-panel/src/pages/Residents.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETE: 1) Login successful with ahmet@mavirezidans.com/admin123, 2) Sakinler page loads with 9 existing residents, 3) Edit resident modal opens with pre-filled data, successfully updated 'Ayşe Demir' to 'Ali Yılmaz Güncellendi' and email to 'ali.updated@test.com', 4) Success toast appears and table updates correctly, 5) Add new resident functionality working - successfully added 'Test Yeni Sakin' with all required fields (name, email, phone, password, type), 6) All form validations, API calls, and UI interactions working perfectly."
+
+  - task: "Building Manager Panel - Apartments (Daireler) Edit Functionality"
+    implemented: true
+    working: true
+    file: "/app/admin-panel/src/pages/Apartments.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETE: 1) Daireler page loads with 49 apartments in table, 2) Edit apartment modal opens correctly with pre-filled data, 3) Successfully changed apartment status to 'Boş' (empty), 4) Update button works and success toast 'Daire başarıyla güncellendi!' appears, 5) All form interactions, dropdown selections, and API calls working perfectly. The apartment management functionality is fully operational."
