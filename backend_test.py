@@ -41,12 +41,12 @@ class SuperadminPanelTester:
         if details and not success:
             print(f"   Details: {details}")
     
-    def test_building_admin_login(self):
-        """Test building admin login and get token"""
+    def test_superadmin_login(self):
+        """Test superadmin login and get token"""
         try:
             login_data = {
-                "username": BUILDING_ADMIN_EMAIL,
-                "password": BUILDING_ADMIN_PASSWORD
+                "username": SUPERADMIN_EMAIL,
+                "password": SUPERADMIN_PASSWORD
             }
             
             response = self.session.post(
@@ -60,17 +60,17 @@ class SuperadminPanelTester:
                 self.token = data.get("access_token")
                 if self.token:
                     self.session.headers.update({"Authorization": f"Bearer {self.token}"})
-                    self.log_test("Building Admin Login", True, "Successfully logged in as building admin")
+                    self.log_test("Superadmin Login", True, "Successfully logged in as superadmin")
                     return True
                 else:
-                    self.log_test("Building Admin Login", False, "No access token in response", data)
+                    self.log_test("Superadmin Login", False, "No access token in response", data)
                     return False
             else:
-                self.log_test("Building Admin Login", False, f"Login failed with status {response.status_code}", response.text)
+                self.log_test("Superadmin Login", False, f"Login failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Building Admin Login", False, f"Login request failed: {str(e)}")
+            self.log_test("Superadmin Login", False, f"Login request failed: {str(e)}")
             return False
     
     def test_get_building_info(self):
