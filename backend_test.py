@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Building Manager Admin Panel
-Tests CRUD APIs for Surveys, Votings, Meetings, and Decisions
+Backend API Testing for Superadmin Panel Improvements
+Tests the 4 key improvements:
+1. Public Subscription Plans (No Auth Required)
+2. Delete Registration Request
+3. Login functionality
+4. Registration requests management
 """
 
 import requests
@@ -11,10 +15,10 @@ from datetime import datetime
 
 # Configuration
 BASE_URL = "https://smart-bms.preview.emergentagent.com/api"
-BUILDING_ADMIN_EMAIL = "ahmet@mavirezidans.com"
-BUILDING_ADMIN_PASSWORD = "admin123"
+SUPERADMIN_EMAIL = "admin@test.com"
+SUPERADMIN_PASSWORD = "admin123"
 
-class CRUDAPITester:
+class SuperadminPanelTester:
     def __init__(self):
         self.session = requests.Session()
         self.token = None
