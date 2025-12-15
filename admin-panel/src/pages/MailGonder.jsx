@@ -217,7 +217,7 @@ const MailGonder = () => {
     handleSendMail('dues_notification', {
       month: duesForm.month,
       amount: duesForm.amount,
-      due_date: duesForm.due_date,
+      due_date: formatDateTR(duesForm.due_date),
       expense_details: expenseHtml,
       previous_balance: '₺0',
       total_amount: duesForm.amount
