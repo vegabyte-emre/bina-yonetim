@@ -23,12 +23,8 @@ class SuperadminPanelTester:
         self.session = requests.Session()
         self.token = None
         self.test_results = []
-        self.building_id = None
         # Store created IDs for cleanup
-        self.created_survey_id = None
-        self.created_voting_id = None
-        self.created_meeting_id = None
-        self.created_decision_id = None
+        self.created_registration_request_id = None
         
     def log_test(self, test_name, success, message, details=None):
         """Log test results"""
