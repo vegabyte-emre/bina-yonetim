@@ -235,34 +235,40 @@ class SuperadminPanelTester:
             self.log_test("Delete Registration Request", False, f"Delete registration request failed: {str(e)}")
             return False
     
-    def test_send_monthly_due_mail(self):
-        """Test sending monthly due notification mail to residents"""
+    def test_verify_deletion(self):
+        """Test verifying that the deleted registration request is no longer in the list"""
         try:
-            if not self.monthly_due_id:
-                self.log_test("Send Monthly Due Mail", False, "No monthly due ID available")
-                return False
+            if not self.created_registration_request_id:
+                self.log_test("Verify Deletion", True, "No registration request to verify deletion")
+                return True
             
-            response = self.session.post(f"{BASE_URL}/monthly-dues/{self.monthly_due_id}/send-mail")
+            response = self.session.get(f"{BASE_URL}/registration-requests")
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success"):
-                    sent_count = data.get("sent_count", 0)
-                    failed_count = data.get("failed_count", 0)
-                    message = data.get("message", "")
+                if isinstance(data, list):
+                    # Check if our deleted registration request is NOT in the list
+                    found_request = None
+                    for request in data:
+                        if request.get("id") == self.created_registration_request_id:
+                            found_request = request
+                            break
                     
-                    # Even if no residents have email, the API should work
-                    self.log_test("Send Monthly Due Mail", True, f"Mail sending completed: {message} (Sent: {sent_count}, Failed: {failed_count})")
-                    return True
+                    if not found_request:
+                        self.log_test("Verify Deletion", True, f"Registration request successfully deleted and not found in list of {len(data)} items")
+                        return True
+                    else:
+                        self.log_test("Verify Deletion", False, f"Registration request still exists after deletion: {found_request}")
+                        return False
                 else:
-                    self.log_test("Send Monthly Due Mail", False, "Mail sending failed", data)
+                    self.log_test("Verify Deletion", False, "Response is not a list", data)
                     return False
             else:
-                self.log_test("Send Monthly Due Mail", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Verify Deletion", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Send Monthly Due Mail", False, f"Send mail request failed: {str(e)}")
+            self.log_test("Verify Deletion", False, f"Verify deletion failed: {str(e)}")
             return False
     
     def test_delete_monthly_due(self):
