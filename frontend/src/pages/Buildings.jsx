@@ -419,12 +419,16 @@ const Buildings = () => {
                         ? 'bg-green-100 text-green-700'
                         : building.subscription_status === 'trial'
                         ? 'bg-blue-100 text-blue-700'
+                        : building.subscription_status === 'passive'
+                        ? 'bg-gray-100 text-gray-700'
                         : 'bg-red-100 text-red-700'
                     }`}>
                       {building.subscription_status === 'active'
                         ? 'Aktif'
                         : building.subscription_status === 'trial'
                         ? 'Deneme'
+                        : building.subscription_status === 'passive'
+                        ? 'Pasif'
                         : 'Süresi Dolmuş'}
                     </span>
                   </div>
