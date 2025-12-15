@@ -311,64 +311,6 @@ const MailGonder = () => {
             ← Geri Dön
           </Button>
 
-          {/* Dues Notification Form */}
-          {selectedTemplate === 'dues_notification' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                  Aidat Bildirimi Gönder
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleDuesSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Dönem (Ay/Yıl) *</Label>
-                      <Input
-                        value={duesForm.month}
-                        onChange={(e) => setDuesForm({...duesForm, month: e.target.value})}
-                        placeholder="Ocak 2025"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label>Aidat Tutarı *</Label>
-                      <Input
-                        value={duesForm.amount}
-                        onChange={(e) => setDuesForm({...duesForm, amount: e.target.value})}
-                        placeholder="₺1.500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label>Son Ödeme Tarihi *</Label>
-                      <Input
-                        type="date"
-                        value={duesForm.due_date}
-                        onChange={(e) => setDuesForm({...duesForm, due_date: e.target.value})}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Harcama Detayları (Her satıra bir kalem: "Açıklama: Tutar")</Label>
-                    <Textarea
-                      value={duesForm.expense_details}
-                      onChange={(e) => setDuesForm({...duesForm, expense_details: e.target.value})}
-                      placeholder="Elektrik: ₺500&#10;Su: ₺300&#10;Temizlik: ₺400&#10;Güvenlik: ₺300"
-                      rows={5}
-                    />
-                  </div>
-                  <Button type="submit" disabled={sending} className="w-full bg-green-600 hover:bg-green-700">
-                    {sending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-                    {residentsWithEmail} Sakin'e Gönder
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-
           {/* Meeting/Voting Form */}
           {selectedTemplate === 'meeting_voting' && (
             <Card>
