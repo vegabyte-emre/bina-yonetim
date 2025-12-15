@@ -14,11 +14,13 @@ BASE_URL = "https://smart-bms.preview.emergentagent.com/api"
 BUILDING_ADMIN_EMAIL = "ahmet@mavirezidans.com"
 BUILDING_ADMIN_PASSWORD = "admin123"
 
-class RegistrationRequestTester:
+class MonthlyDuesTester:
     def __init__(self):
         self.session = requests.Session()
         self.token = None
         self.test_results = []
+        self.building_id = None
+        self.monthly_due_id = None
         
     def log_test(self, test_name, success, message, details=None):
         """Log test results"""
@@ -35,12 +37,12 @@ class RegistrationRequestTester:
         if details and not success:
             print(f"   Details: {details}")
     
-    def test_superadmin_login(self):
-        """Test superadmin login and get token"""
+    def test_building_admin_login(self):
+        """Test building admin login and get token"""
         try:
             login_data = {
-                "username": SUPERADMIN_EMAIL,
-                "password": SUPERADMIN_PASSWORD
+                "username": BUILDING_ADMIN_EMAIL,
+                "password": BUILDING_ADMIN_PASSWORD
             }
             
             response = self.session.post(
@@ -54,17 +56,17 @@ class RegistrationRequestTester:
                 self.token = data.get("access_token")
                 if self.token:
                     self.session.headers.update({"Authorization": f"Bearer {self.token}"})
-                    self.log_test("Superadmin Login", True, "Successfully logged in as superadmin")
+                    self.log_test("Building Admin Login", True, "Successfully logged in as building admin")
                     return True
                 else:
-                    self.log_test("Superadmin Login", False, "No access token in response", data)
+                    self.log_test("Building Admin Login", False, "No access token in response", data)
                     return False
             else:
-                self.log_test("Superadmin Login", False, f"Login failed with status {response.status_code}", response.text)
+                self.log_test("Building Admin Login", False, f"Login failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Superadmin Login", False, f"Login request failed: {str(e)}")
+            self.log_test("Building Admin Login", False, f"Login request failed: {str(e)}")
             return False
     
     def test_create_registration_request(self):
