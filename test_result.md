@@ -3,23 +3,23 @@
 ## Current Testing Session
 **Date:** 2024-12-15
 **Features (Superadmin Panel 3000):**
-1. Login page - Test credentials removed
-2. Buildings page - Status edit (Active/Passive) feature
-3. Registration Requests - Delete functionality
-4. Subscription plans - Public endpoint for Landing Page
+1. Netgsm Config APIs - SMS service integration
+2. Paratika Config APIs - Payment service integration  
+3. Subscription-payments endpoint verification
+4. Previous functionality verification
 
 ## Test Scope
 
 ### Backend API Tests:
-1. DELETE /api/registration-requests/{id} - Delete registration request
-2. GET /api/subscriptions/public - Public subscription plans (no auth)
-3. Buildings status update in edit form
+1. GET/POST /api/netgsm/config - Netgsm SMS configuration
+2. POST /api/netgsm/test - Netgsm connection test
+3. GET/POST /api/paratika/config - Paratika payment configuration
+4. POST /api/paratika/test - Paratika connection test
+5. GET /api/subscription-payments - Finance page endpoint
+6. Previous API functionality verification
 
 ### Frontend UI Tests:
-1. Login page - No test credentials shown
-2. Buildings edit - Status dropdown (Aktif/Pasif)
-3. Registration Requests - Delete button on processed requests
-4. Landing Page (3001) - Dynamic pricing from API
+1. Previous tests completed (not retested in this session)
 
 ## Test Credentials
 - Superadmin Panel: http://localhost:3000
