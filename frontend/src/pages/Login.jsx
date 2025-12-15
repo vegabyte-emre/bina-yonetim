@@ -126,12 +126,6 @@ const Login = ({ setIsAuthenticated }) => {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-white/60">
-              Test: admin@test.com / admin123
-            </p>
-          </div>
         </div>
 
         <p className="text-center text-white/40 text-sm">
