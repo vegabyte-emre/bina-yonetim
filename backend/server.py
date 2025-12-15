@@ -1009,6 +1009,59 @@ async def get_public_subscriptions():
         })
     return result
 
+@api_router.get("/subscription-payments")
+async def get_subscription_payments(current_user: User = Depends(get_current_superadmin)):
+    """Abonelik ödemelerini getir"""
+    payments = await db.subscription_payments.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Eğer veri yoksa binaların abonelik durumlarını döndür
+    if not payments:
+        buildings = await db.buildings.find({}, {"_id": 0}).to_list(1000)
+        payments = []
+        for building in buildings:
+            payments.append({
+                "id": building.get("id"),
+                "building_id": building.get("id"),
+                "building_name": building.get("name"),
+                "period": datetime.now().strftime("%B %Y"),
+                "amount": building.get("subscription_price", 299),
+                "status": "paid" if building.get("subscription_status") == "active" else "pending",
+                "payment_date": building.get("subscription_end_date"),
+                "created_at": building.get("created_at")
+            })
+    
+    return payments
+
+@api_router.post("/subscription-payments")
+async def create_subscription_payment(data: dict, current_user: User = Depends(get_current_superadmin)):
+    """Abonelik ödemesi oluştur"""
+    payment_id = str(uuid.uuid4())
+    
+    payment_doc = {
+        "id": payment_id,
+        "building_id": data.get("building_id"),
+        "building_name": data.get("building_name"),
+        "period": data.get("period"),
+        "amount": data.get("amount"),
+        "status": data.get("status", "pending"),
+        "payment_date": data.get("payment_date"),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.subscription_payments.insert_one(payment_doc)
+    return {"success": True, "id": payment_id}
+
+@api_router.put("/subscription-payments/{payment_id}")
+async def update_subscription_payment(payment_id: str, data: dict, current_user: User = Depends(get_current_superadmin)):
+    """Abonelik ödemesini güncelle"""
+    result = await db.subscription_payments.update_one(
+        {"id": payment_id},
+        {"$set": data}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Ödeme bulunamadı")
+    return {"success": True, "message": "Ödeme güncellendi"}
+
 @api_router.post("/subscriptions", response_model=SubscriptionPlan)
 async def create_subscription(plan_data: SubscriptionPlanCreate, current_user: User = Depends(get_current_superadmin)):
     plan_id = str(uuid.uuid4())
