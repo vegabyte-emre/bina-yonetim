@@ -94,6 +94,26 @@ const RegistrationRequests = () => {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(
+        `${API_URL}/api/registration-requests/${selectedRequest.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      toast.success('Başvuru silindi');
+      setDeleteDialogOpen(false);
+      setSelectedRequest(null);
+      fetchRequests();
+    } catch (error) {
+      console.error('Silme hatası:', error);
+      toast.error('Başvuru silinemedi');
+    }
+  };
+
   const getStatusBadge = (status) => {
     const statusMap = {
       'pending': { label: 'Bekliyor', class: 'bg-yellow-100 text-yellow-700' },
