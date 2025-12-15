@@ -50,15 +50,6 @@ const MailGonder = () => {
 
   const templates = [
     {
-      id: 'dues_notification',
-      name: 'Aidat Bildirimi',
-      description: 'Aylık aidat bildirimi, harcama detayları ile birlikte',
-      icon: DollarSign,
-      color: 'bg-green-500',
-      bgColor: 'bg-green-50',
-      borderColor: 'border-green-200'
-    },
-    {
       id: 'meeting_voting',
       name: 'Toplantı / Oylama',
       description: 'Toplantı veya oylama bildirimi',
