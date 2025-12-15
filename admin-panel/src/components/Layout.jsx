@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Building, Home, Users, Bell, FileText, Settings, LogOut, Menu, X, TrendingUp, BarChart3, ThumbsUp, Calendar, CheckSquare, Mail } from 'lucide-react';
+import { LayoutDashboard, Building, Home, Users, Bell, FileText, Settings, LogOut, Menu, X, TrendingUp, BarChart3, ThumbsUp, Calendar, CheckSquare, Mail, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
 // TL İkonu komponenti
@@ -36,6 +36,7 @@ const Layout = ({ setIsAuthenticated }) => {
 
   const menuItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/payments', icon: CreditCard, label: 'Ödemeler', highlight: true },
     { path: '/blocks', icon: Building, label: 'Bloklar' },
     { path: '/apartments', icon: Home, label: 'Daireler' },
     { path: '/residents', icon: Users, label: 'Sakinler' },
