@@ -641,7 +641,12 @@ class SuperadminPanelTester:
             # Test 4: Subscription Payments Endpoint
             self.test_subscription_payments_endpoint,
             
-            # Test 5: Previous functionality verification
+            # Test 5: Building Admin Authentication & Building Payments
+            self.test_building_admin_login,
+            self.test_get_building_payments,
+            self.test_process_building_payment,
+            
+            # Test 6: Previous functionality verification
             self.test_public_subscription_plans,
             self.test_get_registration_requests,
             self.test_subscription_plans_with_auth
