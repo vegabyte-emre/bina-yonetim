@@ -218,6 +218,7 @@ function App() {
           </ProtectedRoute>
         }>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/payments" element={<Payments />} />
           <Route path="/blocks" element={<Blocks />} />
           <Route path="/apartments" element={<Apartments />} />
           <Route path="/residents" element={<Residents />} />
