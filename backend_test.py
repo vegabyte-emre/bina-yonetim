@@ -199,29 +199,42 @@ class MonthlyDuesTester:
             self.log_test("Get Monthly Dues (After Creation)", False, f"Get monthly dues failed: {str(e)}")
             return False
     
-    def test_reject_registration_request(self):
-        """Test rejecting a registration request"""
+    def test_get_specific_monthly_due(self):
+        """Test getting a specific monthly due by ID"""
         try:
-            if not hasattr(self, 'request_id_2'):
-                self.log_test("Reject Registration Request", False, "No second request ID available for rejection test")
+            if not self.monthly_due_id:
+                self.log_test("Get Specific Monthly Due", False, "No monthly due ID available")
                 return False
             
-            response = self.session.put(f"{BASE_URL}/registration-requests/{self.request_id_2}/reject")
+            response = self.session.get(f"{BASE_URL}/monthly-dues/{self.monthly_due_id}")
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success"):
-                    self.log_test("Reject Registration Request", True, "Registration request successfully rejected")
-                    return True
+                if data.get("id") == self.monthly_due_id:
+                    month = data.get("month")
+                    total_amount = data.get("total_amount")
+                    per_apartment_amount = data.get("per_apartment_amount")
+                    expense_items = data.get("expense_items", [])
+                    
+                    # Verify expense items
+                    expected_items = ["Elektrik", "Su", "Temizlik"]
+                    actual_items = [item.get("name") for item in expense_items]
+                    
+                    if all(item in actual_items for item in expected_items):
+                        self.log_test("Get Specific Monthly Due", True, f"Retrieved monthly due: {month}, Total: ₺{total_amount:,.2f}, Per Apt: ₺{per_apartment_amount:.2f}")
+                        return True
+                    else:
+                        self.log_test("Get Specific Monthly Due", False, f"Expense items mismatch - Expected: {expected_items}, Got: {actual_items}")
+                        return False
                 else:
-                    self.log_test("Reject Registration Request", False, "Invalid response format", data)
+                    self.log_test("Get Specific Monthly Due", False, "Monthly due ID mismatch", data)
                     return False
             else:
-                self.log_test("Reject Registration Request", False, f"Rejection failed with status {response.status_code}", response.text)
+                self.log_test("Get Specific Monthly Due", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Reject Registration Request", False, f"Rejection request failed: {str(e)}")
+            self.log_test("Get Specific Monthly Due", False, f"Get specific monthly due failed: {str(e)}")
             return False
     
     def verify_building_and_user_creation(self):
