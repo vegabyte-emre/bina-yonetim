@@ -991,6 +991,24 @@ async def get_subscriptions(current_user: User = Depends(get_current_superadmin)
             plan['created_at'] = datetime.fromisoformat(plan['created_at'])
     return plans
 
+@api_router.get("/subscriptions/public")
+async def get_public_subscriptions():
+    """Public endpoint - Aktif abonelik planlarını getir (Landing page için)"""
+    plans = await db.subscription_plans.find({"is_active": True}, {"_id": 0}).sort("price_monthly", 1).to_list(10)
+    # Remove created_at from response for simplicity
+    result = []
+    for plan in plans:
+        result.append({
+            "id": plan.get("id"),
+            "name": plan.get("name"),
+            "description": plan.get("description"),
+            "price_monthly": plan.get("price_monthly"),
+            "price_yearly": plan.get("price_yearly"),
+            "max_apartments": plan.get("max_apartments"),
+            "features": plan.get("features", [])
+        })
+    return result
+
 @api_router.post("/subscriptions", response_model=SubscriptionPlan)
 async def create_subscription(plan_data: SubscriptionPlanCreate, current_user: User = Depends(get_current_superadmin)):
     plan_id = str(uuid.uuid4())
