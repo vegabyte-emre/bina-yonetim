@@ -484,28 +484,33 @@ class SuperadminPanelTester:
             return False
     
     def run_all_tests(self):
-        """Run all Superadmin Panel improvement tests"""
-        print("🚀 Starting Superadmin Panel Improvements API Tests")
+        """Run all Superadmin Panel new integrations tests"""
+        print("🚀 Starting Superadmin Panel New Integrations API Tests")
         print(f"📍 Base URL: {BASE_URL}")
         print(f"👤 Superadmin: {SUPERADMIN_EMAIL}")
         print("=" * 70)
         
         # Test sequence
         tests = [
-            # Test 1: Public Subscription Plans (No Auth Required)
-            self.test_public_subscription_plans,
-            
-            # Test 2: Superadmin Authentication
+            # Test 1: Superadmin Authentication (Required for other tests)
             self.test_superadmin_login,
             
-            # Test 3: Registration Requests Management
-            self.test_get_registration_requests,
-            self.test_create_registration_request,
-            self.test_get_registration_requests_after_creation,
-            self.test_delete_registration_request,
-            self.test_verify_deletion,
+            # Test 2: Netgsm Config APIs
+            self.test_netgsm_get_config,
+            self.test_netgsm_save_config,
+            self.test_netgsm_test_connection,
             
-            # Test 4: Subscription Plans with Auth
+            # Test 3: Paratika Config APIs
+            self.test_paratika_get_config,
+            self.test_paratika_save_config,
+            self.test_paratika_test_connection,
+            
+            # Test 4: Subscription Payments Endpoint
+            self.test_subscription_payments_endpoint,
+            
+            # Test 5: Previous functionality verification
+            self.test_public_subscription_plans,
+            self.test_get_registration_requests,
             self.test_subscription_plans_with_auth
         ]
         
