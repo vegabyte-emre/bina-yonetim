@@ -293,22 +293,29 @@ class SuperadminPanelTester:
             return False
     
     def run_all_tests(self):
-        """Run all monthly dues management tests"""
-        print("🚀 Starting Monthly Dues Management (Aidat Yönetimi) API Tests")
+        """Run all Superadmin Panel improvement tests"""
+        print("🚀 Starting Superadmin Panel Improvements API Tests")
         print(f"📍 Base URL: {BASE_URL}")
-        print(f"👤 Building Admin: {BUILDING_ADMIN_EMAIL}")
+        print(f"👤 Superadmin: {SUPERADMIN_EMAIL}")
         print("=" * 70)
         
         # Test sequence
         tests = [
-            self.test_building_admin_login,
-            self.test_get_building_info,
-            self.test_get_monthly_dues_initial,
-            self.test_create_monthly_due,
-            self.test_get_monthly_dues_after_creation,
-            self.test_get_specific_monthly_due,
-            self.test_send_monthly_due_mail,
-            self.test_delete_monthly_due
+            # Test 1: Public Subscription Plans (No Auth Required)
+            self.test_public_subscription_plans,
+            
+            # Test 2: Superadmin Authentication
+            self.test_superadmin_login,
+            
+            # Test 3: Registration Requests Management
+            self.test_get_registration_requests,
+            self.test_create_registration_request,
+            self.test_get_registration_requests_after_creation,
+            self.test_delete_registration_request,
+            self.test_verify_deletion,
+            
+            # Test 4: Subscription Plans with Auth
+            self.test_subscription_plans_with_auth
         ]
         
         passed = 0
@@ -323,7 +330,7 @@ class SuperadminPanelTester:
         print(f"📊 Test Results: {passed}/{total} tests passed")
         
         if passed == total:
-            print("🎉 All tests passed! Monthly Dues Management system is working correctly.")
+            print("🎉 All tests passed! Superadmin Panel improvements are working correctly.")
             return True
         else:
             print("⚠️  Some tests failed. Check the details above.")
