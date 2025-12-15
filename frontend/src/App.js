@@ -9,6 +9,7 @@ import RegistrationRequests from '@/pages/RegistrationRequests';
 import Subscriptions from '@/pages/Subscriptions';
 import Settings from '@/pages/Settings';
 import MailSettings from '@/pages/MailSettings';
+import FinanceManagement from '@/pages/FinanceManagement';
 import Layout from '@/components/Layout';
 import { Toaster } from '@/components/ui/sonner';
 
