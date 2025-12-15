@@ -115,11 +115,16 @@ const MailGonder = () => {
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user'));
       
-      // Get building info
-      const buildingResponse = await axios.get(`${API_URL}/api/buildings/${user.building_id}`, {
-        headers: getAuthHeaders()
-      });
-      const buildingName = buildingResponse.data?.name || 'Bina';
+      // Get building info using building manager endpoint
+      let buildingName = 'Bina';
+      try {
+        const buildingResponse = await axios.get(`${API_URL}/api/building-manager/my-building`, {
+          headers: getAuthHeaders()
+        });
+        buildingName = buildingResponse.data?.name || 'Bina';
+      } catch (e) {
+        console.warn('Building info not fetched, using default name');
+      }
       
       // Get active residents with email
       const activeResidents = residents.filter(r => r.email && r.is_active);
