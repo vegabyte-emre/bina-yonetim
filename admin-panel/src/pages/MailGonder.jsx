@@ -96,6 +96,13 @@ const MailGonder = () => {
     return { Authorization: `Bearer ${token}` };
   };
 
+  // Helper function to format date to Turkish format
+  const formatDateTR = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  };
+
   const fetchResidents = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/residents`, {
