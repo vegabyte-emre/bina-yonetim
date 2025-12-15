@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Building, Home, Users, DollarSign, Bell, FileText, Settings, LogOut, Menu, X, TrendingUp, BarChart3, ThumbsUp, Calendar, CheckSquare, Mail } from 'lucide-react';
+import { LayoutDashboard, Building, Home, Users, Bell, FileText, Settings, LogOut, Menu, X, TrendingUp, BarChart3, ThumbsUp, Calendar, CheckSquare, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+
+// TL İkonu komponenti
+const TLIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 4v16" />
+    <path d="M6 8h8" />
+    <path d="M6 14h6" />
+    <path d="M14 4l4 16" />
+  </svg>
+);
 
 const Layout = ({ setIsAuthenticated }) => {
   const location = useLocation();
