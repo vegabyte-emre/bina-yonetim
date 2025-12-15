@@ -1332,6 +1332,203 @@ async def delete_due(due_id: str, current_user: User = Depends(get_current_build
         raise HTTPException(status_code=404, detail="Due not found")
     return {"message": "Due deleted successfully"}
 
+# ============ MONTHLY DUE DEFINITION ROUTES (Aylık Aidat Tanımı) ============
+
+@api_router.get("/monthly-dues")
+async def get_monthly_dues(current_user: User = Depends(get_current_building_admin)):
+    """Aylık aidat tanımlarını listele"""
+    monthly_dues = await db.monthly_dues.find(
+        {"building_id": current_user.building_id}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    for md in monthly_dues:
+        if isinstance(md.get('created_at'), str):
+            md['created_at'] = datetime.fromisoformat(md['created_at'])
+        if isinstance(md.get('due_date'), str):
+            md['due_date'] = datetime.fromisoformat(md['due_date'])
+        if md.get('sent_at') and isinstance(md.get('sent_at'), str):
+            md['sent_at'] = datetime.fromisoformat(md['sent_at'])
+    
+    return monthly_dues
+
+@api_router.get("/monthly-dues/{monthly_due_id}")
+async def get_monthly_due(monthly_due_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Tek bir aylık aidat tanımını getir"""
+    monthly_due = await db.monthly_dues.find_one(
+        {"id": monthly_due_id, "building_id": current_user.building_id},
+        {"_id": 0}
+    )
+    if not monthly_due:
+        raise HTTPException(status_code=404, detail="Aidat tanımı bulunamadı")
+    
+    if isinstance(monthly_due.get('created_at'), str):
+        monthly_due['created_at'] = datetime.fromisoformat(monthly_due['created_at'])
+    if isinstance(monthly_due.get('due_date'), str):
+        monthly_due['due_date'] = datetime.fromisoformat(monthly_due['due_date'])
+    
+    return monthly_due
+
+@api_router.post("/monthly-dues")
+async def create_monthly_due(data: MonthlyDueDefinitionCreate, current_user: User = Depends(get_current_building_admin)):
+    """Yeni aylık aidat tanımı oluştur"""
+    if data.building_id != current_user.building_id:
+        raise HTTPException(status_code=403, detail="Yetkisiz işlem")
+    
+    # Aynı ay için zaten tanım var mı kontrol et
+    existing = await db.monthly_dues.find_one({
+        "building_id": data.building_id,
+        "month": data.month
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail=f"'{data.month}' için zaten aidat tanımı mevcut")
+    
+    monthly_due_id = str(uuid.uuid4())
+    monthly_due_doc = {
+        "id": monthly_due_id,
+        "building_id": data.building_id,
+        "month": data.month,
+        "expense_items": [item.model_dump() for item in data.expense_items],
+        "total_amount": data.total_amount,
+        "per_apartment_amount": data.per_apartment_amount,
+        "due_date": data.due_date.isoformat(),
+        "is_sent": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "sent_at": None
+    }
+    
+    await db.monthly_dues.insert_one(monthly_due_doc)
+    
+    return {"success": True, "id": monthly_due_id, "message": "Aidat tanımı oluşturuldu"}
+
+@api_router.put("/monthly-dues/{monthly_due_id}")
+async def update_monthly_due(monthly_due_id: str, data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Aylık aidat tanımını güncelle"""
+    existing = await db.monthly_dues.find_one({
+        "id": monthly_due_id, 
+        "building_id": current_user.building_id
+    })
+    if not existing:
+        raise HTTPException(status_code=404, detail="Aidat tanımı bulunamadı")
+    
+    # due_date'i isoformat'a çevir
+    if 'due_date' in data and data['due_date']:
+        if isinstance(data['due_date'], str):
+            data['due_date'] = data['due_date']
+        else:
+            data['due_date'] = data['due_date'].isoformat()
+    
+    await db.monthly_dues.update_one(
+        {"id": monthly_due_id},
+        {"$set": data}
+    )
+    
+    return {"success": True, "message": "Aidat tanımı güncellendi"}
+
+@api_router.delete("/monthly-dues/{monthly_due_id}")
+async def delete_monthly_due(monthly_due_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Aylık aidat tanımını sil"""
+    result = await db.monthly_dues.delete_one({
+        "id": monthly_due_id,
+        "building_id": current_user.building_id
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Aidat tanımı bulunamadı")
+    
+    return {"success": True, "message": "Aidat tanımı silindi"}
+
+@api_router.post("/monthly-dues/{monthly_due_id}/send-mail")
+async def send_monthly_due_mail(monthly_due_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Aylık aidat bildirimini tüm sakinlere mail olarak gönder"""
+    # Aidat tanımını getir
+    monthly_due = await db.monthly_dues.find_one({
+        "id": monthly_due_id,
+        "building_id": current_user.building_id
+    })
+    if not monthly_due:
+        raise HTTPException(status_code=404, detail="Aidat tanımı bulunamadı")
+    
+    # Bina bilgisini getir
+    building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
+    building_name = building.get("name", "Bina") if building else "Bina"
+    
+    # Aktif sakinleri getir
+    residents = await db.residents.find(
+        {"building_id": current_user.building_id, "is_active": True, "email": {"$ne": None}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    if not residents:
+        return {"success": False, "message": "Mail adresi olan aktif sakin bulunamadı", "sent_count": 0}
+    
+    # Mail service'i import et
+    from routes.mail_service import MailService
+    mail_service = MailService(db)
+    
+    # Gider kalemleri HTML tablosu oluştur
+    expense_html = ""
+    for item in monthly_due.get("expense_items", []):
+        expense_html += f'<tr><td>{item["name"]}</td><td style="text-align: right;">₺{item["amount"]:,.2f}</td></tr>'
+    
+    sent_count = 0
+    failed_count = 0
+    
+    for resident in residents:
+        if resident.get("email"):
+            try:
+                # Daire bilgisini getir
+                apartment_no = "-"
+                if resident.get("apartment_id"):
+                    apartment = await db.apartments.find_one(
+                        {"id": resident["apartment_id"]},
+                        {"_id": 0, "apartment_number": 1}
+                    )
+                    if apartment:
+                        apartment_no = apartment.get("apartment_number", "-")
+                
+                # Due date format
+                due_date_str = monthly_due.get("due_date", "")
+                if isinstance(due_date_str, str):
+                    try:
+                        due_date_obj = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
+                        due_date_str = due_date_obj.strftime("%d.%m.%Y")
+                    except:
+                        pass
+                
+                await mail_service.send_with_template(
+                    to=[resident["email"]],
+                    template_name="dues_notification",
+                    variables={
+                        "user_name": resident.get("full_name", "Sakin"),
+                        "building_name": building_name,
+                        "month": monthly_due.get("month", ""),
+                        "amount": f"₺{monthly_due.get('per_apartment_amount', 0):,.2f}",
+                        "due_date": due_date_str,
+                        "expense_details": expense_html,
+                        "apartment_no": apartment_no,
+                        "previous_balance": "₺0",
+                        "total_amount": f"₺{monthly_due.get('per_apartment_amount', 0):,.2f}"
+                    }
+                )
+                sent_count += 1
+            except Exception as e:
+                print(f"Mail error for {resident['email']}: {e}")
+                failed_count += 1
+    
+    # is_sent ve sent_at güncelle
+    if sent_count > 0:
+        await db.monthly_dues.update_one(
+            {"id": monthly_due_id},
+            {"$set": {"is_sent": True, "sent_at": datetime.now(timezone.utc).isoformat()}}
+        )
+    
+    return {
+        "success": True,
+        "message": f"{sent_count} sakin'e mail gönderildi",
+        "sent_count": sent_count,
+        "failed_count": failed_count
+    }
+
 # ============ ANNOUNCEMENT ROUTES (Building Admin) ============
 
 @api_router.get("/announcements", response_model=List[Announcement])
