@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Monthly Dues Management (Aidat Yönetimi) System
-Tests the complete monthly dues workflow including creation, listing, and mail sending.
+Backend API Testing for Building Manager Admin Panel
+Tests CRUD APIs for Surveys, Votings, Meetings, and Decisions
 """
 
 import requests
