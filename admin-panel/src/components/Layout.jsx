@@ -146,13 +146,20 @@ const Layout = ({ setIsAuthenticated }) => {
                   className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                     isActive
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                      : item.highlight && !isActive
+                      ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border border-green-200'
                       : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'
                   }`}
                 >
                   <Icon className={`mr-3 h-5 w-5 flex-shrink-0 ${
-                    isActive ? 'text-white' : 'text-gray-400'
+                    isActive ? 'text-white' : item.highlight ? 'text-green-600' : 'text-gray-400'
                   }`} />
                   <span className="truncate">{item.label}</span>
+                  {item.highlight && !isActive && (
+                    <span className="ml-auto px-2 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full">
+                      Öde
+                    </span>
+                  )}
                 </Link>
               );
             })}
