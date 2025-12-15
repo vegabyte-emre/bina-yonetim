@@ -607,7 +607,8 @@ class SuperadminPanelTester:
                         self.log_test("Process Building Payment", True, f"Payment processed: {data.get('message', 'Success')}")
                         return True
                 else:
-                    self.log_test("Process Building Payment", False, f"Payment processing failed: {data.get('error', 'Unknown error')}")
+                    # Log the full response for debugging
+                    self.log_test("Process Building Payment", False, f"Payment processing failed: {data.get('error', data.get('message', 'Unknown error'))}", data)
                     return False
             else:
                 self.log_test("Process Building Payment", False, f"Request failed with status {response.status_code}", response.text)
