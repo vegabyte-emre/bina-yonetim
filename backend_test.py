@@ -271,29 +271,25 @@ class SuperadminPanelTester:
             self.log_test("Verify Deletion", False, f"Verify deletion failed: {str(e)}")
             return False
     
-    def test_delete_monthly_due(self):
-        """Test deleting the created monthly due (cleanup)"""
+    def test_subscription_plans_with_auth(self):
+        """Test subscription plans endpoint with authentication (superadmin access)"""
         try:
-            if not self.monthly_due_id:
-                self.log_test("Delete Monthly Due (Cleanup)", True, "No monthly due to delete")
-                return True
-            
-            response = self.session.delete(f"{BASE_URL}/monthly-dues/{self.monthly_due_id}")
+            response = self.session.get(f"{BASE_URL}/subscriptions")
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success"):
-                    self.log_test("Delete Monthly Due (Cleanup)", True, "Monthly due deleted successfully")
+                if isinstance(data, list):
+                    self.log_test("Subscription Plans (With Auth)", True, f"Retrieved {len(data)} subscription plans with authentication")
                     return True
                 else:
-                    self.log_test("Delete Monthly Due (Cleanup)", False, "Delete response invalid", data)
+                    self.log_test("Subscription Plans (With Auth)", False, "Response is not a list", data)
                     return False
             else:
-                self.log_test("Delete Monthly Due (Cleanup)", False, f"Delete failed with status {response.status_code}", response.text)
+                self.log_test("Subscription Plans (With Auth)", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Delete Monthly Due (Cleanup)", False, f"Delete request failed: {str(e)}")
+            self.log_test("Subscription Plans (With Auth)", False, f"Subscription plans with auth failed: {str(e)}")
             return False
     
     def run_all_tests(self):
