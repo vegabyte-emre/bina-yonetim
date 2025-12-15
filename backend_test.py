@@ -73,28 +73,42 @@ class SuperadminPanelTester:
             self.log_test("Superadmin Login", False, f"Login request failed: {str(e)}")
             return False
     
-    def test_get_building_info(self):
-        """Test getting building manager's building info"""
+    def test_public_subscription_plans(self):
+        """Test public subscription plans endpoint (no auth required)"""
         try:
-            response = self.session.get(f"{BASE_URL}/building-manager/my-building")
+            # Create a new session without auth headers for this test
+            public_session = requests.Session()
+            
+            response = public_session.get(f"{BASE_URL}/subscriptions/public")
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("id") and data.get("name"):
-                    self.building_id = data["id"]
-                    building_name = data["name"]
-                    apartment_count = data.get("apartment_count", 0)
-                    self.log_test("Get Building Info", True, f"Building info retrieved: {building_name} (ID: {self.building_id}, Apartments: {apartment_count})")
-                    return True
+                if isinstance(data, list):
+                    if len(data) > 0:
+                        # Check if plans have required fields
+                        plan = data[0]
+                        required_fields = ["name", "price_monthly", "features"]
+                        missing_fields = [field for field in required_fields if field not in plan]
+                        
+                        if not missing_fields:
+                            plan_names = [p.get("name", "Unknown") for p in data]
+                            self.log_test("Public Subscription Plans", True, f"Retrieved {len(data)} subscription plans: {', '.join(plan_names)}")
+                            return True
+                        else:
+                            self.log_test("Public Subscription Plans", False, f"Missing required fields: {missing_fields}", plan)
+                            return False
+                    else:
+                        self.log_test("Public Subscription Plans", True, "No subscription plans found (empty list)")
+                        return True
                 else:
-                    self.log_test("Get Building Info", False, "Invalid building data format", data)
+                    self.log_test("Public Subscription Plans", False, "Response is not a list", data)
                     return False
             else:
-                self.log_test("Get Building Info", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Public Subscription Plans", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Get Building Info", False, f"Building info request failed: {str(e)}")
+            self.log_test("Public Subscription Plans", False, f"Public subscription plans request failed: {str(e)}")
             return False
     
     def test_get_monthly_dues_initial(self):
