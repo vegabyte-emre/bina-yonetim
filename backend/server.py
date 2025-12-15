@@ -260,6 +260,32 @@ class Due(DueBase):
     paid_date: Optional[datetime] = None
     created_at: datetime
 
+# ============ MONTHLY DUE DEFINITION (Aylık Aidat Tanımı) ============
+
+class ExpenseItem(BaseModel):
+    """Gider kalemi"""
+    name: str  # Hizmet/Ürün adı (Elektrik, Su, Temizlik vb.)
+    amount: float  # Tutar
+
+class MonthlyDueDefinitionBase(BaseModel):
+    """Aylık aidat tanımı"""
+    building_id: str
+    month: str  # Format: "Ocak 2025"
+    expense_items: List[ExpenseItem]  # Gider kalemleri
+    total_amount: float  # Toplam tutar
+    per_apartment_amount: float  # Daire başına düşen tutar
+    due_date: datetime  # Son ödeme tarihi
+    is_sent: bool = False  # Mail gönderildi mi?
+
+class MonthlyDueDefinitionCreate(MonthlyDueDefinitionBase):
+    pass
+
+class MonthlyDueDefinition(MonthlyDueDefinitionBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    created_at: datetime
+    sent_at: Optional[datetime] = None
+
 class AnnouncementBase(BaseModel):
     building_id: str
     title: str
