@@ -271,7 +271,7 @@ const Dues = () => {
           <DialogContent className="sm:max-w-[700px] bg-white max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-blue-600" />
+                <TLIcon className="h-5 w-5 text-blue-600" />
                 Yeni Aidat Tanımla
               </DialogTitle>
             </DialogHeader>
@@ -454,7 +454,7 @@ const Dues = () => {
       {monthlyDues.length === 0 ? (
         <Card className="border-0 shadow-md">
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <DollarSign className="h-16 w-16 text-gray-400 mb-4" />
+            <TLIcon className="h-16 w-16 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">Henüz aidat tanımı yok</h3>
             <p className="text-gray-600 text-center mb-6">
               İlk aidat tanımınızı oluşturmak için yukarıdaki butonu kullanın
@@ -473,7 +473,7 @@ const Dues = () => {
                 >
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-xl ${due.is_sent ? 'bg-green-100' : 'bg-blue-100'}`}>
-                      <DollarSign className={`h-6 w-6 ${due.is_sent ? 'text-green-600' : 'text-blue-600'}`} />
+                      <TLIcon className={`h-6 w-6 ${due.is_sent ? 'text-green-600' : 'text-blue-600'}`} />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">{due.month}</h3>
