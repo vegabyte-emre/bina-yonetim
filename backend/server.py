@@ -2189,6 +2189,111 @@ async def get_my_building(current_user: User = Depends(get_current_building_admi
     
     return Building(**building)
 
+# ============ BUILDING MANAGER PAYMENT ROUTES ============
+
+@api_router.get("/building-payments")
+async def get_building_payments(current_user: User = Depends(get_current_building_admin)):
+    """Bina yöneticisi için ödeme çizelgesini getir"""
+    payments = await db.building_payments.find(
+        {"building_id": current_user.building_id},
+        {"_id": 0}
+    ).sort("due_date", -1).to_list(100)
+    
+    # Eğer ödeme yoksa, aylık çizelge oluştur
+    if not payments:
+        building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
+        monthly_amount = building.get("subscription_price", 299) if building else 299
+        
+        months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
+        current_date = datetime.now()
+        current_month = current_date.month - 1
+        current_year = current_date.year
+        
+        payments = []
+        for i in range(-3, 4):
+            month_idx = (current_month + i) % 12
+            year = current_year + ((current_month + i) // 12)
+            
+            status = 'pending'
+            if i < 0:
+                status = 'paid'
+            elif i == 0:
+                status = 'pending'
+            else:
+                status = 'upcoming'
+            
+            payments.append({
+                "id": f"payment-{year}-{month_idx}",
+                "building_id": current_user.building_id,
+                "period": f"{months[month_idx]} {year}",
+                "amount": monthly_amount,
+                "status": status,
+                "due_date": datetime(year, month_idx + 1, 15).isoformat(),
+                "paid_date": datetime(year, month_idx + 1, 5).isoformat() if status == 'paid' else None
+            })
+    
+    return payments
+
+@api_router.post("/building-payments/process")
+async def process_building_payment(data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Bina yöneticisi ödeme işlemi"""
+    payment_id = data.get("payment_id")
+    amount = data.get("amount")
+    period = data.get("period")
+    
+    # Paratika config kontrolü
+    paratika_config = await db.paratika_config.find_one({"id": "default"}, {"_id": 0})
+    
+    if not paratika_config or not paratika_config.get("is_active"):
+        # Paratika aktif değilse demo ödeme simülasyonu
+        await db.building_payments.update_one(
+            {"id": payment_id, "building_id": current_user.building_id},
+            {"$set": {
+                "status": "paid",
+                "paid_date": datetime.now(timezone.utc).isoformat(),
+                "payment_method": "demo"
+            }},
+            upsert=True
+        )
+        return {"success": True, "message": "Demo ödeme başarılı"}
+    
+    # Paratika ile ödeme oturumu oluştur
+    building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
+    
+    result = await paratika_service.create_session_token(
+        amount=float(amount),
+        currency="TRY",
+        order_id=payment_id,
+        customer_info={
+            "email": current_user.email,
+            "name": building.get("admin_name", "") if building else "",
+            "phone": building.get("admin_phone", "") if building else ""
+        },
+        return_url=paratika_config.get("return_url"),
+        cancel_url=paratika_config.get("cancel_url")
+    )
+    
+    if result.get("success"):
+        # Ödeme kaydını güncelle
+        await db.building_payments.update_one(
+            {"id": payment_id, "building_id": current_user.building_id},
+            {"$set": {
+                "session_token": result.get("session_token"),
+                "status": "processing",
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+        
+        return {
+            "success": True,
+            "payment_url": result.get("payment_url"),
+            "session_token": result.get("session_token")
+        }
+    else:
+        return {"success": False, "error": result.get("error", "Ödeme oturumu oluşturulamadı")}
+
 # Include routers
 from routes import push_notifications
 from routes import firebase_push
