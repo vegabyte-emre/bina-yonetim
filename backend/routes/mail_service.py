@@ -669,6 +669,521 @@ def get_mail_routes(db):
                 "is_active": True,
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            # ===== YENİ ŞABLONLAR =====
+            # 1. Superadmin'e yeni kayıt bildirimi
+            {
+                "id": str(uuid.uuid4()),
+                "name": "new_registration_admin",
+                "subject": "🆕 Yeni Bina Kaydı - {{building_name}}",
+                "description": "Landing page'den yeni kayıt olunduğunda superadmin'e gönderilir",
+                "variables": ["building_name", "manager_name", "manager_email", "manager_phone", "address", "apartment_count", "registration_date"],
+                "body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 40px 30px; }
+        .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .info-table td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
+        .info-table td:first-child { color: #6b7280; width: 40%; }
+        .info-table td:last-child { color: #1f2937; font-weight: 500; }
+        .button { display: inline-block; background: #F59E0B; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+        .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🆕 Yeni Bina Kaydı</h1>
+        </div>
+        <div class="content">
+            <p style="color: #4b5563;">Yeni bir bina yönetici kaydı alındı. Detaylar aşağıdadır:</p>
+            <table class="info-table">
+                <tr><td>Bina/Site Adı</td><td>{{building_name}}</td></tr>
+                <tr><td>Yönetici Adı</td><td>{{manager_name}}</td></tr>
+                <tr><td>E-posta</td><td>{{manager_email}}</td></tr>
+                <tr><td>Telefon</td><td>{{manager_phone}}</td></tr>
+                <tr><td>Adres</td><td>{{address}}</td></tr>
+                <tr><td>Daire Sayısı</td><td>{{apartment_count}}</td></tr>
+                <tr><td>Kayıt Tarihi</td><td>{{registration_date}}</td></tr>
+            </table>
+            <div style="text-align: center;">
+                <a href="https://admin.yonetioo.com/registration-requests" class="button">Başvuruları İncele</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2024 Yönetioo - Superadmin Paneli</p>
+        </div>
+    </div>
+</body>
+</html>
+                """,
+                "body_text": "Yeni bina kaydı: {{building_name}} - Yönetici: {{manager_name}} ({{manager_email}}) - Daire: {{apartment_count}} - Tarih: {{registration_date}}",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            # 2. Yeni kayıt yapan yöneticiye hoşgeldin maili
+            {
+                "id": str(uuid.uuid4()),
+                "name": "manager_welcome",
+                "subject": "🏠 Yönetioo'ya Hoş Geldiniz - Başvurunuz Alındı!",
+                "description": "Yeni kayıt olan bina yöneticisine gönderilir",
+                "variables": ["manager_name", "building_name", "registration_date"],
+                "body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 40px 30px; }
+        .content h2 { color: #1f2937; margin-top: 0; }
+        .content p { color: #4b5563; line-height: 1.6; }
+        .steps { background: #f3f4f6; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .step { display: flex; align-items: flex-start; margin-bottom: 15px; }
+        .step-number { background: #7C3AED; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px; flex-shrink: 0; }
+        .step-content { flex: 1; }
+        .step-title { font-weight: 600; color: #1f2937; }
+        .step-desc { color: #6b7280; font-size: 14px; margin-top: 4px; }
+        .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Yönetioo</h1>
+        </div>
+        <div class="content">
+            <h2>Hoş Geldiniz, {{manager_name}}! 👋</h2>
+            <p><strong>{{building_name}}</strong> için yönetici başvurunuz başarıyla alındı.</p>
+            <p>Başvuru Tarihi: <strong>{{registration_date}}</strong></p>
+            
+            <div class="steps">
+                <h3 style="margin-top: 0; color: #1f2937;">Sonraki Adımlar</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Başvuru İnceleme</div>
+                        <div class="step-desc">Ekibimiz başvurunuzu 24 saat içinde inceleyecektir.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Hesap Aktivasyonu</div>
+                        <div class="step-desc">Onay sonrası giriş bilgileriniz e-posta ile iletilecektir.</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Sistemi Kullanmaya Başlayın</div>
+                        <div class="step-desc">14 günlük ücretsiz deneme süreniz başlayacaktır.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="color: #9ca3af; font-size: 14px;">Sorularınız için <a href="mailto:destek@yonetioo.com" style="color: #7C3AED;">destek@yonetioo.com</a> adresinden bize ulaşabilirsiniz.</p>
+        </div>
+        <div class="footer">
+            <p>© 2024 Yönetioo - Akıllı Bina Yönetimi</p>
+        </div>
+    </div>
+</body>
+</html>
+                """,
+                "body_text": "Hoş Geldiniz {{manager_name}}! {{building_name}} için başvurunuz alındı. Ekibimiz 24 saat içinde inceleyecektir.",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            # 3. Abonelik ödeme hatırlatması (Superadmin -> Bina Yöneticisi)
+            {
+                "id": str(uuid.uuid4()),
+                "name": "subscription_reminder",
+                "subject": "💳 Abonelik Ödeme Hatırlatması - {{month}}",
+                "description": "Aylık abonelik ödemesi için bina yöneticilerine gönderilir",
+                "variables": ["manager_name", "building_name", "month", "amount", "due_date", "plan_name", "payment_link"],
+                "body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 40px 30px; }
+        .amount-box { background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border: 2px solid #6366F1; border-radius: 16px; padding: 30px; margin: 25px 0; text-align: center; }
+        .amount { font-size: 42px; font-weight: bold; color: #4F46E5; }
+        .plan-badge { display: inline-block; background: #6366F1; color: white; padding: 6px 16px; border-radius: 20px; font-size: 14px; margin-bottom: 15px; }
+        .button { display: inline-block; background: #6366F1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e5e7eb; }
+        .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Abonelik Hatırlatması</h1>
+        </div>
+        <div class="content">
+            <p style="color: #4b5563;">Sayın {{manager_name}},</p>
+            <p style="color: #4b5563;"><strong>{{building_name}}</strong> için {{month}} ayı abonelik ödemenizi hatırlatmak isteriz.</p>
+            
+            <div class="amount-box">
+                <span class="plan-badge">{{plan_name}}</span>
+                <p class="amount">{{amount}}</p>
+                <p style="margin: 0; color: #6b7280;">Son Ödeme Tarihi: <strong>{{due_date}}</strong></p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="{{payment_link}}" class="button">Ödeme Yap</a>
+            </div>
+            
+            <p style="color: #9ca3af; font-size: 14px; margin-top: 30px;">
+                ⚠️ Ödemenin son tarihe kadar yapılmaması durumunda hizmet kesintisi yaşanabilir.
+            </p>
+        </div>
+        <div class="footer">
+            <p>© 2024 Yönetioo - Akıllı Bina Yönetimi</p>
+        </div>
+    </div>
+</body>
+</html>
+                """,
+                "body_text": "Sayın {{manager_name}}, {{building_name}} için {{month}} ayı abonelik ödemesi: {{amount}} - Son Ödeme: {{due_date}} - Plan: {{plan_name}}",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            # 4. Aidat bildirimi (Bina Yönetici -> Sakinler) - Harcama detaylı
+            {
+                "id": str(uuid.uuid4()),
+                "name": "dues_notification",
+                "subject": "🏠 {{month}} Ayı Aidat Bildirimi - {{building_name}}",
+                "description": "Aylık aidat bildirimi, harcama detayları ile birlikte sakinlere gönderilir",
+                "variables": ["user_name", "building_name", "month", "amount", "due_date", "expense_details", "apartment_no", "previous_balance", "total_amount"],
+                "body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 40px 30px; }
+        .apartment-badge { display: inline-block; background: #D1FAE5; color: #065F46; padding: 8px 16px; border-radius: 8px; font-weight: 600; margin-bottom: 20px; }
+        .expense-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .expense-table th { background: #f3f4f6; padding: 12px; text-align: left; font-weight: 600; color: #374151; }
+        .expense-table td { padding: 12px; border-bottom: 1px solid #e5e7eb; color: #4b5563; }
+        .expense-table tr:last-child td { border-bottom: none; }
+        .total-box { background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); border: 2px solid #10B981; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .total-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .total-amount { font-size: 32px; font-weight: bold; color: #059669; text-align: center; margin-top: 15px; }
+        .button { display: inline-block; background: #10B981; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+        .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Aidat Bildirimi</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">{{month}}</p>
+        </div>
+        <div class="content">
+            <span class="apartment-badge">Daire {{apartment_no}}</span>
+            <p style="color: #4b5563;">Sayın {{user_name}},</p>
+            <p style="color: #4b5563;"><strong>{{building_name}}</strong> için {{month}} ayı aidat detaylarınız aşağıdadır.</p>
+            
+            <h3 style="color: #1f2937; margin-top: 30px;">📋 Harcama Detayları</h3>
+            <table class="expense-table">
+                <thead>
+                    <tr>
+                        <th>Açıklama</th>
+                        <th style="text-align: right;">Tutar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{expense_details}}
+                </tbody>
+            </table>
+            
+            <div class="total-box">
+                <div class="total-row">
+                    <span style="color: #6b7280;">Bu Ay Aidat</span>
+                    <span style="color: #1f2937; font-weight: 600;">{{amount}}</span>
+                </div>
+                <div class="total-row">
+                    <span style="color: #6b7280;">Önceki Bakiye</span>
+                    <span style="color: #1f2937; font-weight: 600;">{{previous_balance}}</span>
+                </div>
+                <hr style="border: none; border-top: 2px solid #10B981; margin: 15px 0;">
+                <div class="total-amount">{{total_amount}}</div>
+                <p style="text-align: center; color: #6b7280; margin: 10px 0 0 0;">Son Ödeme: {{due_date}}</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="#" class="button">Ödeme Yap</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Bu bildirim {{building_name}} yönetimi tarafından gönderilmiştir.</p>
+            <p>© 2024 Yönetioo - Akıllı Bina Yönetimi</p>
+        </div>
+    </div>
+</body>
+</html>
+                """,
+                "body_text": "Sayın {{user_name}}, {{building_name}} Daire {{apartment_no}} için {{month}} ayı aidat tutarı: {{total_amount}} - Son Ödeme: {{due_date}}",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            # 5. Toplantı/Oylama bildirimi
+            {
+                "id": str(uuid.uuid4()),
+                "name": "meeting_voting",
+                "subject": "🗳️ {{meeting_type}} - {{building_name}}",
+                "description": "Toplantı veya oylama bildirimi için sakinlere gönderilir",
+                "variables": ["user_name", "building_name", "meeting_type", "meeting_title", "meeting_date", "meeting_time", "meeting_location", "meeting_description", "vote_deadline"],
+                "body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .type-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; margin-top: 10px; }
+        .content { padding: 40px 30px; }
+        .meeting-card { background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%); border: 2px solid #8B5CF6; border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .meeting-title { font-size: 20px; font-weight: bold; color: #5B21B6; margin-bottom: 20px; }
+        .detail-row { display: flex; align-items: center; margin-bottom: 12px; color: #4b5563; }
+        .detail-icon { width: 24px; margin-right: 12px; color: #7C3AED; }
+        .button { display: inline-block; background: #8B5CF6; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+        .warning { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 15px; margin: 20px 0; color: #92400E; }
+        .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗳️ {{meeting_type}}</h1>
+            <span class="type-badge">{{building_name}}</span>
+        </div>
+        <div class="content">
+            <p style="color: #4b5563;">Sayın {{user_name}},</p>
+            <p style="color: #4b5563;">Aşağıdaki {{meeting_type}} hakkında bilgilendirilmenizi rica ederiz.</p>
+            
+            <div class="meeting-card">
+                <div class="meeting-title">{{meeting_title}}</div>
+                <div class="detail-row">
+                    <span class="detail-icon">📅</span>
+                    <span><strong>Tarih:</strong> {{meeting_date}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-icon">🕐</span>
+                    <span><strong>Saat:</strong> {{meeting_time}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-icon">📍</span>
+                    <span><strong>Yer:</strong> {{meeting_location}}</span>
+                </div>
+                <hr style="border: none; border-top: 1px solid #DDD6FE; margin: 20px 0;">
+                <p style="color: #4b5563; margin: 0;">{{meeting_description}}</p>
+            </div>
+            
+            <div class="warning">
+                ⚠️ Oylama için son tarih: <strong>{{vote_deadline}}</strong>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="#" class="button">Oylamaya Katıl</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2024 Yönetioo - Akıllı Bina Yönetimi</p>
+        </div>
+    </div>
+</body>
+</html>
+                """,
+                "body_text": "{{meeting_type}}: {{meeting_title}} - Tarih: {{meeting_date}} {{meeting_time}} - Yer: {{meeting_location}} - Son Oylama: {{vote_deadline}}",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            # 6. Ödeme başarılı bildirimi
+            {
+                "id": str(uuid.uuid4()),
+                "name": "payment_success",
+                "subject": "✅ Ödeme Başarılı - {{building_name}}",
+                "description": "Aidat ödemesi başarılı olduğunda sakinlere gönderilir",
+                "variables": ["user_name", "building_name", "apartment_no", "amount", "payment_date", "payment_method", "receipt_no", "month"],
+                "body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .success-icon { font-size: 48px; margin-bottom: 15px; }
+        .content { padding: 40px 30px; }
+        .receipt-box { background: #f9fafb; border: 2px dashed #d1d5db; border-radius: 12px; padding: 25px; margin: 25px 0; }
+        .receipt-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e5e7eb; }
+        .receipt-row:last-child { border-bottom: none; }
+        .receipt-total { font-size: 24px; font-weight: bold; color: #059669; text-align: center; margin-top: 20px; padding-top: 20px; border-top: 2px solid #10B981; }
+        .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="success-icon">✅</div>
+            <h1>Ödeme Başarılı!</h1>
+        </div>
+        <div class="content">
+            <p style="color: #4b5563;">Sayın {{user_name}},</p>
+            <p style="color: #4b5563;">{{building_name}} için {{month}} ayı aidat ödemeniz başarıyla alınmıştır.</p>
+            
+            <div class="receipt-box">
+                <h3 style="margin-top: 0; color: #1f2937; text-align: center;">🧾 Ödeme Makbuzu</h3>
+                <div class="receipt-row">
+                    <span style="color: #6b7280;">Makbuz No</span>
+                    <span style="color: #1f2937; font-weight: 600;">{{receipt_no}}</span>
+                </div>
+                <div class="receipt-row">
+                    <span style="color: #6b7280;">Daire</span>
+                    <span style="color: #1f2937;">{{apartment_no}}</span>
+                </div>
+                <div class="receipt-row">
+                    <span style="color: #6b7280;">Dönem</span>
+                    <span style="color: #1f2937;">{{month}}</span>
+                </div>
+                <div class="receipt-row">
+                    <span style="color: #6b7280;">Ödeme Tarihi</span>
+                    <span style="color: #1f2937;">{{payment_date}}</span>
+                </div>
+                <div class="receipt-row">
+                    <span style="color: #6b7280;">Ödeme Yöntemi</span>
+                    <span style="color: #1f2937;">{{payment_method}}</span>
+                </div>
+                <div class="receipt-total">{{amount}}</div>
+            </div>
+            
+            <p style="color: #9ca3af; font-size: 14px; text-align: center;">Bu makbuzu yazdırabilir veya kaydedebilirsiniz.</p>
+        </div>
+        <div class="footer">
+            <p>Teşekkür ederiz!</p>
+            <p>© 2024 Yönetioo - Akıllı Bina Yönetimi</p>
+        </div>
+    </div>
+</body>
+</html>
+                """,
+                "body_text": "Ödeme Başarılı! {{building_name}} - Daire {{apartment_no}} - {{month}} ayı: {{amount}} - Makbuz: {{receipt_no}} - Tarih: {{payment_date}}",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            # 7. Ödeme başarısız bildirimi
+            {
+                "id": str(uuid.uuid4()),
+                "name": "payment_failed",
+                "subject": "❌ Ödeme Başarısız - {{building_name}}",
+                "description": "Aidat ödemesi başarısız olduğunda sakinlere gönderilir",
+                "variables": ["user_name", "building_name", "apartment_no", "amount", "payment_date", "error_message", "month"],
+                "body_html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); color: white; padding: 40px 30px; text-align: center; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .error-icon { font-size: 48px; margin-bottom: 15px; }
+        .content { padding: 40px 30px; }
+        .error-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px; padding: 20px; margin: 25px 0; }
+        .error-title { color: #991B1B; font-weight: 600; margin-bottom: 10px; }
+        .error-message { color: #DC2626; }
+        .info-box { background: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; }
+        .button { display: inline-block; background: #EF4444; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; }
+        .footer { background: #f9fafb; padding: 20px 30px; text-align: center; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="error-icon">❌</div>
+            <h1>Ödeme Başarısız</h1>
+        </div>
+        <div class="content">
+            <p style="color: #4b5563;">Sayın {{user_name}},</p>
+            <p style="color: #4b5563;">{{building_name}} için {{month}} ayı aidat ödemeniz gerçekleştirilemedi.</p>
+            
+            <div class="error-box">
+                <div class="error-title">⚠️ Hata Detayı</div>
+                <div class="error-message">{{error_message}}</div>
+            </div>
+            
+            <div class="info-box">
+                <div class="info-row">
+                    <span style="color: #6b7280;">Daire</span>
+                    <span style="color: #1f2937;">{{apartment_no}}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280;">Dönem</span>
+                    <span style="color: #1f2937;">{{month}}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280;">Tutar</span>
+                    <span style="color: #1f2937; font-weight: 600;">{{amount}}</span>
+                </div>
+                <div class="info-row">
+                    <span style="color: #6b7280;">Deneme Tarihi</span>
+                    <span style="color: #1f2937;">{{payment_date}}</span>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="#" class="button">Tekrar Dene</a>
+            </div>
+            
+            <p style="color: #9ca3af; font-size: 14px;">Sorun devam ederse lütfen yöneticinizle iletişime geçin.</p>
+        </div>
+        <div class="footer">
+            <p>© 2024 Yönetioo - Akıllı Bina Yönetimi</p>
+        </div>
+    </div>
+</body>
+</html>
+                """,
+                "body_text": "Ödeme Başarısız! {{building_name}} - Daire {{apartment_no}} - {{month}} ayı: {{amount}} - Hata: {{error_message}}",
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
             }
         ]
         
