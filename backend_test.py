@@ -93,40 +93,26 @@ class MonthlyDuesTester:
             self.log_test("Get Building Info", False, f"Building info request failed: {str(e)}")
             return False
     
-    def test_get_registration_requests(self):
-        """Test fetching all registration requests as superadmin"""
+    def test_get_monthly_dues_initial(self):
+        """Test getting monthly dues list (should be empty or have existing items)"""
         try:
-            response = self.session.get(f"{BASE_URL}/registration-requests")
+            response = self.session.get(f"{BASE_URL}/monthly-dues")
             
             if response.status_code == 200:
                 data = response.json()
                 if isinstance(data, list):
-                    # Check if our test request is in the list
-                    test_request = None
-                    for req in data:
-                        if req.get("id") == getattr(self, 'request_id', None):
-                            test_request = req
-                            break
-                    
-                    if test_request:
-                        if test_request.get("status") == "pending":
-                            self.log_test("Get Registration Requests", True, f"Found test request with pending status. Total requests: {len(data)}")
-                            return True
-                        else:
-                            self.log_test("Get Registration Requests", False, f"Test request status is {test_request.get('status')}, expected 'pending'")
-                            return False
-                    else:
-                        self.log_test("Get Registration Requests", False, f"Test request not found in list of {len(data)} requests")
-                        return False
+                    self.initial_dues_count = len(data)
+                    self.log_test("Get Monthly Dues (Initial)", True, f"Retrieved monthly dues list with {len(data)} items")
+                    return True
                 else:
-                    self.log_test("Get Registration Requests", False, "Response is not a list", data)
+                    self.log_test("Get Monthly Dues (Initial)", False, "Response is not a list", data)
                     return False
             else:
-                self.log_test("Get Registration Requests", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Get Monthly Dues (Initial)", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Get Registration Requests", False, f"Get requests failed: {str(e)}")
+            self.log_test("Get Monthly Dues (Initial)", False, f"Get monthly dues failed: {str(e)}")
             return False
     
     def test_approve_registration_request(self):
