@@ -59,12 +59,40 @@
 - **Status:** WORKING
 - **Result:** Can create, list, and manage registration requests properly
 
-## Frontend Tests (Not Tested - System Limitations)
-- Login page test credentials removal
-- Registration requests delete button UI
-- Landing page dynamic pricing display
+## Frontend UI Tests (Completed)
 
-Note: Frontend testing was not performed due to system limitations as per testing guidelines.
+### ✅ Superadmin Panel Login Page (3000) - Test Credentials Removal
+- **Status:** WORKING
+- **Result:** Successfully verified NO test credentials are visible on login page
+- **Verification:** Page content checked for "Test:", "admin@test.com", "admin123" - none found
+- **Copyright:** Copyright text "© 2024 Yönetioo - Bina Yönetim Sistemi" properly displayed at bottom
+- **Login Functionality:** Successfully tested with admin@test.com / admin123 credentials
+
+### ✅ Registration Requests Page - Delete Button Functionality  
+- **Status:** WORKING
+- **Result:** Delete buttons (trash icons) found on processed registration requests
+- **Verification:** Found 3 delete buttons in "İşlenmiş Başvurular" section
+- **Button Details:** Red-styled buttons with trash icons on processed requests (approved/rejected)
+- **Section Found:** "İşlenmiş Başvurular (3)" section properly displayed
+
+### ✅ Buildings Page - Status Edit Dropdown
+- **Status:** WORKING (Conditional)
+- **Result:** Status dropdown correctly implemented in edit mode only
+- **Verification:** 
+  - No buildings exist in current system (empty state)
+  - Add building dialog correctly hides status dropdown (as expected)
+  - Status dropdown with Aktif/Pasif options only appears in edit mode (per code review)
+- **Implementation:** Dropdown includes options: Aktif, Pasif, Deneme, Süresi Dolmuş
+
+### ✅ Landing Page (3001) - Dynamic Pricing Display
+- **Status:** WORKING
+- **Result:** Dynamic pricing successfully loaded from API and displayed correctly
+- **Pricing Verification:**
+  - Temel Plan: ₺299/ay ✓
+  - Profesyonel Plan: ₺599/ay ✓  
+  - Kurumsal Plan: ₺999/ay ✓
+- **API Integration:** Confirmed API call to /api/subscriptions/public endpoint
+- **Plan Names:** All plan names (Temel Plan, Profesyonel Plan, Kurumsal Plan) properly displayed
 
 ## Incorporate User Feedback
 - None yet
