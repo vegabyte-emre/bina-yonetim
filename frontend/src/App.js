@@ -72,6 +72,7 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/registration-requests" element={<RegistrationRequests />} />
           <Route path="/subscriptions" element={<Subscriptions />} />
+          <Route path="/finance" element={<FinanceManagement />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/mail-settings" element={<MailSettings />} />
         </Route>
