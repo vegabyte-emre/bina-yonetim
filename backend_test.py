@@ -69,39 +69,28 @@ class MonthlyDuesTester:
             self.log_test("Building Admin Login", False, f"Login request failed: {str(e)}")
             return False
     
-    def test_create_registration_request(self):
-        """Test creating a new registration request"""
+    def test_get_building_info(self):
+        """Test getting building manager's building info"""
         try:
-            request_data = {
-                "building_name": "Test Sitesi",
-                "manager_name": "Ahmet Yılmaz", 
-                "email": "testmanager@example.com",
-                "phone": "05301234567",
-                "address": "Istanbul, Kadıköy",
-                "apartment_count": "50"
-            }
-            
-            response = self.session.post(
-                f"{BASE_URL}/registration-requests",
-                json=request_data,
-                headers={"Content-Type": "application/json"}
-            )
+            response = self.session.get(f"{BASE_URL}/building-manager/my-building")
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success") and data.get("request_id"):
-                    self.request_id = data["request_id"]
-                    self.log_test("Create Registration Request", True, f"Registration request created with ID: {self.request_id}")
+                if data.get("id") and data.get("name"):
+                    self.building_id = data["id"]
+                    building_name = data["name"]
+                    apartment_count = data.get("apartment_count", 0)
+                    self.log_test("Get Building Info", True, f"Building info retrieved: {building_name} (ID: {self.building_id}, Apartments: {apartment_count})")
                     return True
                 else:
-                    self.log_test("Create Registration Request", False, "Invalid response format", data)
+                    self.log_test("Get Building Info", False, "Invalid building data format", data)
                     return False
             else:
-                self.log_test("Create Registration Request", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Get Building Info", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Create Registration Request", False, f"Request creation failed: {str(e)}")
+            self.log_test("Get Building Info", False, f"Building info request failed: {str(e)}")
             return False
     
     def test_get_registration_requests(self):
