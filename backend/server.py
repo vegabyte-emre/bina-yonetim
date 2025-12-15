@@ -286,6 +286,91 @@ class MonthlyDueDefinition(MonthlyDueDefinitionBase):
     created_at: datetime
     sent_at: Optional[datetime] = None
 
+# ============ SURVEY MODELS ============
+
+class SurveyQuestion(BaseModel):
+    question: str
+    options: List[str]
+
+class SurveyBase(BaseModel):
+    building_id: str
+    title: str
+    description: Optional[str] = None
+    questions: List[SurveyQuestion]
+    end_date: datetime
+    status: str = "active"  # active, completed, cancelled
+
+class SurveyCreate(SurveyBase):
+    pass
+
+class Survey(SurveyBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    created_by: str
+    responses: int = 0
+    created_at: datetime
+
+# ============ VOTING MODELS ============
+
+class VotingBase(BaseModel):
+    building_id: str
+    title: str
+    description: str
+    end_date: datetime
+    status: str = "active"  # active, completed
+
+class VotingCreate(VotingBase):
+    pass
+
+class Voting(VotingBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    yes_votes: int = 0
+    no_votes: int = 0
+    abstain_votes: int = 0
+    created_at: datetime
+
+# ============ MEETING MODELS ============
+
+class MeetingBase(BaseModel):
+    building_id: str
+    title: str
+    description: Optional[str] = None
+    date: datetime
+    time: str
+    location: str
+    agenda: Optional[str] = None
+    status: str = "scheduled"  # scheduled, completed, cancelled
+
+class MeetingCreate(MeetingBase):
+    pass
+
+class Meeting(MeetingBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    attendees: List[str] = []
+    notes: Optional[str] = None
+    created_at: datetime
+
+# ============ DECISION MODELS ============
+
+class DecisionBase(BaseModel):
+    building_id: str
+    title: str
+    description: str
+    decision_type: str  # management, general_assembly, emergency
+    decision_date: datetime
+    decision_number: str
+
+class DecisionCreate(DecisionBase):
+    pass
+
+class Decision(DecisionBase):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    created_by: str
+    created_at: datetime
+
 class AnnouncementBase(BaseModel):
     building_id: str
     title: str
