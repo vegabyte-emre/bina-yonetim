@@ -229,11 +229,11 @@ const MailGonder = () => {
     handleSendMail('meeting_voting', {
       meeting_type: meetingForm.meeting_type,
       meeting_title: meetingForm.meeting_title,
-      meeting_date: meetingForm.meeting_date,
+      meeting_date: formatDateTR(meetingForm.meeting_date),
       meeting_time: meetingForm.meeting_time,
       meeting_location: meetingForm.meeting_location,
       meeting_description: meetingForm.meeting_description,
-      vote_deadline: meetingForm.vote_deadline
+      vote_deadline: formatDateTR(meetingForm.vote_deadline)
     });
   };
 
