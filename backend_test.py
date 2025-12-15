@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Superadmin Registration Requests Flow
-Tests the complete registration request workflow including creation, approval, and rejection.
+Backend API Testing for Monthly Dues Management (Aidat Yönetimi) System
+Tests the complete monthly dues workflow including creation, listing, and mail sending.
 """
 
 import requests
@@ -11,8 +11,8 @@ from datetime import datetime
 
 # Configuration
 BASE_URL = "https://smart-bms.preview.emergentagent.com/api"
-SUPERADMIN_EMAIL = "admin@test.com"
-SUPERADMIN_PASSWORD = "admin123"
+BUILDING_ADMIN_EMAIL = "ahmet@mavirezidans.com"
+BUILDING_ADMIN_PASSWORD = "admin123"
 
 class RegistrationRequestTester:
     def __init__(self):
