@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Mail, Send, Users, DollarSign, Calendar, CheckCircle, 
-  XCircle, FileText, Loader2, AlertCircle, ChevronDown
+  Mail, Send, Users, Calendar, CheckCircle, 
+  XCircle, Loader2, AlertCircle
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -20,14 +20,6 @@ const MailGonder = () => {
   const [residentsWithEmail, setResidentsWithEmail] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [sending, setSending] = useState(false);
-  
-  // Form states for each template
-  const [duesForm, setDuesForm] = useState({
-    month: '',
-    amount: '',
-    due_date: '',
-    expense_details: ''
-  });
   
   const [meetingForm, setMeetingForm] = useState({
     meeting_type: 'Toplantı',
