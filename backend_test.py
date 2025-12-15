@@ -132,48 +132,42 @@ class SuperadminPanelTester:
             self.log_test("Get Registration Requests", False, f"Get registration requests failed: {str(e)}")
             return False
     
-    def test_create_monthly_due(self):
-        """Test creating a new monthly due with expense items"""
+    def test_create_registration_request(self):
+        """Test creating a new registration request (public endpoint)"""
         try:
-            if not self.building_id:
-                self.log_test("Create Monthly Due", False, "No building ID available")
-                return False
+            # Create a new session without auth headers for this test
+            public_session = requests.Session()
             
-            monthly_due_data = {
-                "building_id": self.building_id,
-                "month": "Şubat 2025",
-                "expense_items": [
-                    {"name": "Elektrik", "amount": 10000},
-                    {"name": "Su", "amount": 5000},
-                    {"name": "Temizlik", "amount": 3000}
-                ],
-                "total_amount": 18000,
-                "per_apartment_amount": 367.35,
-                "due_date": "2025-02-28T00:00:00Z",
-                "is_sent": False
+            registration_data = {
+                "building_name": "Test Building for API Testing",
+                "manager_name": "Test Manager",
+                "email": f"test.manager.{datetime.now().strftime('%Y%m%d%H%M%S')}@example.com",
+                "phone": "+90 555 123 4567",
+                "address": "Test Address, Test District, Test City",
+                "apartment_count": "50"
             }
             
-            response = self.session.post(
-                f"{BASE_URL}/monthly-dues",
-                json=monthly_due_data,
+            response = public_session.post(
+                f"{BASE_URL}/registration-requests",
+                json=registration_data,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success") and data.get("id"):
-                    self.monthly_due_id = data["id"]
-                    self.log_test("Create Monthly Due", True, f"Monthly due created successfully with ID: {self.monthly_due_id}")
+                if data.get("success") and data.get("request_id"):
+                    self.created_registration_request_id = data["request_id"]
+                    self.log_test("Create Registration Request", True, f"Registration request created successfully with ID: {self.created_registration_request_id}")
                     return True
                 else:
-                    self.log_test("Create Monthly Due", False, "Invalid response format", data)
+                    self.log_test("Create Registration Request", False, "Invalid response format", data)
                     return False
             else:
-                self.log_test("Create Monthly Due", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Create Registration Request", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Create Monthly Due", False, f"Monthly due creation failed: {str(e)}")
+            self.log_test("Create Registration Request", False, f"Registration request creation failed: {str(e)}")
             return False
     
     def test_get_monthly_dues_after_creation(self):
