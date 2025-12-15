@@ -532,9 +532,10 @@ const LandingPage = () => {
                   className="w-full py-3 rounded-xl border-2 border-[#0071e3] text-[#0071e3] font-medium hover:bg-[#0071e3] hover:text-white transition-all"
                 >
                   İletişime Geç
-              </button>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
