@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Bell, Calendar, Image as ImageIcon, Send, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Bell, Calendar, Image as ImageIcon, Send, Edit, Trash2, Eye, Mail, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
@@ -31,6 +31,7 @@ const AnnouncementsNew = () => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [sendingNotification, setSendingNotification] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(null); // announcement id
   
   const [formData, setFormData] = useState({
     title: '',
