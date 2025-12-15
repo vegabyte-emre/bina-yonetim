@@ -37,6 +37,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/voting', icon: ThumbsUp, label: 'Oylamalar' },
     { path: '/meetings', icon: Calendar, label: 'Toplantılar' },
     { path: '/decisions', icon: CheckSquare, label: 'Kararlar' },
+    { path: '/mail-gonder', icon: Mail, label: 'Mail Gönder' },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
 
