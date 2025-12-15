@@ -173,20 +173,23 @@ frontend:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
-  run_ui: false
+  version: "1.1"
+  test_sequence: 2
+  run_ui: true
 
 test_plan:
   current_focus:
-    - "Building Admin Login"
-    - "GET /api/monthly-dues"
-    - "POST /api/monthly-dues"
-    - "GET /api/building-manager/my-building"
+    - "Admin Panel Login UI"
+    - "Dues Page Navigation (/dues)"
+    - "Monthly Due Creation Form"
+    - "Total Calculation UI"
+    - "Mail Send Button UI"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
   - agent: "testing"
     message: "✅ ALL BACKEND TESTS PASSED: Monthly Dues Management system is fully functional. All 8 backend API tests completed successfully including login, building info retrieval, monthly dues CRUD operations, and mail sending. The system correctly handles expense items (Elektrik, Su, Temizlik), calculates totals (₺18,000) and per-apartment amounts (₺367.35). Mail service integration is working but no residents have email addresses configured. Frontend testing was not performed due to system limitations but all supporting backend APIs are operational."
+  - agent: "testing"
+    message: "✅ COMPREHENSIVE UI TESTING COMPLETED: Building Manager Admin Panel (localhost:3001) fully functional. Fixed ChevronDown import issue in MailGonder.jsx. All test scenarios passed: Login (ahmet@mavirezidans.com/admin123), Aidat Yönetimi navigation, form creation with expense items, real-time calculations (₺22,000 total, ₺448.98 per apartment), and Mail Gönder page verification. UI is responsive and well-styled. Monthly Dues Management system ready for production use."
