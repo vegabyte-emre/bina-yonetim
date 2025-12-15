@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Superadmin Panel New Integrations
+Backend API Testing for Superadmin Panel New Integrations + Building Manager Payments
 Tests the new integrations:
 1. Netgsm Config APIs (GET/POST config, POST test)
 2. Paratika Config APIs (GET/POST config, POST test)
 3. Subscription-payments endpoint verification
-4. Previous functionality verification
+4. Building Manager Payments (GET /api/building-payments, POST /api/building-payments/process)
+5. Previous functionality verification
 """
 
 import requests
