@@ -382,92 +382,156 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Starter */}
-            <div className="rounded-2xl bg-white border border-gray-200 p-6 md:p-8 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
-              <div className="mb-6">
-                <h3 className="text-[#86868b] text-sm font-medium mb-2">Başlangıç</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[40px] font-semibold text-[#1d1d1f]">₺499</span>
-                  <span className="text-[#86868b]">/ay</span>
-                </div>
-                <p className="text-sm text-[#86868b] mt-2">Küçük apartmanlar için</p>
-              </div>
-              
-              <ul className="space-y-3 mb-8">
-                {['50 daireye kadar', 'Temel özellikler', 'Mobil uygulama', 'E-posta desteği'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-[#1d1d1f]">
-                    <CheckCircle size={18} className="text-[#86868b] flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              
-              <button 
-                onClick={() => scrollToSection('signup')}
-                className="w-full py-3 rounded-xl border-2 border-[#0071e3] text-[#0071e3] font-medium hover:bg-[#0071e3] hover:text-white transition-all"
-              >
-                Başla
-              </button>
+          {/* Dynamic Plans from API */}
+          {subscriptionPlans.length > 0 ? (
+            <div className={`grid gap-6 ${subscriptionPlans.length === 1 ? 'md:grid-cols-1 max-w-md mx-auto' : subscriptionPlans.length === 2 ? 'md:grid-cols-2 max-w-2xl mx-auto' : 'md:grid-cols-3'}`}>
+              {subscriptionPlans.map((plan, index) => {
+                const isPopular = index === 1 || subscriptionPlans.length === 1;
+                return (
+                  <div 
+                    key={plan.id} 
+                    className={`rounded-2xl p-6 md:p-8 transition-all duration-300 ${
+                      isPopular 
+                        ? 'bg-[#1d1d1f] text-white relative overflow-hidden transform md:-translate-y-4 shadow-xl' 
+                        : 'bg-white border border-gray-200 hover:border-gray-300 hover:shadow-lg'
+                    }`}
+                  >
+                    {isPopular && (
+                      <div className="absolute top-4 right-4">
+                        <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">Popüler</span>
+                      </div>
+                    )}
+                    
+                    <div className="mb-6">
+                      <h3 className={`text-sm font-medium mb-2 ${isPopular ? 'text-white/60' : 'text-[#86868b]'}`}>
+                        {plan.name}
+                      </h3>
+                      <div className="flex items-baseline gap-1">
+                        <span className={`text-[40px] font-semibold ${isPopular ? 'text-white' : 'text-[#1d1d1f]'}`}>
+                          ₺{plan.price_monthly?.toLocaleString('tr-TR')}
+                        </span>
+                        <span className={isPopular ? 'text-white/60' : 'text-[#86868b]'}>/ay</span>
+                      </div>
+                      <p className={`text-sm mt-2 ${isPopular ? 'text-white/60' : 'text-[#86868b]'}`}>
+                        {plan.description || `${plan.max_apartments} daireye kadar`}
+                      </p>
+                    </div>
+                    
+                    <ul className="space-y-3 mb-8">
+                      <li className={`flex items-center gap-3 text-sm ${isPopular ? 'text-white/90' : 'text-[#1d1d1f]'}`}>
+                        <CheckCircle size={18} className={isPopular ? 'text-blue-400 flex-shrink-0' : 'text-[#86868b] flex-shrink-0'} />
+                        {plan.max_apartments === 999999 || plan.max_apartments > 1000 ? 'Sınırsız daire' : `${plan.max_apartments} daireye kadar`}
+                      </li>
+                      {plan.features?.map((feature, i) => (
+                        <li key={i} className={`flex items-center gap-3 text-sm ${isPopular ? 'text-white/90' : 'text-[#1d1d1f]'}`}>
+                          <CheckCircle size={18} className={isPopular ? 'text-blue-400 flex-shrink-0' : 'text-[#86868b] flex-shrink-0'} />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <button 
+                      onClick={() => scrollToSection('signup')}
+                      className={`w-full py-3 rounded-xl font-medium transition-all ${
+                        isPopular 
+                          ? 'bg-[#0071e3] text-white hover:bg-[#0077ed]' 
+                          : 'border-2 border-[#0071e3] text-[#0071e3] hover:bg-[#0071e3] hover:text-white'
+                      }`}
+                    >
+                      Başla
+                    </button>
+                  </div>
+                );
+              })}
             </div>
-
-            {/* Pro - Popular */}
-            <div className="rounded-2xl bg-[#1d1d1f] p-6 md:p-8 text-white relative overflow-hidden transform md:-translate-y-4 shadow-xl">
-              <div className="absolute top-4 right-4">
-                <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">Popüler</span>
-              </div>
-              
-              <div className="mb-6">
-                <h3 className="text-white/60 text-sm font-medium mb-2">Profesyonel</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[40px] font-semibold">₺999</span>
-                  <span className="text-white/60">/ay</span>
+          ) : (
+            /* Fallback - Static Plans */
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Starter */}
+              <div className="rounded-2xl bg-white border border-gray-200 p-6 md:p-8 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+                <div className="mb-6">
+                  <h3 className="text-[#86868b] text-sm font-medium mb-2">Başlangıç</h3>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[40px] font-semibold text-[#1d1d1f]">₺499</span>
+                    <span className="text-[#86868b]">/ay</span>
+                  </div>
+                  <p className="text-sm text-[#86868b] mt-2">Küçük apartmanlar için</p>
                 </div>
-                <p className="text-sm text-white/60 mt-2">Büyüyen siteler için</p>
+                
+                <ul className="space-y-3 mb-8">
+                  {['50 daireye kadar', 'Temel özellikler', 'Mobil uygulama', 'E-posta desteği'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm text-[#1d1d1f]">
+                      <CheckCircle size={18} className="text-[#86868b] flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                
+                <button 
+                  onClick={() => scrollToSection('signup')}
+                  className="w-full py-3 rounded-xl border-2 border-[#0071e3] text-[#0071e3] font-medium hover:bg-[#0071e3] hover:text-white transition-all"
+                >
+                  Başla
+                </button>
               </div>
-              
-              <ul className="space-y-3 mb-8">
-                {['200 daireye kadar', 'Tüm özellikler', 'Push bildirimler', 'Öncelikli destek', 'Detaylı raporlar'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-white/90">
-                    <CheckCircle size={18} className="text-blue-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              
-              <button 
-                onClick={() => scrollToSection('signup')}
-                className="w-full py-3 rounded-xl bg-[#0071e3] text-white font-medium hover:bg-[#0077ed] transition-all"
-              >
-                Başla
-              </button>
-            </div>
 
-            {/* Enterprise */}
-            <div className="rounded-2xl bg-white border border-gray-200 p-6 md:p-8 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
-              <div className="mb-6">
-                <h3 className="text-[#86868b] text-sm font-medium mb-2">Kurumsal</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[40px] font-semibold text-[#1d1d1f]">₺1999</span>
-                  <span className="text-[#86868b]">/ay</span>
+              {/* Pro - Popular */}
+              <div className="rounded-2xl bg-[#1d1d1f] p-6 md:p-8 text-white relative overflow-hidden transform md:-translate-y-4 shadow-xl">
+                <div className="absolute top-4 right-4">
+                  <span className="px-3 py-1 bg-white/10 rounded-full text-xs font-medium">Popüler</span>
                 </div>
-                <p className="text-sm text-[#86868b] mt-2">Büyük siteler için</p>
+                
+                <div className="mb-6">
+                  <h3 className="text-white/60 text-sm font-medium mb-2">Profesyonel</h3>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[40px] font-semibold">₺999</span>
+                    <span className="text-white/60">/ay</span>
+                  </div>
+                  <p className="text-sm text-white/60 mt-2">Büyüyen siteler için</p>
+                </div>
+                
+                <ul className="space-y-3 mb-8">
+                  {['200 daireye kadar', 'Tüm özellikler', 'Push bildirimler', 'Öncelikli destek', 'Detaylı raporlar'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm text-white/90">
+                      <CheckCircle size={18} className="text-blue-400 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                
+                <button 
+                  onClick={() => scrollToSection('signup')}
+                  className="w-full py-3 rounded-xl bg-[#0071e3] text-white font-medium hover:bg-[#0077ed] transition-all"
+                >
+                  Başla
+                </button>
               </div>
-              
-              <ul className="space-y-3 mb-8">
-                {['Sınırsız daire', 'Tüm özellikler', 'API erişimi', 'Özel destek', 'SLA garantisi'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-[#1d1d1f]">
-                    <CheckCircle size={18} className="text-[#86868b] flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              
-              <button 
-                onClick={() => scrollToSection('signup')}
-                className="w-full py-3 rounded-xl border-2 border-[#0071e3] text-[#0071e3] font-medium hover:bg-[#0071e3] hover:text-white transition-all"
-              >
-                İletişime Geç
+
+              {/* Enterprise */}
+              <div className="rounded-2xl bg-white border border-gray-200 p-6 md:p-8 hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+                <div className="mb-6">
+                  <h3 className="text-[#86868b] text-sm font-medium mb-2">Kurumsal</h3>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[40px] font-semibold text-[#1d1d1f]">₺1999</span>
+                    <span className="text-[#86868b]">/ay</span>
+                  </div>
+                  <p className="text-sm text-[#86868b] mt-2">Büyük siteler için</p>
+                </div>
+                
+                <ul className="space-y-3 mb-8">
+                  {['Sınırsız daire', 'Tüm özellikler', 'API erişimi', 'Özel destek', 'SLA garantisi'].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-sm text-[#1d1d1f]">
+                      <CheckCircle size={18} className="text-[#86868b] flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                
+                <button 
+                  onClick={() => scrollToSection('signup')}
+                  className="w-full py-3 rounded-xl border-2 border-[#0071e3] text-[#0071e3] font-medium hover:bg-[#0071e3] hover:text-white transition-all"
+                >
+                  İletişime Geç
               </button>
             </div>
           </div>
