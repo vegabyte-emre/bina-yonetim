@@ -380,6 +380,139 @@ def get_mail_routes(db):
             bcc=request.bcc
         )
     
+    # --- Bulk Mail Routes (Bina Yönetici için) ---
+    
+    @router.post("/send-to-residents")
+    async def send_mail_to_residents(
+        template_name: str,
+        variables: Dict[str, Any],
+        building_id: str
+    ):
+        """Bir binadaki tüm sakinlere mail gönder"""
+        # Aktif sakinleri bul
+        residents = await db.residents.find(
+            {"building_id": building_id, "is_active": True, "email": {"$ne": None}},
+            {"_id": 0, "email": 1, "full_name": 1, "apartment_id": 1}
+        ).to_list(1000)
+        
+        if not residents:
+            return {"success": False, "message": "Gönderilecek sakin bulunamadı", "sent_count": 0}
+        
+        sent_count = 0
+        failed_count = 0
+        
+        for resident in residents:
+            if resident.get("email"):
+                try:
+                    # Kişiye özel değişkenler ekle
+                    resident_vars = {**variables}
+                    resident_vars["user_name"] = resident.get("full_name", "Sakin")
+                    
+                    # Daire bilgisi ekle
+                    if resident.get("apartment_id"):
+                        apartment = await db.apartments.find_one(
+                            {"id": resident["apartment_id"]},
+                            {"_id": 0, "apartment_number": 1}
+                        )
+                        if apartment:
+                            resident_vars["apartment_no"] = apartment.get("apartment_number", "-")
+                    
+                    await mail_service.send_with_template(
+                        to=[resident["email"]],
+                        template_name=template_name,
+                        variables=resident_vars
+                    )
+                    sent_count += 1
+                except Exception as e:
+                    print(f"Mail error for {resident['email']}: {e}")
+                    failed_count += 1
+        
+        return {
+            "success": True,
+            "message": f"{sent_count} mail gönderildi, {failed_count} başarısız",
+            "sent_count": sent_count,
+            "failed_count": failed_count
+        }
+    
+    @router.post("/send-announcement-email")
+    async def send_announcement_email(
+        building_id: str,
+        announcement_title: str,
+        announcement_content: str
+    ):
+        """Duyuruyu tüm sakinlere mail olarak gönder"""
+        # Bina bilgisi
+        building = await db.buildings.find_one({"id": building_id}, {"_id": 0, "name": 1})
+        building_name = building.get("name", "Bina") if building else "Bina"
+        
+        # Sakinlere mail gönder
+        return await send_mail_to_residents(
+            template_name="announcement",
+            variables={
+                "building_name": building_name,
+                "announcement_title": announcement_title,
+                "announcement_content": announcement_content,
+                "announcement_date": datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M")
+            },
+            building_id=building_id
+        )
+    
+    @router.post("/send-dues-notification")
+    async def send_dues_notification(
+        building_id: str,
+        month: str,
+        amount: str,
+        due_date: str,
+        expense_details: str = ""
+    ):
+        """Aidat bildirimini tüm sakinlere gönder"""
+        building = await db.buildings.find_one({"id": building_id}, {"_id": 0, "name": 1})
+        building_name = building.get("name", "Bina") if building else "Bina"
+        
+        return await send_mail_to_residents(
+            template_name="dues_notification",
+            variables={
+                "building_name": building_name,
+                "month": month,
+                "amount": amount,
+                "due_date": due_date,
+                "expense_details": expense_details,
+                "previous_balance": "₺0",
+                "total_amount": amount
+            },
+            building_id=building_id
+        )
+    
+    @router.post("/send-meeting-notification")
+    async def send_meeting_notification(
+        building_id: str,
+        meeting_type: str,
+        meeting_title: str,
+        meeting_date: str,
+        meeting_time: str,
+        meeting_location: str,
+        meeting_description: str,
+        vote_deadline: str
+    ):
+        """Toplantı/oylama bildirimini tüm sakinlere gönder"""
+        building = await db.buildings.find_one({"id": building_id}, {"_id": 0, "name": 1})
+        building_name = building.get("name", "Bina") if building else "Bina"
+        
+        return await send_mail_to_residents(
+            template_name="meeting_voting",
+            variables={
+                "building_name": building_name,
+                "meeting_type": meeting_type,
+                "meeting_title": meeting_title,
+                "meeting_date": meeting_date,
+                "meeting_time": meeting_time,
+                "meeting_location": meeting_location,
+                "meeting_description": meeting_description,
+                "vote_deadline": vote_deadline
+            },
+            building_id=building_id
+        )
+    
     # --- Mail Logs ---
     
     @router.get("/logs")
