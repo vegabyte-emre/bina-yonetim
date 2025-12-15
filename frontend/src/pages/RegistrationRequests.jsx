@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Clock, Building, User, Mail, Phone, MapPin, Home } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Building, User, Mail, Phone, MapPin, Home, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -24,6 +24,7 @@ const RegistrationRequests = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchRequests();
