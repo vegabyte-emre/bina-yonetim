@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Building, Home, Users, DollarSign, AlertCircle, FileText } from 'lucide-react';
+import { Building, Home, Users, AlertCircle, FileText, Banknote } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// TL İkonu komponenti
+const TLIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 4v16" />
+    <path d="M6 8h8" />
+    <path d="M6 14h6" />
+    <path d="M14 4l4 16" />
+  </svg>
+);
 
 const Dashboard = () => {
   const navigate = useNavigate();
