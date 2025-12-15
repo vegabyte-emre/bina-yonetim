@@ -1614,6 +1614,323 @@ async def send_monthly_due_mail(monthly_due_id: str, current_user: User = Depend
         "failed_count": failed_count
     }
 
+# ============ SURVEY ROUTES (Building Admin) ============
+
+@api_router.get("/surveys")
+async def get_surveys(current_user: User = Depends(get_current_building_admin)):
+    """Anketleri listele"""
+    surveys = await db.surveys.find(
+        {"building_id": current_user.building_id}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    for survey in surveys:
+        if isinstance(survey.get('created_at'), str):
+            survey['created_at'] = datetime.fromisoformat(survey['created_at'])
+        if isinstance(survey.get('end_date'), str):
+            survey['end_date'] = datetime.fromisoformat(survey['end_date'])
+    
+    return surveys
+
+@api_router.get("/surveys/{survey_id}")
+async def get_survey(survey_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Tek bir anketi getir"""
+    survey = await db.surveys.find_one(
+        {"id": survey_id, "building_id": current_user.building_id},
+        {"_id": 0}
+    )
+    if not survey:
+        raise HTTPException(status_code=404, detail="Anket bulunamadı")
+    return survey
+
+@api_router.post("/surveys")
+async def create_survey(data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Yeni anket oluştur"""
+    survey_id = str(uuid.uuid4())
+    
+    survey_doc = {
+        "id": survey_id,
+        "building_id": current_user.building_id,
+        "title": data.get("title"),
+        "description": data.get("description", ""),
+        "questions": data.get("questions", []),
+        "end_date": data.get("end_date"),
+        "status": data.get("status", "active"),
+        "created_by": current_user.id,
+        "responses": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.surveys.insert_one(survey_doc)
+    return {"success": True, "id": survey_id, "message": "Anket oluşturuldu"}
+
+@api_router.put("/surveys/{survey_id}")
+async def update_survey(survey_id: str, data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Anketi güncelle"""
+    existing = await db.surveys.find_one({
+        "id": survey_id, 
+        "building_id": current_user.building_id
+    })
+    if not existing:
+        raise HTTPException(status_code=404, detail="Anket bulunamadı")
+    
+    await db.surveys.update_one({"id": survey_id}, {"$set": data})
+    return {"success": True, "message": "Anket güncellendi"}
+
+@api_router.delete("/surveys/{survey_id}")
+async def delete_survey(survey_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Anketi sil"""
+    result = await db.surveys.delete_one({
+        "id": survey_id,
+        "building_id": current_user.building_id
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Anket bulunamadı")
+    return {"success": True, "message": "Anket silindi"}
+
+# ============ VOTING ROUTES (Building Admin) ============
+
+@api_router.get("/votings")
+async def get_votings(current_user: User = Depends(get_current_building_admin)):
+    """Oylamaları listele"""
+    votings = await db.votings.find(
+        {"building_id": current_user.building_id}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    for voting in votings:
+        if isinstance(voting.get('created_at'), str):
+            voting['created_at'] = datetime.fromisoformat(voting['created_at'])
+        if isinstance(voting.get('end_date'), str):
+            voting['end_date'] = datetime.fromisoformat(voting['end_date'])
+    
+    return votings
+
+@api_router.get("/votings/{voting_id}")
+async def get_voting(voting_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Tek bir oylamayı getir"""
+    voting = await db.votings.find_one(
+        {"id": voting_id, "building_id": current_user.building_id},
+        {"_id": 0}
+    )
+    if not voting:
+        raise HTTPException(status_code=404, detail="Oylama bulunamadı")
+    return voting
+
+@api_router.post("/votings")
+async def create_voting(data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Yeni oylama oluştur"""
+    voting_id = str(uuid.uuid4())
+    
+    voting_doc = {
+        "id": voting_id,
+        "building_id": current_user.building_id,
+        "title": data.get("title"),
+        "description": data.get("description", ""),
+        "end_date": data.get("end_date"),
+        "status": data.get("status", "active"),
+        "yes_votes": 0,
+        "no_votes": 0,
+        "abstain_votes": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.votings.insert_one(voting_doc)
+    return {"success": True, "id": voting_id, "message": "Oylama oluşturuldu"}
+
+@api_router.put("/votings/{voting_id}")
+async def update_voting(voting_id: str, data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Oylamayı güncelle"""
+    existing = await db.votings.find_one({
+        "id": voting_id, 
+        "building_id": current_user.building_id
+    })
+    if not existing:
+        raise HTTPException(status_code=404, detail="Oylama bulunamadı")
+    
+    await db.votings.update_one({"id": voting_id}, {"$set": data})
+    return {"success": True, "message": "Oylama güncellendi"}
+
+@api_router.delete("/votings/{voting_id}")
+async def delete_voting(voting_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Oylamayı sil"""
+    result = await db.votings.delete_one({
+        "id": voting_id,
+        "building_id": current_user.building_id
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Oylama bulunamadı")
+    return {"success": True, "message": "Oylama silindi"}
+
+@api_router.post("/votings/{voting_id}/vote")
+async def cast_vote(voting_id: str, vote_type: str, current_user: User = Depends(get_current_building_admin)):
+    """Oy kullan (yes, no, abstain)"""
+    if vote_type not in ["yes", "no", "abstain"]:
+        raise HTTPException(status_code=400, detail="Geçersiz oy türü")
+    
+    existing = await db.votings.find_one({
+        "id": voting_id, 
+        "building_id": current_user.building_id
+    })
+    if not existing:
+        raise HTTPException(status_code=404, detail="Oylama bulunamadı")
+    
+    field_map = {"yes": "yes_votes", "no": "no_votes", "abstain": "abstain_votes"}
+    await db.votings.update_one(
+        {"id": voting_id}, 
+        {"$inc": {field_map[vote_type]: 1}}
+    )
+    return {"success": True, "message": "Oy kullanıldı"}
+
+# ============ MEETING ROUTES (Building Admin) ============
+
+@api_router.get("/meetings")
+async def get_meetings(current_user: User = Depends(get_current_building_admin)):
+    """Toplantıları listele"""
+    meetings = await db.meetings.find(
+        {"building_id": current_user.building_id}, 
+        {"_id": 0}
+    ).sort("date", -1).to_list(100)
+    
+    for meeting in meetings:
+        if isinstance(meeting.get('created_at'), str):
+            meeting['created_at'] = datetime.fromisoformat(meeting['created_at'])
+        if isinstance(meeting.get('date'), str):
+            meeting['date'] = datetime.fromisoformat(meeting['date'])
+    
+    return meetings
+
+@api_router.get("/meetings/{meeting_id}")
+async def get_meeting(meeting_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Tek bir toplantıyı getir"""
+    meeting = await db.meetings.find_one(
+        {"id": meeting_id, "building_id": current_user.building_id},
+        {"_id": 0}
+    )
+    if not meeting:
+        raise HTTPException(status_code=404, detail="Toplantı bulunamadı")
+    return meeting
+
+@api_router.post("/meetings")
+async def create_meeting(data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Yeni toplantı oluştur"""
+    meeting_id = str(uuid.uuid4())
+    
+    meeting_doc = {
+        "id": meeting_id,
+        "building_id": current_user.building_id,
+        "title": data.get("title"),
+        "description": data.get("description", ""),
+        "date": data.get("date"),
+        "time": data.get("time"),
+        "location": data.get("location"),
+        "agenda": data.get("agenda", ""),
+        "status": data.get("status", "scheduled"),
+        "attendees": [],
+        "notes": None,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.meetings.insert_one(meeting_doc)
+    return {"success": True, "id": meeting_id, "message": "Toplantı oluşturuldu"}
+
+@api_router.put("/meetings/{meeting_id}")
+async def update_meeting(meeting_id: str, data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Toplantıyı güncelle"""
+    existing = await db.meetings.find_one({
+        "id": meeting_id, 
+        "building_id": current_user.building_id
+    })
+    if not existing:
+        raise HTTPException(status_code=404, detail="Toplantı bulunamadı")
+    
+    await db.meetings.update_one({"id": meeting_id}, {"$set": data})
+    return {"success": True, "message": "Toplantı güncellendi"}
+
+@api_router.delete("/meetings/{meeting_id}")
+async def delete_meeting(meeting_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Toplantıyı sil"""
+    result = await db.meetings.delete_one({
+        "id": meeting_id,
+        "building_id": current_user.building_id
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Toplantı bulunamadı")
+    return {"success": True, "message": "Toplantı silindi"}
+
+# ============ DECISION ROUTES (Building Admin) ============
+
+@api_router.get("/decisions")
+async def get_decisions(current_user: User = Depends(get_current_building_admin)):
+    """Kararları listele"""
+    decisions = await db.decisions.find(
+        {"building_id": current_user.building_id}, 
+        {"_id": 0}
+    ).sort("decision_date", -1).to_list(100)
+    
+    for decision in decisions:
+        if isinstance(decision.get('created_at'), str):
+            decision['created_at'] = datetime.fromisoformat(decision['created_at'])
+        if isinstance(decision.get('decision_date'), str):
+            decision['decision_date'] = datetime.fromisoformat(decision['decision_date'])
+    
+    return decisions
+
+@api_router.get("/decisions/{decision_id}")
+async def get_decision(decision_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Tek bir kararı getir"""
+    decision = await db.decisions.find_one(
+        {"id": decision_id, "building_id": current_user.building_id},
+        {"_id": 0}
+    )
+    if not decision:
+        raise HTTPException(status_code=404, detail="Karar bulunamadı")
+    return decision
+
+@api_router.post("/decisions")
+async def create_decision(data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Yeni karar oluştur"""
+    decision_id = str(uuid.uuid4())
+    
+    decision_doc = {
+        "id": decision_id,
+        "building_id": current_user.building_id,
+        "title": data.get("title"),
+        "description": data.get("description", ""),
+        "decision_type": data.get("decision_type", "management"),
+        "decision_date": data.get("decision_date"),
+        "decision_number": data.get("decision_number"),
+        "created_by": current_user.id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.decisions.insert_one(decision_doc)
+    return {"success": True, "id": decision_id, "message": "Karar kaydedildi"}
+
+@api_router.put("/decisions/{decision_id}")
+async def update_decision(decision_id: str, data: dict, current_user: User = Depends(get_current_building_admin)):
+    """Kararı güncelle"""
+    existing = await db.decisions.find_one({
+        "id": decision_id, 
+        "building_id": current_user.building_id
+    })
+    if not existing:
+        raise HTTPException(status_code=404, detail="Karar bulunamadı")
+    
+    await db.decisions.update_one({"id": decision_id}, {"$set": data})
+    return {"success": True, "message": "Karar güncellendi"}
+
+@api_router.delete("/decisions/{decision_id}")
+async def delete_decision(decision_id: str, current_user: User = Depends(get_current_building_admin)):
+    """Kararı sil"""
+    result = await db.decisions.delete_one({
+        "id": decision_id,
+        "building_id": current_user.building_id
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Karar bulunamadı")
+    return {"success": True, "message": "Karar silindi"}
+
 # ============ ANNOUNCEMENT ROUTES (Building Admin) ============
 
 @api_router.get("/announcements", response_model=List[Announcement])
