@@ -143,10 +143,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Surveys CRUD API"
-    - "Votings CRUD API"
-    - "Meetings CRUD API"
-    - "Decisions CRUD API"
+    - "TL icon replacement (Dollar → TL)"
+    - "Surveys page CRUD operations"
+    - "Votings page CRUD operations"
+    - "Meetings page CRUD operations"
+    - "Decisions page CRUD operations"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -154,4 +155,6 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: All 4 CRUD APIs (Surveys, Votings, Meetings, Decisions) are working perfectly. Comprehensive testing performed with 17/17 tests passed. Authentication system working correctly. All CREATE, READ, DELETE operations verified with real data. Frontend testing not performed due to system limitations - main agent should handle UI testing if needed."
+  - agent: "testing"
+    message: "✅ ADMIN PANEL FRONTEND TESTING COMPLETE: Comprehensive UI testing performed on admin panel (http://localhost:3001). All test scenarios passed successfully: 1) Login with ahmet@mavirezidans.com/admin123 ✅ 2) Dashboard TL icons and ₺ currency format ✅ 3) Sidebar TL icon in 'Aidat' menu ✅ 4) All CRUD pages functional - Surveys, Votings, Meetings, Decisions ✅ 5) Form submissions and list updates working ✅. TL icon replacement fully implemented. All UI interactions smooth and responsive. No critical issues found."
 
