@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  DollarSign, Plus, Trash2, Send, Mail, Calendar, 
+  Plus, Trash2, Send, Mail, Calendar, 
   Calculator, Building, AlertCircle, CheckCircle, Loader2,
   ChevronDown, ChevronUp, Edit, Eye
 } from 'lucide-react';
@@ -24,6 +24,16 @@ import { toast } from 'sonner';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+// TL İkonu komponenti
+const TLIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 4v16" />
+    <path d="M6 8h8" />
+    <path d="M6 14h6" />
+    <path d="M14 4l4 16" />
+  </svg>
+);
 
 const Dues = () => {
   const [monthlyDues, setMonthlyDues] = useState([]);
