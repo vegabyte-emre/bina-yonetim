@@ -489,6 +489,133 @@ class SuperadminPanelTester:
             self.log_test("Subscription Payments Endpoint", False, f"Subscription payments endpoint test failed: {str(e)}")
             return False
     
+    def test_building_admin_login(self):
+        """Test building admin login and get token"""
+        try:
+            login_data = {
+                "username": BUILDING_ADMIN_EMAIL,
+                "password": BUILDING_ADMIN_PASSWORD
+            }
+            
+            response = self.building_admin_session.post(
+                f"{BASE_URL}/auth/login",
+                data=login_data,
+                headers={"Content-Type": "application/x-www-form-urlencoded"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.building_admin_token = data.get("access_token")
+                if self.building_admin_token:
+                    self.building_admin_session.headers.update({"Authorization": f"Bearer {self.building_admin_token}"})
+                    self.log_test("Building Admin Login", True, "Successfully logged in as building admin")
+                    return True
+                else:
+                    self.log_test("Building Admin Login", False, "No access token in response", data)
+                    return False
+            else:
+                self.log_test("Building Admin Login", False, f"Login failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Building Admin Login", False, f"Login request failed: {str(e)}")
+            return False
+    
+    def test_get_building_payments(self):
+        """Test GET /api/building-payments - Should return payment schedule"""
+        try:
+            response = self.building_admin_session.get(f"{BASE_URL}/building-payments")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    if len(data) > 0:
+                        # Check if payments have required fields
+                        payment = data[0]
+                        required_fields = ["id", "period", "amount", "status", "due_date"]
+                        missing_fields = [field for field in required_fields if field not in payment]
+                        
+                        if not missing_fields:
+                            # Check for expected periods (months)
+                            periods = [p.get("period", "") for p in data]
+                            self.log_test("Get Building Payments", True, f"Retrieved {len(data)} payments with periods: {', '.join(periods[:3])}...")
+                            return True
+                        else:
+                            self.log_test("Get Building Payments", False, f"Missing required fields: {missing_fields}", payment)
+                            return False
+                    else:
+                        self.log_test("Get Building Payments", True, "No payments found (empty list)")
+                        return True
+                else:
+                    self.log_test("Get Building Payments", False, "Response is not a list", data)
+                    return False
+            else:
+                self.log_test("Get Building Payments", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Get Building Payments", False, f"Get building payments failed: {str(e)}")
+            return False
+    
+    def test_process_building_payment(self):
+        """Test POST /api/building-payments/process - Demo payment processing"""
+        try:
+            # First get the payment schedule to get a valid payment_id
+            response = self.building_admin_session.get(f"{BASE_URL}/building-payments")
+            
+            if response.status_code != 200:
+                self.log_test("Process Building Payment", False, "Could not get payment schedule for testing")
+                return False
+            
+            payments = response.json()
+            if not payments:
+                self.log_test("Process Building Payment", False, "No payments available for testing")
+                return False
+            
+            # Find a pending payment to process
+            pending_payment = None
+            for payment in payments:
+                if payment.get("status") in ["pending", "upcoming"]:
+                    pending_payment = payment
+                    break
+            
+            if not pending_payment:
+                # Use the first payment for testing
+                pending_payment = payments[0]
+            
+            payment_data = {
+                "payment_id": pending_payment.get("id"),
+                "amount": pending_payment.get("amount", 299),
+                "period": pending_payment.get("period")
+            }
+            
+            response = self.building_admin_session.post(
+                f"{BASE_URL}/building-payments/process",
+                json=payment_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    expected_message = "Demo ödeme başarılı"
+                    if data.get("message") == expected_message:
+                        self.log_test("Process Building Payment", True, f"Demo payment processed successfully: {data.get('message')}")
+                        return True
+                    else:
+                        self.log_test("Process Building Payment", True, f"Payment processed: {data.get('message', 'Success')}")
+                        return True
+                else:
+                    self.log_test("Process Building Payment", False, f"Payment processing failed: {data.get('error', 'Unknown error')}")
+                    return False
+            else:
+                self.log_test("Process Building Payment", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Process Building Payment", False, f"Process building payment failed: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all Superadmin Panel new integrations tests"""
         print("🚀 Starting Superadmin Panel New Integrations API Tests")
