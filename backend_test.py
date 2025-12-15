@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Superadmin Panel Improvements
-Tests the 4 key improvements:
-1. Public Subscription Plans (No Auth Required)
-2. Delete Registration Request
-3. Login functionality
-4. Registration requests management
+Backend API Testing for Superadmin Panel New Integrations
+Tests the new integrations:
+1. Netgsm Config APIs (GET/POST config, POST test)
+2. Paratika Config APIs (GET/POST config, POST test)
+3. Subscription-payments endpoint verification
+4. Previous functionality verification
 """
 
 import requests
