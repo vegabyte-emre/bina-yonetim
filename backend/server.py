@@ -1429,9 +1429,12 @@ async def get_building_manager_dashboard(current_user: User = Depends(get_curren
 from routes import push_notifications
 from routes import firebase_push
 from routes import expo_push
+from routes.mail_service import get_mail_routes
+
 app.include_router(push_notifications.router)
 app.include_router(firebase_push.router)
 app.include_router(expo_push.router)
+app.include_router(get_mail_routes(db))
 app.include_router(api_router)
 
 app.add_middleware(
