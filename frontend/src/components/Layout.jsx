@@ -29,6 +29,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/users', icon: Users, label: 'Kullanıcılar' },
     { path: '/registration-requests', icon: FileText, label: 'Başvurular' },
     { path: '/subscriptions', icon: CreditCard, label: 'Abonelikler' },
+    { path: '/mail-settings', icon: Mail, label: 'Mail Ayarları' },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
 
