@@ -142,6 +142,39 @@ const AnnouncementsNew = () => {
     }
   };
 
+  // Mail ile duyuru gönder
+  const handleSendEmail = async (announcement) => {
+    setSendingEmail(announcement.id);
+    try {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user'));
+      
+      const response = await axios.post(
+        `${API_URL}/api/mail/send-announcement-email`,
+        null,
+        {
+          params: {
+            building_id: user.building_id,
+            announcement_title: announcement.title,
+            announcement_content: announcement.content
+          },
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      if (response.data.success) {
+        toast.success(`${response.data.sent_count} sakin'e mail gönderildi!`);
+      } else {
+        toast.error(response.data.message || 'Mail gönderilemedi');
+      }
+    } catch (error) {
+      console.error('Email error:', error);
+      toast.error(error.response?.data?.detail || 'Mail gönderilemedi');
+    } finally {
+      setSendingEmail(null);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
