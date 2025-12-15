@@ -111,26 +111,25 @@ class SuperadminPanelTester:
             self.log_test("Public Subscription Plans", False, f"Public subscription plans request failed: {str(e)}")
             return False
     
-    def test_get_monthly_dues_initial(self):
-        """Test getting monthly dues list (should be empty or have existing items)"""
+    def test_get_registration_requests(self):
+        """Test getting registration requests list"""
         try:
-            response = self.session.get(f"{BASE_URL}/monthly-dues")
+            response = self.session.get(f"{BASE_URL}/registration-requests")
             
             if response.status_code == 200:
                 data = response.json()
                 if isinstance(data, list):
-                    self.initial_dues_count = len(data)
-                    self.log_test("Get Monthly Dues (Initial)", True, f"Retrieved monthly dues list with {len(data)} items")
+                    self.log_test("Get Registration Requests", True, f"Retrieved registration requests list with {len(data)} items")
                     return True
                 else:
-                    self.log_test("Get Monthly Dues (Initial)", False, "Response is not a list", data)
+                    self.log_test("Get Registration Requests", False, "Response is not a list", data)
                     return False
             else:
-                self.log_test("Get Monthly Dues (Initial)", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Get Registration Requests", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Get Monthly Dues (Initial)", False, f"Get monthly dues failed: {str(e)}")
+            self.log_test("Get Registration Requests", False, f"Get registration requests failed: {str(e)}")
             return False
     
     def test_create_monthly_due(self):
