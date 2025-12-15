@@ -241,7 +241,7 @@ const RegistrationRequests = () => {
           </h2>
           <div className="grid gap-4">
             {processedRequests.map((request) => (
-              <Card key={request.id} className="opacity-75">
+              <Card key={request.id} className="opacity-75 hover:opacity-100 transition-opacity">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -257,6 +257,17 @@ const RegistrationRequests = () => {
                         </span>
                       </div>
                     </div>
+                    <Button
+                      onClick={() => {
+                        setSelectedRequest(request);
+                        setDeleteDialogOpen(true);
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
