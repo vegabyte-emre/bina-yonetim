@@ -29,6 +29,43 @@
 - Email: ahmet@mavirezidans.com  
 - Password: admin123
 
+## Backend API Test Results (Completed)
+
+### ✅ Public Subscription Plans API (No Auth Required)
+- **Endpoint:** GET /api/subscriptions/public
+- **Status:** WORKING
+- **Result:** Successfully retrieved 3 subscription plans without authentication
+- **Plans Found:**
+  - Temel Plan: ₺299/ay
+  - Profesyonel Plan: ₺599/ay  
+  - Kurumsal Plan: ₺999/ay
+- **Features:** All plans include proper feature lists and pricing data
+
+### ✅ Delete Registration Request API
+- **Endpoint:** DELETE /api/registration-requests/{id}
+- **Status:** WORKING
+- **Result:** Successfully deletes registration requests
+- **Response:** {"success": true, "message": "Başvuru silindi"}
+- **Verification:** Confirmed deletion by checking request no longer exists in list
+
+### ✅ Superadmin Authentication
+- **Endpoint:** POST /api/auth/login
+- **Status:** WORKING
+- **Credentials:** admin@test.com / admin123
+- **Result:** Successfully authenticates and returns JWT token
+
+### ✅ Registration Requests Management
+- **Endpoints:** GET /api/registration-requests, POST /api/registration-requests
+- **Status:** WORKING
+- **Result:** Can create, list, and manage registration requests properly
+
+## Frontend Tests (Not Tested - System Limitations)
+- Login page test credentials removal
+- Registration requests delete button UI
+- Landing page dynamic pricing display
+
+Note: Frontend testing was not performed due to system limitations as per testing guidelines.
+
 ## Incorporate User Feedback
 - None yet
 
