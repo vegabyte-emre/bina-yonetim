@@ -86,63 +86,90 @@ backend:
 frontend:
   - task: "Admin Panel Login UI"
     implemented: true
-    working: "NA"
-    file: "frontend/src/App.js"
+    working: true
+    file: "admin-panel/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend testing not performed as per system limitations. Backend APIs are working correctly."
+      - working: true
+        agent: "testing"
+        comment: "✅ Building Manager Admin Panel login working perfectly. Successfully logged in with ahmet@mavirezidans.com/admin123. Glassmorphism UI design loads correctly, redirects to dashboard after authentication."
 
   - task: "Dues Page Navigation (/dues)"
     implemented: true
-    working: "NA"
-    file: "frontend/src/App.js"
+    working: true
+    file: "admin-panel/src/pages/Dues.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend testing not performed as per system limitations. Backend APIs support this functionality."
+      - working: true
+        agent: "testing"
+        comment: "✅ Aidat Yönetimi page navigation working correctly. Page title 'Aidat Yönetimi' displays properly. All summary cards visible: Toplam Daire (49), Gönderilen (0), Bekleyen (1). Sidebar navigation functional."
 
   - task: "Monthly Due Creation Form"
     implemented: true
-    working: "NA"
-    file: "frontend/src/App.js"
+    working: true
+    file: "admin-panel/src/pages/Dues.jsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend testing not performed as per system limitations. Backend POST /api/monthly-dues is working correctly."
+      - working: true
+        agent: "testing"
+        comment: "✅ Monthly due creation form fully functional. 'Yeni Aidat Tanımla' button opens dialog correctly. Form fields work: Dönem (Mart 2025), Son Ödeme Tarihi (date picker). Expense items table allows adding multiple rows (Elektrik: ₺12,000, Su: ₺6,000, Temizlik: ₺4,000). 'Kalem Ekle' button adds new expense rows successfully."
 
   - task: "Total Calculation UI"
     implemented: true
-    working: "NA"
-    file: "frontend/src/App.js"
+    working: true
+    file: "admin-panel/src/pages/Dues.jsx"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend testing not performed as per system limitations. Backend calculations are accurate."
+      - working: true
+        agent: "testing"
+        comment: "✅ Real-time calculations working perfectly. Toplam Gider shows ₺22.000,00 correctly (12000+6000+4000). Daire Başı Aidat calculates ₺448,98 per apartment (₺22,000/49 apartments). Summary cards update dynamically as expense items are added/modified."
 
   - task: "Mail Send Button UI"
     implemented: true
-    working: "NA"
-    file: "frontend/src/App.js"
+    working: true
+    file: "admin-panel/src/pages/Dues.jsx"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Frontend testing not performed as per system limitations. Backend mail API is functional."
+      - working: true
+        agent: "testing"
+        comment: "✅ Mail functionality integrated in dues management. Mail Gönder page (/mail-gonder) correctly shows info notice: 'Aidat bildirimleri artık Aidat Yönetimi sayfasından gönderilmektedir'. Only shows correct templates: Toplantı/Oylama, Ödeme Başarılı, Ödeme Başarısız. Aidat Bildirimi template correctly NOT shown."
+
+  - task: "Mobile Responsiveness"
+    implemented: true
+    working: true
+    file: "admin-panel/src/pages/Dues.jsx"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ Mobile responsiveness working. Dues page displays correctly on mobile viewport (390x844). UI elements scale appropriately for mobile devices."
 
 metadata:
   created_by: "testing_agent"
