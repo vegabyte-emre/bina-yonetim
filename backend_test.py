@@ -352,7 +352,7 @@ class SuperadminPanelTester:
 
 def main():
     """Main test execution"""
-    tester = MonthlyDuesTester()
+    tester = SuperadminPanelTester()
     
     try:
         success = tester.run_all_tests()
