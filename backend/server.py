@@ -1470,6 +1470,20 @@ async def get_building_manager_dashboard(current_user: User = Depends(get_curren
         collected_amount=collected_amount
     )
 
+@api_router.get("/building-manager/my-building", response_model=Building)
+async def get_my_building(current_user: User = Depends(get_current_building_admin)):
+    """Get building info for the current building admin"""
+    building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
+    if not building:
+        raise HTTPException(status_code=404, detail="Building not found")
+    
+    if isinstance(building.get('created_at'), str):
+        building['created_at'] = datetime.fromisoformat(building['created_at'])
+    if isinstance(building.get('subscription_end_date'), str):
+        building['subscription_end_date'] = datetime.fromisoformat(building['subscription_end_date'])
+    
+    return Building(**building)
+
 # Include routers
 from routes import push_notifications
 from routes import firebase_push
