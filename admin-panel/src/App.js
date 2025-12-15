@@ -228,6 +228,7 @@ function App() {
           <Route path="/voting" element={<Voting />} />
           <Route path="/meetings" element={<Meetings />} />
           <Route path="/decisions" element={<Decisions />} />
+          <Route path="/mail-gonder" element={<MailGonder />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         
