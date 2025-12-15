@@ -526,7 +526,7 @@ class SuperadminPanelTester:
         print(f"📊 Test Results: {passed}/{total} tests passed")
         
         if passed == total:
-            print("🎉 All tests passed! Superadmin Panel improvements are working correctly.")
+            print("🎉 All tests passed! Superadmin Panel new integrations are working correctly.")
             return True
         else:
             print("⚠️  Some tests failed. Check the details above.")
