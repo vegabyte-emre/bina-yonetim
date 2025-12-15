@@ -18,6 +18,10 @@ BASE_URL = "https://smart-bms.preview.emergentagent.com/api"
 SUPERADMIN_EMAIL = "admin@test.com"
 SUPERADMIN_PASSWORD = "admin123"
 
+# Building Admin credentials for building-payments testing
+BUILDING_ADMIN_EMAIL = "ahmet@mavirezidans.com"
+BUILDING_ADMIN_PASSWORD = "admin123"
+
 class SuperadminPanelTester:
     def __init__(self):
         self.session = requests.Session()
