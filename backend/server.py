@@ -734,6 +734,51 @@ async def create_registration_request(request_data: RegistrationRequest):
     
     await db.registration_requests.insert_one(request_doc)
     
+    # === MAIL GÖNDERİMİ ===
+    try:
+        from routes.mail_service import MailService
+        mail_service = MailService(db)
+        
+        registration_date = datetime.now(timezone.utc).strftime("%d.%m.%Y %H:%M")
+        
+        # 1. Superadmin'e bilgilendirme maili
+        superadmin = await db.users.find_one({"role": "superadmin"}, {"_id": 0})
+        if superadmin and superadmin.get("email"):
+            try:
+                await mail_service.send_with_template(
+                    to=[superadmin["email"]],
+                    template_name="new_registration_admin",
+                    variables={
+                        "building_name": request_data.building_name,
+                        "manager_name": request_data.manager_name,
+                        "manager_email": request_data.email,
+                        "manager_phone": request_data.phone,
+                        "address": request_data.address,
+                        "apartment_count": str(request_data.apartment_count),
+                        "registration_date": registration_date
+                    }
+                )
+            except Exception as e:
+                print(f"Superadmin mail error: {e}")
+        
+        # 2. Kayıt yapan yöneticiye hoşgeldin maili
+        try:
+            await mail_service.send_with_template(
+                to=[request_data.email],
+                template_name="manager_welcome",
+                variables={
+                    "manager_name": request_data.manager_name,
+                    "building_name": request_data.building_name,
+                    "registration_date": registration_date
+                }
+            )
+        except Exception as e:
+            print(f"Manager welcome mail error: {e}")
+            
+    except Exception as e:
+        print(f"Mail service error: {e}")
+    # === MAIL GÖNDERİMİ SONU ===
+    
     return {"success": True, "message": "Başvurunuz alındı", "request_id": request_doc['id']}
 
 @api_router.get("/registration-requests")
