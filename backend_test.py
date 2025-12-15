@@ -210,42 +210,29 @@ class SuperadminPanelTester:
             self.log_test("Get Registration Requests (After Creation)", False, f"Get registration requests failed: {str(e)}")
             return False
     
-    def test_get_specific_monthly_due(self):
-        """Test getting a specific monthly due by ID"""
+    def test_delete_registration_request(self):
+        """Test deleting a registration request"""
         try:
-            if not self.monthly_due_id:
-                self.log_test("Get Specific Monthly Due", False, "No monthly due ID available")
+            if not self.created_registration_request_id:
+                self.log_test("Delete Registration Request", False, "No registration request ID available")
                 return False
             
-            response = self.session.get(f"{BASE_URL}/monthly-dues/{self.monthly_due_id}")
+            response = self.session.delete(f"{BASE_URL}/registration-requests/{self.created_registration_request_id}")
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("id") == self.monthly_due_id:
-                    month = data.get("month")
-                    total_amount = data.get("total_amount")
-                    per_apartment_amount = data.get("per_apartment_amount")
-                    expense_items = data.get("expense_items", [])
-                    
-                    # Verify expense items
-                    expected_items = ["Elektrik", "Su", "Temizlik"]
-                    actual_items = [item.get("name") for item in expense_items]
-                    
-                    if all(item in actual_items for item in expected_items):
-                        self.log_test("Get Specific Monthly Due", True, f"Retrieved monthly due: {month}, Total: ₺{total_amount:,.2f}, Per Apt: ₺{per_apartment_amount:.2f}")
-                        return True
-                    else:
-                        self.log_test("Get Specific Monthly Due", False, f"Expense items mismatch - Expected: {expected_items}, Got: {actual_items}")
-                        return False
+                if data.get("success") and data.get("message") == "Başvuru silindi":
+                    self.log_test("Delete Registration Request", True, f"Registration request deleted successfully: {data.get('message')}")
+                    return True
                 else:
-                    self.log_test("Get Specific Monthly Due", False, "Monthly due ID mismatch", data)
+                    self.log_test("Delete Registration Request", False, "Invalid delete response", data)
                     return False
             else:
-                self.log_test("Get Specific Monthly Due", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Delete Registration Request", False, f"Delete failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Get Specific Monthly Due", False, f"Get specific monthly due failed: {str(e)}")
+            self.log_test("Delete Registration Request", False, f"Delete registration request failed: {str(e)}")
             return False
     
     def test_send_monthly_due_mail(self):
