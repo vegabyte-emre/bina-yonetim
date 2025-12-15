@@ -220,14 +220,23 @@ const MailGonder = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Toplu Mail Gönder</h1>
-          <p className="mt-1 text-sm text-gray-600">Kayıtlı sakinlere mail bildirimi gönderin</p>
+          <h1 className="text-2xl font-bold text-gray-900">Diğer Mail Şablonları</h1>
+          <p className="mt-1 text-sm text-gray-600">Toplantı, ödeme bildirimleri ve diğer mailler</p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 rounded-lg">
           <Users className="h-5 w-5 text-purple-600" />
           <span className="text-sm font-medium text-purple-700">
             {residentsWithEmail} sakin mail alabilir
           </span>
+        </div>
+      </div>
+
+      {/* Info Notice */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
+        <Mail className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-medium text-blue-800">Aidat Bildirimleri</p>
+          <p className="text-sm text-blue-700">Aidat bildirimleri artık <strong>"Aidat Yönetimi"</strong> sayfasından gönderilmektedir. Gider kalemlerini girin, toplam tutarı görün ve tek tıkla tüm sakinlere mail gönderin.</p>
         </div>
       </div>
 
@@ -244,7 +253,7 @@ const MailGonder = () => {
 
       {/* Template Selection */}
       {!selectedTemplate ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {templates.map((template) => (
             <Card 
               key={template.id}
