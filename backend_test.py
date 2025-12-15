@@ -115,32 +115,48 @@ class MonthlyDuesTester:
             self.log_test("Get Monthly Dues (Initial)", False, f"Get monthly dues failed: {str(e)}")
             return False
     
-    def test_approve_registration_request(self):
-        """Test approving a registration request"""
+    def test_create_monthly_due(self):
+        """Test creating a new monthly due with expense items"""
         try:
-            if not hasattr(self, 'request_id'):
-                self.log_test("Approve Registration Request", False, "No request ID available for approval test")
+            if not self.building_id:
+                self.log_test("Create Monthly Due", False, "No building ID available")
                 return False
             
-            response = self.session.put(f"{BASE_URL}/registration-requests/{self.request_id}/approve")
+            monthly_due_data = {
+                "building_id": self.building_id,
+                "month": "Şubat 2025",
+                "expense_items": [
+                    {"name": "Elektrik", "amount": 10000},
+                    {"name": "Su", "amount": 5000},
+                    {"name": "Temizlik", "amount": 3000}
+                ],
+                "total_amount": 18000,
+                "per_apartment_amount": 367.35,
+                "due_date": "2025-02-28T00:00:00Z",
+                "is_sent": False
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/monthly-dues",
+                json=monthly_due_data,
+                headers={"Content-Type": "application/json"}
+            )
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success") and data.get("building_id") and data.get("user_id"):
-                    self.building_id = data["building_id"]
-                    self.user_id = data["user_id"]
-                    self.temp_password = data.get("temp_password")
-                    self.log_test("Approve Registration Request", True, f"Request approved. Building ID: {self.building_id}, User ID: {self.user_id}")
+                if data.get("success") and data.get("id"):
+                    self.monthly_due_id = data["id"]
+                    self.log_test("Create Monthly Due", True, f"Monthly due created successfully with ID: {self.monthly_due_id}")
                     return True
                 else:
-                    self.log_test("Approve Registration Request", False, "Invalid response format", data)
+                    self.log_test("Create Monthly Due", False, "Invalid response format", data)
                     return False
             else:
-                self.log_test("Approve Registration Request", False, f"Approval failed with status {response.status_code}", response.text)
+                self.log_test("Create Monthly Due", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Approve Registration Request", False, f"Approval request failed: {str(e)}")
+            self.log_test("Create Monthly Due", False, f"Monthly due creation failed: {str(e)}")
             return False
     
     def test_create_second_registration_request(self):
