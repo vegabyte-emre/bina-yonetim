@@ -170,44 +170,44 @@ class SuperadminPanelTester:
             self.log_test("Create Registration Request", False, f"Registration request creation failed: {str(e)}")
             return False
     
-    def test_get_monthly_dues_after_creation(self):
-        """Test getting monthly dues list after creation to verify the new due is included"""
+    def test_get_registration_requests_after_creation(self):
+        """Test getting registration requests list after creation to verify the new request is included"""
         try:
-            response = self.session.get(f"{BASE_URL}/monthly-dues")
+            response = self.session.get(f"{BASE_URL}/registration-requests")
             
             if response.status_code == 200:
                 data = response.json()
                 if isinstance(data, list):
-                    # Check if our created monthly due is in the list
-                    found_due = None
-                    for due in data:
-                        if due.get("id") == self.monthly_due_id:
-                            found_due = due
+                    # Check if our created registration request is in the list
+                    found_request = None
+                    for request in data:
+                        if request.get("id") == self.created_registration_request_id:
+                            found_request = request
                             break
                     
-                    if found_due:
-                        month = found_due.get("month")
-                        total_amount = found_due.get("total_amount")
-                        expense_items = found_due.get("expense_items", [])
+                    if found_request:
+                        building_name = found_request.get("building_name")
+                        manager_name = found_request.get("manager_name")
+                        status = found_request.get("status")
                         
-                        if month == "Şubat 2025" and total_amount == 18000 and len(expense_items) == 3:
-                            self.log_test("Get Monthly Dues (After Creation)", True, f"Found created monthly due: {month}, Total: ₺{total_amount:,.2f}, Items: {len(expense_items)}")
+                        if building_name == "Test Building for API Testing" and manager_name == "Test Manager" and status == "pending":
+                            self.log_test("Get Registration Requests (After Creation)", True, f"Found created registration request: {building_name}, Manager: {manager_name}, Status: {status}")
                             return True
                         else:
-                            self.log_test("Get Monthly Dues (After Creation)", False, f"Monthly due data mismatch - Month: {month}, Total: {total_amount}, Items: {len(expense_items)}")
+                            self.log_test("Get Registration Requests (After Creation)", False, f"Registration request data mismatch - Building: {building_name}, Manager: {manager_name}, Status: {status}")
                             return False
                     else:
-                        self.log_test("Get Monthly Dues (After Creation)", False, f"Created monthly due not found in list of {len(data)} items")
+                        self.log_test("Get Registration Requests (After Creation)", False, f"Created registration request not found in list of {len(data)} items")
                         return False
                 else:
-                    self.log_test("Get Monthly Dues (After Creation)", False, "Response is not a list", data)
+                    self.log_test("Get Registration Requests (After Creation)", False, "Response is not a list", data)
                     return False
             else:
-                self.log_test("Get Monthly Dues (After Creation)", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Get Registration Requests (After Creation)", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Get Monthly Dues (After Creation)", False, f"Get monthly dues failed: {str(e)}")
+            self.log_test("Get Registration Requests (After Creation)", False, f"Get registration requests failed: {str(e)}")
             return False
     
     def test_get_specific_monthly_due(self):
