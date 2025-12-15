@@ -17,6 +17,7 @@ const LandingPage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
+  const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [formData, setFormData] = useState({
     building_name: '',
     manager_name: '',
@@ -25,6 +26,21 @@ const LandingPage = () => {
     address: '',
     apartment_count: '',
   });
+
+  // Fetch subscription plans
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/subscriptions/public`);
+        if (response.data && response.data.length > 0) {
+          setSubscriptionPlans(response.data);
+        }
+      } catch (error) {
+        console.error('Planlar yüklenemedi:', error);
+      }
+    };
+    fetchPlans();
+  }, []);
 
   // Scroll effect for navbar
   useEffect(() => {
