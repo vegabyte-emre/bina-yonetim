@@ -165,6 +165,7 @@ const Buildings = () => {
       apartment_count: '',
       currency: 'TRY',
       aidat_amount: '',
+      subscription_status: 'active',
       admin_name: '',
       admin_email: '',
       admin_phone: '',
