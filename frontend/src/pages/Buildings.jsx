@@ -139,6 +139,7 @@ const Buildings = () => {
       apartment_count: building.apartment_count,
       currency: building.currency,
       aidat_amount: building.aidat_amount,
+      subscription_status: building.subscription_status || 'active',
       admin_name: building.admin_name,
       admin_email: building.admin_email,
       admin_phone: building.admin_phone,
