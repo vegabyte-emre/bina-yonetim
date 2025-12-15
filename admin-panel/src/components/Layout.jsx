@@ -39,7 +39,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/blocks', icon: Building, label: 'Bloklar' },
     { path: '/apartments', icon: Home, label: 'Daireler' },
     { path: '/residents', icon: Users, label: 'Sakinler' },
-    { path: '/dues', icon: DollarSign, label: 'Aidat' },
+    { path: '/dues', icon: TLIcon, label: 'Aidat' },
     { path: '/announcements', icon: Bell, label: 'Duyurular' },
     { path: '/requests', icon: FileText, label: 'Talepler' },
     { path: '/financial-report', icon: TrendingUp, label: 'Tahsilat Özeti' },
