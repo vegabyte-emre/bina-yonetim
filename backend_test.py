@@ -159,39 +159,44 @@ class MonthlyDuesTester:
             self.log_test("Create Monthly Due", False, f"Monthly due creation failed: {str(e)}")
             return False
     
-    def test_create_second_registration_request(self):
-        """Test creating a second registration request for rejection test"""
+    def test_get_monthly_dues_after_creation(self):
+        """Test getting monthly dues list after creation to verify the new due is included"""
         try:
-            request_data = {
-                "building_name": "Test Sitesi 2",
-                "manager_name": "Mehmet Demir",
-                "email": "testmanager2@example.com", 
-                "phone": "05309876543",
-                "address": "Ankara, Çankaya",
-                "apartment_count": "30"
-            }
-            
-            response = self.session.post(
-                f"{BASE_URL}/registration-requests",
-                json=request_data,
-                headers={"Content-Type": "application/json"}
-            )
+            response = self.session.get(f"{BASE_URL}/monthly-dues")
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("success") and data.get("request_id"):
-                    self.request_id_2 = data["request_id"]
-                    self.log_test("Create Second Registration Request", True, f"Second registration request created with ID: {self.request_id_2}")
-                    return True
+                if isinstance(data, list):
+                    # Check if our created monthly due is in the list
+                    found_due = None
+                    for due in data:
+                        if due.get("id") == self.monthly_due_id:
+                            found_due = due
+                            break
+                    
+                    if found_due:
+                        month = found_due.get("month")
+                        total_amount = found_due.get("total_amount")
+                        expense_items = found_due.get("expense_items", [])
+                        
+                        if month == "Şubat 2025" and total_amount == 18000 and len(expense_items) == 3:
+                            self.log_test("Get Monthly Dues (After Creation)", True, f"Found created monthly due: {month}, Total: ₺{total_amount:,.2f}, Items: {len(expense_items)}")
+                            return True
+                        else:
+                            self.log_test("Get Monthly Dues (After Creation)", False, f"Monthly due data mismatch - Month: {month}, Total: {total_amount}, Items: {len(expense_items)}")
+                            return False
+                    else:
+                        self.log_test("Get Monthly Dues (After Creation)", False, f"Created monthly due not found in list of {len(data)} items")
+                        return False
                 else:
-                    self.log_test("Create Second Registration Request", False, "Invalid response format", data)
+                    self.log_test("Get Monthly Dues (After Creation)", False, "Response is not a list", data)
                     return False
             else:
-                self.log_test("Create Second Registration Request", False, f"Request failed with status {response.status_code}", response.text)
+                self.log_test("Get Monthly Dues (After Creation)", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Create Second Registration Request", False, f"Second request creation failed: {str(e)}")
+            self.log_test("Get Monthly Dues (After Creation)", False, f"Get monthly dues failed: {str(e)}")
             return False
     
     def test_reject_registration_request(self):
