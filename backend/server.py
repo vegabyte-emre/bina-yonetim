@@ -2141,12 +2141,116 @@ from routes import push_notifications
 from routes import firebase_push
 from routes import expo_push
 from routes.mail_service import get_mail_routes
+from routes.netgsm_service import NetgsmService
+from routes.paratika_service import ParatikaService
+
+# Initialize services
+netgsm_service = NetgsmService(db)
+paratika_service = ParatikaService(db)
 
 app.include_router(push_notifications.router)
 app.include_router(firebase_push.router)
 app.include_router(expo_push.router)
 app.include_router(get_mail_routes(db))
 app.include_router(api_router)
+
+# ============ NETGSM ROUTES ============
+
+@app.get("/api/netgsm/config")
+async def get_netgsm_config(current_user: User = Depends(get_current_superadmin)):
+    """Netgsm ayarlarını getir"""
+    config = await netgsm_service.get_config()
+    # Şifreyi maskele
+    if config.get("password"):
+        config["password"] = "••••••••"
+    return config
+
+@app.post("/api/netgsm/config")
+async def save_netgsm_config(config: dict, current_user: User = Depends(get_current_superadmin)):
+    """Netgsm ayarlarını kaydet"""
+    # Eğer şifre maskeliyse, mevcut şifreyi koru
+    if config.get("password") == "••••••••":
+        existing = await netgsm_service.get_config()
+        config["password"] = existing.get("password", "")
+    
+    await netgsm_service.save_config(config)
+    return {"success": True, "message": "Netgsm ayarları kaydedildi"}
+
+@app.post("/api/netgsm/test")
+async def test_netgsm(current_user: User = Depends(get_current_superadmin)):
+    """Netgsm bağlantısını test et"""
+    result = await netgsm_service.test_connection()
+    return result
+
+@app.post("/api/netgsm/send")
+async def send_sms(data: dict, current_user: User = Depends(get_current_superadmin)):
+    """SMS gönder"""
+    phone_numbers = data.get("phone_numbers", [])
+    message = data.get("message", "")
+    sender = data.get("sender")
+    
+    if not phone_numbers or not message:
+        raise HTTPException(status_code=400, detail="Telefon numarası ve mesaj gerekli")
+    
+    result = await netgsm_service.send_sms(phone_numbers, message, sender)
+    return result
+
+@app.get("/api/netgsm/balance")
+async def get_netgsm_balance(current_user: User = Depends(get_current_superadmin)):
+    """Netgsm bakiye sorgula"""
+    result = await netgsm_service.check_balance()
+    return result
+
+# ============ PARATIKA ROUTES ============
+
+@app.get("/api/paratika/config")
+async def get_paratika_config(current_user: User = Depends(get_current_superadmin)):
+    """Paratika ayarlarını getir"""
+    config = await paratika_service.get_config()
+    # Şifreyi maskele
+    if config.get("merchant_password"):
+        config["merchant_password"] = "••••••••"
+    return config
+
+@app.post("/api/paratika/config")
+async def save_paratika_config(config: dict, current_user: User = Depends(get_current_superadmin)):
+    """Paratika ayarlarını kaydet"""
+    # Eğer şifre maskeliyse, mevcut şifreyi koru
+    if config.get("merchant_password") == "••••••••":
+        existing = await paratika_service.get_config()
+        config["merchant_password"] = existing.get("merchant_password", "")
+    
+    await paratika_service.save_config(config)
+    return {"success": True, "message": "Paratika ayarları kaydedildi"}
+
+@app.post("/api/paratika/test")
+async def test_paratika(current_user: User = Depends(get_current_superadmin)):
+    """Paratika bağlantısını test et"""
+    result = await paratika_service.test_connection()
+    return result
+
+@app.post("/api/paratika/create-session")
+async def create_payment_session(data: dict, current_user: User = Depends(get_current_superadmin)):
+    """Ödeme oturumu oluştur"""
+    amount = data.get("amount")
+    if not amount:
+        raise HTTPException(status_code=400, detail="Tutar gerekli")
+    
+    result = await paratika_service.create_session_token(
+        amount=float(amount),
+        currency=data.get("currency", "TRY"),
+        order_id=data.get("order_id"),
+        customer_info=data.get("customer_info"),
+        return_url=data.get("return_url"),
+        cancel_url=data.get("cancel_url")
+    )
+    return result
+
+@app.get("/api/paratika/query/{order_id}")
+async def query_payment(order_id: str, current_user: User = Depends(get_current_superadmin)):
+    """Ödeme durumunu sorgula"""
+    result = await paratika_service.query_payment(order_id=order_id)
+    return result
 
 app.add_middleware(
     CORSMiddleware,
