@@ -293,20 +293,22 @@ class MonthlyDuesTester:
             return False
     
     def run_all_tests(self):
-        """Run all registration request tests"""
-        print("🚀 Starting Registration Request API Tests")
+        """Run all monthly dues management tests"""
+        print("🚀 Starting Monthly Dues Management (Aidat Yönetimi) API Tests")
         print(f"📍 Base URL: {BASE_URL}")
-        print("=" * 60)
+        print(f"👤 Building Admin: {BUILDING_ADMIN_EMAIL}")
+        print("=" * 70)
         
         # Test sequence
         tests = [
-            self.test_superadmin_login,
-            self.test_create_registration_request,
-            self.test_get_registration_requests,
-            self.test_approve_registration_request,
-            self.verify_building_and_user_creation,
-            self.test_create_second_registration_request,
-            self.test_reject_registration_request
+            self.test_building_admin_login,
+            self.test_get_building_info,
+            self.test_get_monthly_dues_initial,
+            self.test_create_monthly_due,
+            self.test_get_monthly_dues_after_creation,
+            self.test_get_specific_monthly_due,
+            self.test_send_monthly_due_mail,
+            self.test_delete_monthly_due
         ]
         
         passed = 0
@@ -317,11 +319,11 @@ class MonthlyDuesTester:
                 passed += 1
             print()  # Add spacing between tests
         
-        print("=" * 60)
+        print("=" * 70)
         print(f"📊 Test Results: {passed}/{total} tests passed")
         
         if passed == total:
-            print("🎉 All tests passed! Registration request flow is working correctly.")
+            print("🎉 All tests passed! Monthly Dues Management system is working correctly.")
             return True
         else:
             print("⚠️  Some tests failed. Check the details above.")
