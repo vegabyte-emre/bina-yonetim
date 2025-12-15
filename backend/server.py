@@ -972,6 +972,15 @@ async def reject_registration(request_id: str, current_user: User = Depends(get_
     
     return {"success": True, "message": "Başvuru reddedildi"}
 
+@api_router.delete("/registration-requests/{request_id}")
+async def delete_registration_request(request_id: str, current_user: User = Depends(get_current_superadmin)):
+    """Başvuruyu sil"""
+    result = await db.registration_requests.delete_one({"id": request_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Başvuru bulunamadı")
+    
+    return {"success": True, "message": "Başvuru silindi"}
+
 # ============ SUBSCRIPTION ROUTES ============
 
 @api_router.get("/subscriptions", response_model=List[SubscriptionPlan])
