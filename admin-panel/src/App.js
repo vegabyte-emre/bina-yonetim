@@ -16,6 +16,7 @@ import Voting from './pages/Voting';
 import Meetings from './pages/Meetings';
 import Decisions from './pages/Decisions';
 import MailGonder from './pages/MailGonder';
+import Payments from './pages/Payments';
 import Settings from './pages/Settings';
 import './App.css';
 
