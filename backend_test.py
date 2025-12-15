@@ -237,41 +237,59 @@ class MonthlyDuesTester:
             self.log_test("Get Specific Monthly Due", False, f"Get specific monthly due failed: {str(e)}")
             return False
     
-    def verify_building_and_user_creation(self):
-        """Verify that building and user were created after approval"""
+    def test_send_monthly_due_mail(self):
+        """Test sending monthly due notification mail to residents"""
         try:
-            if not hasattr(self, 'building_id') or not hasattr(self, 'user_id'):
-                self.log_test("Verify Building and User Creation", False, "No building or user ID available for verification")
+            if not self.monthly_due_id:
+                self.log_test("Send Monthly Due Mail", False, "No monthly due ID available")
                 return False
             
-            # Check if building was created
-            building_response = self.session.get(f"{BASE_URL}/buildings/{self.building_id}")
-            if building_response.status_code == 200:
-                building_data = building_response.json()
-                building_name = building_data.get("name")
-                
-                # Check if user was created
-                user_response = self.session.get(f"{BASE_URL}/users/{self.user_id}")
-                if user_response.status_code == 200:
-                    user_data = user_response.json()
-                    user_email = user_data.get("email")
-                    user_role = user_data.get("role")
+            response = self.session.post(f"{BASE_URL}/monthly-dues/{self.monthly_due_id}/send-mail")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    sent_count = data.get("sent_count", 0)
+                    failed_count = data.get("failed_count", 0)
+                    message = data.get("message", "")
                     
-                    if building_name == "Test Sitesi" and user_email == "testmanager@example.com" and user_role == "building_admin":
-                        self.log_test("Verify Building and User Creation", True, f"Building '{building_name}' and user '{user_email}' created successfully")
-                        return True
-                    else:
-                        self.log_test("Verify Building and User Creation", False, f"Data mismatch - Building: {building_name}, User: {user_email}, Role: {user_role}")
-                        return False
+                    # Even if no residents have email, the API should work
+                    self.log_test("Send Monthly Due Mail", True, f"Mail sending completed: {message} (Sent: {sent_count}, Failed: {failed_count})")
+                    return True
                 else:
-                    self.log_test("Verify Building and User Creation", False, f"User verification failed with status {user_response.status_code}")
+                    self.log_test("Send Monthly Due Mail", False, "Mail sending failed", data)
                     return False
             else:
-                self.log_test("Verify Building and User Creation", False, f"Building verification failed with status {building_response.status_code}")
+                self.log_test("Send Monthly Due Mail", False, f"Request failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Verify Building and User Creation", False, f"Verification failed: {str(e)}")
+            self.log_test("Send Monthly Due Mail", False, f"Send mail request failed: {str(e)}")
+            return False
+    
+    def test_delete_monthly_due(self):
+        """Test deleting the created monthly due (cleanup)"""
+        try:
+            if not self.monthly_due_id:
+                self.log_test("Delete Monthly Due (Cleanup)", True, "No monthly due to delete")
+                return True
+            
+            response = self.session.delete(f"{BASE_URL}/monthly-dues/{self.monthly_due_id}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    self.log_test("Delete Monthly Due (Cleanup)", True, "Monthly due deleted successfully")
+                    return True
+                else:
+                    self.log_test("Delete Monthly Due (Cleanup)", False, "Delete response invalid", data)
+                    return False
+            else:
+                self.log_test("Delete Monthly Due (Cleanup)", False, f"Delete failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Delete Monthly Due (Cleanup)", False, f"Delete request failed: {str(e)}")
             return False
     
     def run_all_tests(self):
