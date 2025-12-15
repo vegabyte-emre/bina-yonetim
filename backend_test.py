@@ -292,6 +292,197 @@ class SuperadminPanelTester:
             self.log_test("Subscription Plans (With Auth)", False, f"Subscription plans with auth failed: {str(e)}")
             return False
     
+    def test_netgsm_get_config(self):
+        """Test GET /api/netgsm/config - Should return config (may be empty)"""
+        try:
+            response = self.session.get(f"{BASE_URL}/netgsm/config")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, dict):
+                    self.log_test("Netgsm Get Config", True, f"Retrieved Netgsm config: {len(data)} fields")
+                    return True
+                else:
+                    self.log_test("Netgsm Get Config", False, "Response is not a dict", data)
+                    return False
+            else:
+                self.log_test("Netgsm Get Config", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Netgsm Get Config", False, f"Netgsm get config failed: {str(e)}")
+            return False
+    
+    def test_netgsm_save_config(self):
+        """Test POST /api/netgsm/config - Save config"""
+        try:
+            config_data = {
+                "is_active": True,
+                "username": "850XXXXXXX",
+                "password": "testpass",
+                "default_sender": "YONETIOO"
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/netgsm/config",
+                json=config_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    self.log_test("Netgsm Save Config", True, f"Netgsm config saved successfully: {data.get('message', 'OK')}")
+                    return True
+                else:
+                    self.log_test("Netgsm Save Config", False, "Save failed", data)
+                    return False
+            else:
+                self.log_test("Netgsm Save Config", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Netgsm Save Config", False, f"Netgsm save config failed: {str(e)}")
+            return False
+    
+    def test_netgsm_test_connection(self):
+        """Test POST /api/netgsm/test - Test connection (may fail without real credentials)"""
+        try:
+            response = self.session.post(f"{BASE_URL}/netgsm/test")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "success" in data:
+                    if data.get("success"):
+                        self.log_test("Netgsm Test Connection", True, f"Netgsm connection test successful: {data.get('message', 'OK')}")
+                    else:
+                        # Expected to fail with test credentials
+                        self.log_test("Netgsm Test Connection", True, f"Netgsm connection test failed as expected: {data.get('error', 'Connection failed')}")
+                    return True
+                else:
+                    self.log_test("Netgsm Test Connection", False, "Invalid response format", data)
+                    return False
+            else:
+                self.log_test("Netgsm Test Connection", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Netgsm Test Connection", False, f"Netgsm test connection failed: {str(e)}")
+            return False
+    
+    def test_paratika_get_config(self):
+        """Test GET /api/paratika/config - Should return config (may be empty)"""
+        try:
+            response = self.session.get(f"{BASE_URL}/paratika/config")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, dict):
+                    # Check for password masking
+                    password_masked = False
+                    if "password" in data and data["password"] == "••••••••":
+                        password_masked = True
+                    elif "merchant_password" in data and data["merchant_password"] == "••••••••":
+                        password_masked = True
+                    
+                    message = f"Retrieved Paratika config: {len(data)} fields"
+                    if password_masked:
+                        message += " (password properly masked)"
+                    
+                    self.log_test("Paratika Get Config", True, message)
+                    return True
+                else:
+                    self.log_test("Paratika Get Config", False, "Response is not a dict", data)
+                    return False
+            else:
+                self.log_test("Paratika Get Config", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Paratika Get Config", False, f"Paratika get config failed: {str(e)}")
+            return False
+    
+    def test_paratika_save_config(self):
+        """Test POST /api/paratika/config - Save config"""
+        try:
+            config_data = {
+                "is_active": True,
+                "is_live": False,
+                "merchant": "700000000",
+                "merchant_user": "testuser",
+                "merchant_password": "testpass",
+                "return_url": "https://yonetioo.com/odeme/basarili",
+                "cancel_url": "https://yonetioo.com/odeme/iptal"
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/paratika/config",
+                json=config_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    self.log_test("Paratika Save Config", True, f"Paratika config saved successfully: {data.get('message', 'OK')}")
+                    return True
+                else:
+                    self.log_test("Paratika Save Config", False, "Save failed", data)
+                    return False
+            else:
+                self.log_test("Paratika Save Config", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Paratika Save Config", False, f"Paratika save config failed: {str(e)}")
+            return False
+    
+    def test_paratika_test_connection(self):
+        """Test POST /api/paratika/test - Test connection (may fail without real credentials)"""
+        try:
+            response = self.session.post(f"{BASE_URL}/paratika/test")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "success" in data:
+                    if data.get("success"):
+                        self.log_test("Paratika Test Connection", True, f"Paratika connection test successful: {data.get('message', 'OK')}")
+                    else:
+                        # Expected to fail with test credentials
+                        self.log_test("Paratika Test Connection", True, f"Paratika connection test failed as expected: {data.get('error', 'Connection failed')}")
+                    return True
+                else:
+                    self.log_test("Paratika Test Connection", False, "Invalid response format", data)
+                    return False
+            else:
+                self.log_test("Paratika Test Connection", False, f"Request failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Paratika Test Connection", False, f"Paratika test connection failed: {str(e)}")
+            return False
+    
+    def test_subscription_payments_endpoint(self):
+        """Test GET /api/subscription-payments endpoint exists (for Finance page)"""
+        try:
+            response = self.session.get(f"{BASE_URL}/subscription-payments")
+            
+            # We expect this endpoint to exist, even if it returns empty data or 404
+            if response.status_code in [200, 404]:
+                if response.status_code == 200:
+                    data = response.json()
+                    self.log_test("Subscription Payments Endpoint", True, f"Endpoint exists and returned data: {type(data)}")
+                else:
+                    self.log_test("Subscription Payments Endpoint", False, "Endpoint returns 404 - not implemented yet")
+                return response.status_code == 200
+            else:
+                self.log_test("Subscription Payments Endpoint", False, f"Unexpected status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_test("Subscription Payments Endpoint", False, f"Subscription payments endpoint test failed: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all Superadmin Panel improvement tests"""
         print("🚀 Starting Superadmin Panel Improvements API Tests")
