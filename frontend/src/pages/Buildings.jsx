@@ -283,6 +283,22 @@ const Buildings = () => {
                     onChange={(e) => setFormData({ ...formData, aidat_amount: parseFloat(e.target.value) })}
                   />
                 </div>
+                {editMode && (
+                  <div>
+                    <Label htmlFor="subscription_status">Durum</Label>
+                    <select
+                      id="subscription_status"
+                      value={formData.subscription_status}
+                      onChange={(e) => setFormData({ ...formData, subscription_status: e.target.value })}
+                      className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                    >
+                      <option value="active">Aktif</option>
+                      <option value="passive">Pasif</option>
+                      <option value="trial">Deneme</option>
+                      <option value="expired">Süresi Dolmuş</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="border-t pt-4">
