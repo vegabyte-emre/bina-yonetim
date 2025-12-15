@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Building2, Users, CreditCard, Settings, LogOut, Menu, X, FileText, Mail } from 'lucide-react';
+import { LayoutDashboard, Building2, Users, CreditCard, Settings, LogOut, Menu, X, FileText, Mail, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Layout = ({ setIsAuthenticated }) => {
@@ -29,6 +29,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/users', icon: Users, label: 'Kullanıcılar' },
     { path: '/registration-requests', icon: FileText, label: 'Başvurular' },
     { path: '/subscriptions', icon: CreditCard, label: 'Abonelikler' },
+    { path: '/finance', icon: TrendingUp, label: 'Finans Yönetimi' },
     { path: '/mail-settings', icon: Mail, label: 'Mail Ayarları' },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
