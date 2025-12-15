@@ -181,32 +181,6 @@ const MailGonder = () => {
     }
   };
 
-  const handleDuesSubmit = (e) => {
-    e.preventDefault();
-    
-    // Create expense details HTML
-    let expenseHtml = '';
-    if (duesForm.expense_details) {
-      const lines = duesForm.expense_details.split('\n').filter(l => l.trim());
-      expenseHtml = lines.map(line => {
-        const parts = line.split(':');
-        if (parts.length >= 2) {
-          return `<tr><td>${parts[0].trim()}</td><td style="text-align: right;">${parts[1].trim()}</td></tr>`;
-        }
-        return `<tr><td colspan="2">${line}</td></tr>`;
-      }).join('');
-    }
-    
-    handleSendMail('dues_notification', {
-      month: duesForm.month,
-      amount: duesForm.amount,
-      due_date: formatDateTR(duesForm.due_date),
-      expense_details: expenseHtml,
-      previous_balance: '₺0',
-      total_amount: duesForm.amount
-    });
-  };
-
   const handleMeetingSubmit = (e) => {
     e.preventDefault();
     handleSendMail('meeting_voting', {
