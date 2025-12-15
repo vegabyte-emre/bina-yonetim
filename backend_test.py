@@ -345,7 +345,7 @@ class MonthlyDuesTester:
 
 def main():
     """Main test execution"""
-    tester = RegistrationRequestTester()
+    tester = MonthlyDuesTester()
     
     try:
         success = tester.run_all_tests()
