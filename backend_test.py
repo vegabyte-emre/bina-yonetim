@@ -26,6 +26,8 @@ class SuperadminPanelTester:
     def __init__(self):
         self.session = requests.Session()
         self.token = None
+        self.building_admin_session = requests.Session()
+        self.building_admin_token = None
         self.test_results = []
         # Store created IDs for cleanup
         self.created_registration_request_id = None
