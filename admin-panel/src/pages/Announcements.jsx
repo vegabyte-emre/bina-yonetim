@@ -367,15 +367,33 @@ const AnnouncementsNew = () => {
                     </div>
                   </div>
                   <div className="flex gap-2 ml-4">
+                    {/* Push Notification Gönder */}
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => sendPushNotification(announcement)}
                       disabled={sendingNotification}
                       className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                      title="Push Bildirim Gönder"
                     >
                       <Send className="h-4 w-4" />
                     </Button>
+                    {/* Mail Gönder */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleSendEmail(announcement)}
+                      disabled={sendingEmail === announcement.id}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      title="E-posta ile Gönder"
+                    >
+                      {sendingEmail === announcement.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Mail className="h-4 w-4" />
+                      )}
+                    </Button>
+                    {/* Sil */}
                     <Button
                       size="sm"
                       variant="outline"
@@ -384,6 +402,7 @@ const AnnouncementsNew = () => {
                         setDeleteDialogOpen(true);
                       }}
                       className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      title="Sil"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
