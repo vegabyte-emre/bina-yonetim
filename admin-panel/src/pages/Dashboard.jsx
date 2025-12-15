@@ -92,7 +92,7 @@ const Dashboard = () => {
     {
       title: 'Bekleyen Aidat',
       value: stats?.pending_dues || 0,
-      icon: DollarSign,
+      icon: TLIcon,
       color: 'bg-red-500',
       lightColor: 'bg-red-50',
       textColor: 'text-red-600',
