@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://buildpro-mgmt.preview.emergentagent.com/api"
+BASE_URL = "https://propertyflow-8.preview.emergentagent.com/api"
 SUPERADMIN_EMAIL = "admin@test.com"
 SUPERADMIN_PASSWORD = "admin123"
 

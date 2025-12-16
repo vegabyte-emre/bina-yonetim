@@ -42,7 +42,7 @@
 ### Test Credentials
 - Building Manager: ahmet@mavirezidans.com / admin123
 - Test Card: 4355 0840 0000 0016 | 12/30 | CVV: 000
-- API URL: https://buildpro-mgmt.preview.emergentagent.com/api
+- API URL: https://propertyflow-8.preview.emergentagent.com/api
 - Frontend URL: http://localhost:3001
 
 ## Issues Found and Resolved ✅
@@ -78,7 +78,7 @@
 - Payment dialog functionality needs verification
 
 ## Test Environment Details
-- Backend URL: https://buildpro-mgmt.preview.emergentagent.com/api
+- Backend URL: https://propertyflow-8.preview.emergentagent.com/api
 - Frontend URL: http://localhost:3001 (Building Manager Panel)
 - Database: MongoDB with building_management database
 - Payment Gateway: Paratika (test environment)
