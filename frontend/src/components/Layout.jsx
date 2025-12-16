@@ -30,6 +30,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/registration-requests', icon: FileText, label: 'Başvurular' },
     { path: '/subscriptions', icon: CreditCard, label: 'Abonelikler' },
     { path: '/finance', icon: TrendingUp, label: 'Finans Yönetimi' },
+    { path: '/building-status', icon: Activity, label: 'Bina Durumu' },
     { path: '/mail-settings', icon: Mail, label: 'Mail Ayarları' },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
