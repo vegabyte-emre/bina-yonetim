@@ -2305,7 +2305,7 @@ async def update_building_status(
                 await mail_service.send_mail(
                     to=email_recipients,
                     subject=f"⚠️ {building_name} - Asansör Arızası Bildirimi",
-                    body=f"""
+                    body_html=f"""
                     <h2>Asansör Arızası Bildirimi</h2>
                     <p>Sayın Sakinimiz,</p>
                     <p><strong>{building_name}</strong> binasında asansör arızası bildirilmiştir.</p>
