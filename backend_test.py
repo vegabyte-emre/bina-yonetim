@@ -537,9 +537,27 @@ class SuperadminPanelTester:
                         missing_fields = [field for field in required_fields if field not in payment]
                         
                         if not missing_fields:
-                            # Check for expected periods (months)
+                            # Check for expected periods (months) and Turkish Lira amounts
                             periods = [p.get("period", "") for p in data]
-                            self.log_test("Get Building Payments", True, f"Retrieved {len(data)} payments with periods: {', '.join(periods[:3])}...")
+                            amounts = [p.get("amount", 0) for p in data]
+                            statuses = [p.get("status", "") for p in data]
+                            
+                            # Verify we have different payment statuses
+                            expected_statuses = ["paid", "pending", "upcoming"]
+                            found_statuses = list(set(statuses))
+                            
+                            # Check for Turkish month names
+                            turkish_months = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", 
+                                            "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"]
+                            has_turkish_months = any(any(month in period for month in turkish_months) for period in periods)
+                            
+                            message = f"Retrieved {len(data)} payments with periods: {', '.join(periods[:3])}..."
+                            if has_turkish_months:
+                                message += " (Turkish months ✓)"
+                            if len(found_statuses) > 1:
+                                message += f" Statuses: {', '.join(found_statuses)}"
+                            
+                            self.log_test("Get Building Payments", True, message)
                             return True
                         else:
                             self.log_test("Get Building Payments", False, f"Missing required fields: {missing_fields}", payment)
