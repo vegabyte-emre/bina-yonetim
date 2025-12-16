@@ -2236,7 +2236,12 @@ async def get_building_status(current_user: User = Depends(get_current_building_
             "updated_by": current_user.id
         }
         await db.building_status.insert_one(default_status)
-        return default_status
+        # Fetch without _id to return clean data
+        status = await db.building_status.find_one(
+            {"building_id": current_user.building_id},
+            {"_id": 0}
+        )
+        return status
     
     return status
 
