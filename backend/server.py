@@ -2261,11 +2261,27 @@ async def update_building_status(
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     update_data["updated_by"] = current_user.id
     
-    # Asansör durumu değişti mi kontrol et
-    elevator_changed_to_faulty = (
-        status_data.elevator == "faulty" and 
-        (not current_status or current_status.get("elevator") != "faulty")
-    )
+    # Hangi durumlar arıza/kesinti olarak değişti kontrol et
+    status_changes = []
+    status_labels = {
+        "wifi": {"name": "Wi-Fi", "faulty": "inactive", "label_faulty": "kapalı"},
+        "elevator": {"name": "Asansör", "faulty": "faulty", "label_faulty": "arızalı"},
+        "electricity": {"name": "Elektrik", "faulty": "outage", "label_faulty": "kesintisi"},
+        "water": {"name": "Su", "faulty": "outage", "label_faulty": "kesintisi"}
+    }
+    
+    for key, config in status_labels.items():
+        new_value = getattr(status_data, key, None)
+        old_value = current_status.get(key) if current_status else "active"
+        faulty_status = config["faulty"]
+        
+        # Eğer yeni değer arızalı/kesinti ve eski değer farklıysa
+        if new_value == faulty_status and old_value != faulty_status:
+            status_changes.append({
+                "key": key,
+                "name": config["name"],
+                "label": config["label_faulty"]
+            })
     
     if current_status:
         await db.building_status.update_one(
@@ -2282,8 +2298,8 @@ async def update_building_status(
         update_data.setdefault("water", "active")
         await db.building_status.insert_one(update_data)
     
-    # Asansör arızalı ise bildirim gönder
-    if elevator_changed_to_faulty:
+    # Arıza/kesinti varsa bildirim gönder
+    if status_changes:
         # Bina bilgisini al
         building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
         building_name = building.get("name", "Bina") if building else "Bina"
@@ -2294,50 +2310,54 @@ async def update_building_status(
             {"_id": 0}
         ).to_list(1000)
         
-        # Mail gönder
-        try:
-            from routes.mail_service import MailService
-            mail_service = MailService(db)
+        # Her arıza için bildirim oluştur
+        for change in status_changes:
+            system_name = change["name"]
+            system_label = change["label"]
             
-            # Mail adresi olan sakinlere mail gönder
-            email_recipients = [r["email"] for r in residents if r.get("email")]
-            if email_recipients:
-                await mail_service.send_mail(
-                    to=email_recipients,
-                    subject=f"⚠️ {building_name} - Asansör Arızası Bildirimi",
-                    body_html=f"""
-                    <h2>Asansör Arızası Bildirimi</h2>
-                    <p>Sayın Sakinimiz,</p>
-                    <p><strong>{building_name}</strong> binasında asansör arızası bildirilmiştir.</p>
-                    <p>En kısa sürede onarım yapılacaktır. Anlayışınız için teşekkür ederiz.</p>
-                    <p>Lütfen merdivenleri kullanınız.</p>
-                    <br>
-                    <p>Saygılarımızla,<br>{building_name} Yönetimi</p>
-                    """
-                )
-                print(f"Asansör arıza maili gönderildi: {len(email_recipients)} kişi")
-        except Exception as e:
-            print(f"Mail gönderimi hatası: {e}")
-        
-        # Push notification gönder
-        try:
-            # Expo push token'ları olan sakinlere bildirim gönder
-            tokens_to_notify = []
-            for resident in residents:
-                if resident.get("expo_push_token"):
-                    tokens_to_notify.append(resident["expo_push_token"])
+            # Mail gönder
+            try:
+                from routes.mail_service import MailService
+                mail_service = MailService(db)
+                
+                # Mail adresi olan sakinlere mail gönder
+                email_recipients = [r["email"] for r in residents if r.get("email")]
+                if email_recipients:
+                    await mail_service.send_mail(
+                        to=email_recipients,
+                        subject=f"⚠️ {building_name} - {system_name} {system_label.title()} Bildirimi",
+                        body_html=f"""
+                        <h2>{system_name} {system_label.title()} Bildirimi</h2>
+                        <p>Sayın Sakinimiz,</p>
+                        <p><strong>{building_name}</strong> binasında {system_name.lower()} {system_label} bildirilmiştir.</p>
+                        <p>En kısa sürede düzeltilecektir. Anlayışınız için teşekkür ederiz.</p>
+                        <br>
+                        <p>Saygılarımızla,<br>{building_name} Yönetimi</p>
+                        """
+                    )
+                    print(f"{system_name} arıza maili gönderildi: {len(email_recipients)} kişi")
+            except Exception as e:
+                print(f"Mail gönderimi hatası ({system_name}): {e}")
             
-            if tokens_to_notify:
-                from routes.expo_push import send_push_notification
-                await send_push_notification(
-                    tokens=tokens_to_notify,
-                    title="⚠️ Asansör Arızası",
-                    body=f"{building_name} binasında asansör arızası bildirildi. Lütfen merdivenleri kullanın.",
-                    data={"type": "elevator_alert", "building_id": current_user.building_id}
-                )
-                print(f"Push notification gönderildi: {len(tokens_to_notify)} cihaz")
-        except Exception as e:
-            print(f"Push notification hatası: {e}")
+            # Push notification gönder
+            try:
+                # Expo push token'ları olan sakinlere bildirim gönder
+                tokens_to_notify = []
+                for resident in residents:
+                    if resident.get("expo_push_token"):
+                        tokens_to_notify.append(resident["expo_push_token"])
+                
+                if tokens_to_notify:
+                    from routes.expo_push import send_push_notification
+                    await send_push_notification(
+                        tokens=tokens_to_notify,
+                        title=f"⚠️ {system_name} {system_label.title()}",
+                        body=f"{building_name} binasında {system_name.lower()} {system_label} bildirildi.",
+                        data={"type": f"{change['key']}_alert", "building_id": current_user.building_id}
+                    )
+                    print(f"Push notification gönderildi ({system_name}): {len(tokens_to_notify)} cihaz")
+            except Exception as e:
+                print(f"Push notification hatası ({system_name}): {e}")
     
     updated_status = await db.building_status.find_one(
         {"building_id": current_user.building_id},
