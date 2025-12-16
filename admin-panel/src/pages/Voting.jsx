@@ -77,7 +77,16 @@ const Voting = () => {
       </div>
 
       <div className="grid gap-4">
-        {votings.map((voting) => (
+        {votings.length === 0 ? (
+          <Card className="border-0 shadow-md">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <ThumbsUp className="h-16 w-16 text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Henüz oylama yok</h3>
+              <p className="text-sm text-gray-500 mb-4">Yeni bir oylama oluşturarak başlayın</p>
+            </CardContent>
+          </Card>
+        ) : (
+        votings.map((voting) => (
           <Card key={voting.id}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
