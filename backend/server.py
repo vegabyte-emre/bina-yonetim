@@ -2196,6 +2196,131 @@ async def get_my_building(current_user: User = Depends(get_current_building_admi
     
     return Building(**building)
 
+# ============ BUILDING MANAGER SETTINGS ROUTES ============
+
+class BuildingManagerProfileUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+class BuildingManagerPasswordChange(BaseModel):
+    current_password: str
+    new_password: str
+
+class BuildingManagerBuildingUpdate(BaseModel):
+    name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    district: Optional[str] = None
+
+class NotificationSettings(BaseModel):
+    email_notifications: bool = True
+    sms_notifications: bool = True
+
+@api_router.get("/building-manager/profile")
+async def get_building_manager_profile(current_user: User = Depends(get_current_building_admin)):
+    """Bina yöneticisi profil bilgilerini getir"""
+    user = await db.users.find_one({"id": current_user.id}, {"_id": 0, "hashed_password": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+    return user
+
+@api_router.put("/building-manager/profile")
+async def update_building_manager_profile(
+    profile_data: BuildingManagerProfileUpdate, 
+    current_user: User = Depends(get_current_building_admin)
+):
+    """Bina yöneticisi profil bilgilerini güncelle"""
+    update_data = {k: v for k, v in profile_data.model_dump().items() if v is not None}
+    
+    # Email değişiyorsa, başka birinde var mı kontrol et
+    if 'email' in update_data and update_data['email'] != current_user.email:
+        existing = await db.users.find_one({"email": update_data['email'], "id": {"$ne": current_user.id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Bu e-posta adresi başka bir kullanıcı tarafından kullanılıyor")
+    
+    if update_data:
+        await db.users.update_one({"id": current_user.id}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": current_user.id}, {"_id": 0, "hashed_password": 0})
+    return {"success": True, "message": "Profil bilgileri güncellendi", "user": updated_user}
+
+@api_router.put("/building-manager/change-password")
+async def change_building_manager_password(
+    password_data: BuildingManagerPasswordChange,
+    current_user: User = Depends(get_current_building_admin)
+):
+    """Bina yöneticisi şifre değiştir"""
+    # Mevcut kullanıcıyı şifresiyle birlikte getir
+    user = await db.users.find_one({"id": current_user.id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+    
+    # Mevcut şifreyi doğrula
+    if not verify_password(password_data.current_password, user.get("hashed_password", "")):
+        raise HTTPException(status_code=400, detail="Mevcut şifre yanlış")
+    
+    # Yeni şifre en az 6 karakter olmalı
+    if len(password_data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Yeni şifre en az 6 karakter olmalıdır")
+    
+    # Yeni şifreyi hashle ve kaydet
+    new_hashed_password = get_password_hash(password_data.new_password)
+    await db.users.update_one({"id": current_user.id}, {"$set": {"hashed_password": new_hashed_password}})
+    
+    return {"success": True, "message": "Şifre başarıyla değiştirildi"}
+
+@api_router.put("/building-manager/building")
+async def update_building_manager_building(
+    building_data: BuildingManagerBuildingUpdate,
+    current_user: User = Depends(get_current_building_admin)
+):
+    """Bina yöneticisi bina bilgilerini güncelle"""
+    # Binanın mevcut olduğunu kontrol et
+    building = await db.buildings.find_one({"id": current_user.building_id})
+    if not building:
+        raise HTTPException(status_code=404, detail="Bina bulunamadı")
+    
+    update_data = {k: v for k, v in building_data.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.buildings.update_one({"id": current_user.building_id}, {"$set": update_data})
+    
+    updated_building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
+    
+    # datetime dönüşümleri
+    if isinstance(updated_building.get('created_at'), str):
+        updated_building['created_at'] = datetime.fromisoformat(updated_building['created_at'])
+    if isinstance(updated_building.get('subscription_end_date'), str):
+        updated_building['subscription_end_date'] = datetime.fromisoformat(updated_building['subscription_end_date'])
+    
+    return {"success": True, "message": "Bina bilgileri güncellendi", "building": updated_building}
+
+@api_router.get("/building-manager/notification-settings")
+async def get_notification_settings(current_user: User = Depends(get_current_building_admin)):
+    """Bildirim ayarlarını getir"""
+    user = await db.users.find_one({"id": current_user.id}, {"_id": 0})
+    
+    return {
+        "email_notifications": user.get("email_notifications", True),
+        "sms_notifications": user.get("sms_notifications", True)
+    }
+
+@api_router.put("/building-manager/notification-settings")
+async def update_notification_settings(
+    settings: NotificationSettings,
+    current_user: User = Depends(get_current_building_admin)
+):
+    """Bildirim ayarlarını güncelle"""
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {
+            "email_notifications": settings.email_notifications,
+            "sms_notifications": settings.sms_notifications
+        }}
+    )
+    
+    return {"success": True, "message": "Bildirim ayarları güncellendi"}
+
 # ============ BUILDING MANAGER PAYMENT ROUTES ============
 
 @api_router.get("/building-payments")
