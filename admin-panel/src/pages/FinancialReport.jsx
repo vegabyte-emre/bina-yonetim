@@ -34,6 +34,17 @@ const FinancialReport = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      // Daireleri çek (daire numaralarını göstermek için)
+      const apartmentsResponse = await axios.get(`${API_URL}/api/apartments`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Daire ID -> Daire numarası map'i oluştur
+      const apartmentMap = {};
+      apartmentsResponse.data.forEach(apt => {
+        apartmentMap[apt.id] = apt.apartment_number || apt.door_number || 'Bilinmiyor';
+      });
+      
       const paidDues = duesResponse.data.filter(due => due.status === 'paid');
       const pendingDues = duesResponse.data.filter(due => due.status === 'pending' || due.status === 'overdue');
       
@@ -59,12 +70,12 @@ const FinancialReport = () => {
         pendingDues: totalPending,
       });
       
-      // Gelir listesi - ödenen aidatlar
+      // Gelir listesi - ödenen aidatlar (daire numarası ile)
       const incomeData = paidDues.map(due => ({
         id: due.id,
-        title: `Aidat - ${due.apartment_id}`,
+        title: `Aidat - Daire ${apartmentMap[due.apartment_id] || 'Bilinmiyor'}`,
         amount: due.amount,
-        date: due.payment_date || due.due_date,
+        date: due.paid_date || due.due_date,
         category: 'Aidat',
       }));
       
