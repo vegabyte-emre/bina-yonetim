@@ -49,7 +49,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/meetings', icon: Calendar, label: 'Toplantılar' },
     { path: '/decisions', icon: CheckSquare, label: 'Kararlar' },
     { path: '/mail-gonder', icon: Mail, label: 'Mail Gönder' },
-    { path: '/building-status', icon: Activity, label: 'Bina Durumu', highlight: true },
+    { path: '/building-status', icon: Activity, label: 'Bina Durumu' },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
 
