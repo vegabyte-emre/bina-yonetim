@@ -307,12 +307,17 @@ const Subscriptions = () => {
                   <div>
                     <div className="flex items-baseline">
                       <span className="text-3xl font-bold text-gray-900">
-                        {plan.price_monthly.toFixed(2)}
+                        ₺{plan.price_monthly.toFixed(0)}
                       </span>
-                      <span className="ml-1 text-gray-500">TL/ay</span>
+                      <span className="ml-1 text-gray-500">/ay</span>
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      veya {plan.price_yearly.toFixed(2)} TL/yıl
+                      veya ₺{plan.price_yearly.toFixed(0)}/yıl
+                      {plan.price_monthly * 12 > plan.price_yearly && (
+                        <Badge className="ml-2 bg-green-100 text-green-700">
+                          %{Math.round(((plan.price_monthly * 12 - plan.price_yearly) / (plan.price_monthly * 12)) * 100)} tasarruf
+                        </Badge>
+                      )}
                     </div>
                   </div>
 
