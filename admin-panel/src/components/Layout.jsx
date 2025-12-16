@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Building, Home, Users, Bell, FileText, Settings, LogOut, Menu, X, TrendingUp, BarChart3, ThumbsUp, Calendar, CheckSquare, Mail, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Building, Home, Users, Bell, FileText, Settings, LogOut, Menu, X, TrendingUp, BarChart3, ThumbsUp, Calendar, CheckSquare, Mail, CreditCard, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 
 // TL İkonu komponenti
@@ -49,6 +49,7 @@ const Layout = ({ setIsAuthenticated }) => {
     { path: '/meetings', icon: Calendar, label: 'Toplantılar' },
     { path: '/decisions', icon: CheckSquare, label: 'Kararlar' },
     { path: '/mail-gonder', icon: Mail, label: 'Mail Gönder' },
+    { path: '/building-status', icon: Activity, label: 'Bina Durumu', highlight: true },
     { path: '/settings', icon: Settings, label: 'Ayarlar' },
   ];
 
