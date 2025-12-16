@@ -2196,6 +2196,171 @@ async def get_my_building(current_user: User = Depends(get_current_building_admi
     
     return Building(**building)
 
+# ============ BUILDING STATUS ROUTES ============
+
+class BuildingStatusUpdate(BaseModel):
+    wifi: Optional[str] = None  # active, inactive, maintenance
+    elevator: Optional[str] = None  # active, faulty, maintenance
+    electricity: Optional[str] = None  # active, outage, maintenance
+    water: Optional[str] = None  # active, outage, maintenance
+
+class BuildingStatus(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    building_id: str
+    wifi: str = "active"
+    elevator: str = "active"
+    electricity: str = "active"
+    water: str = "active"
+    updated_at: datetime
+    updated_by: Optional[str] = None
+
+@api_router.get("/building-manager/building-status")
+async def get_building_status(current_user: User = Depends(get_current_building_admin)):
+    """Bina durum bilgilerini getir"""
+    status = await db.building_status.find_one(
+        {"building_id": current_user.building_id}, 
+        {"_id": 0}
+    )
+    
+    if not status:
+        # Default status oluştur
+        default_status = {
+            "id": str(uuid.uuid4()),
+            "building_id": current_user.building_id,
+            "wifi": "active",
+            "elevator": "active",
+            "electricity": "active",
+            "water": "active",
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": current_user.id
+        }
+        await db.building_status.insert_one(default_status)
+        return default_status
+    
+    return status
+
+@api_router.put("/building-manager/building-status")
+async def update_building_status(
+    status_data: BuildingStatusUpdate,
+    current_user: User = Depends(get_current_building_admin)
+):
+    """Bina durum bilgilerini güncelle - Asansör arızalı olduğunda bildirim gönder"""
+    # Mevcut durumu al
+    current_status = await db.building_status.find_one(
+        {"building_id": current_user.building_id},
+        {"_id": 0}
+    )
+    
+    update_data = {k: v for k, v in status_data.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    update_data["updated_by"] = current_user.id
+    
+    # Asansör durumu değişti mi kontrol et
+    elevator_changed_to_faulty = (
+        status_data.elevator == "faulty" and 
+        (not current_status or current_status.get("elevator") != "faulty")
+    )
+    
+    if current_status:
+        await db.building_status.update_one(
+            {"building_id": current_user.building_id},
+            {"$set": update_data}
+        )
+    else:
+        update_data["id"] = str(uuid.uuid4())
+        update_data["building_id"] = current_user.building_id
+        # Set defaults for missing fields
+        update_data.setdefault("wifi", "active")
+        update_data.setdefault("elevator", "active")
+        update_data.setdefault("electricity", "active")
+        update_data.setdefault("water", "active")
+        await db.building_status.insert_one(update_data)
+    
+    # Asansör arızalı ise bildirim gönder
+    if elevator_changed_to_faulty:
+        # Bina bilgisini al
+        building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
+        building_name = building.get("name", "Bina") if building else "Bina"
+        
+        # Tüm aktif sakinleri al
+        residents = await db.residents.find(
+            {"building_id": current_user.building_id, "is_active": True},
+            {"_id": 0}
+        ).to_list(1000)
+        
+        # Mail gönder
+        try:
+            from routes.mail_service import MailService
+            mail_service = MailService(db)
+            
+            # Mail adresi olan sakinlere mail gönder
+            email_recipients = [r["email"] for r in residents if r.get("email")]
+            if email_recipients:
+                await mail_service.send_mail(
+                    to=email_recipients,
+                    subject=f"⚠️ {building_name} - Asansör Arızası Bildirimi",
+                    body=f"""
+                    <h2>Asansör Arızası Bildirimi</h2>
+                    <p>Sayın Sakinimiz,</p>
+                    <p><strong>{building_name}</strong> binasında asansör arızası bildirilmiştir.</p>
+                    <p>En kısa sürede onarım yapılacaktır. Anlayışınız için teşekkür ederiz.</p>
+                    <p>Lütfen merdivenleri kullanınız.</p>
+                    <br>
+                    <p>Saygılarımızla,<br>{building_name} Yönetimi</p>
+                    """
+                )
+                print(f"Asansör arıza maili gönderildi: {len(email_recipients)} kişi")
+        except Exception as e:
+            print(f"Mail gönderimi hatası: {e}")
+        
+        # Push notification gönder
+        try:
+            # Expo push token'ları olan sakinlere bildirim gönder
+            tokens_to_notify = []
+            for resident in residents:
+                if resident.get("expo_push_token"):
+                    tokens_to_notify.append(resident["expo_push_token"])
+            
+            if tokens_to_notify:
+                from routes.expo_push import send_push_notification
+                await send_push_notification(
+                    tokens=tokens_to_notify,
+                    title="⚠️ Asansör Arızası",
+                    body=f"{building_name} binasında asansör arızası bildirildi. Lütfen merdivenleri kullanın.",
+                    data={"type": "elevator_alert", "building_id": current_user.building_id}
+                )
+                print(f"Push notification gönderildi: {len(tokens_to_notify)} cihaz")
+        except Exception as e:
+            print(f"Push notification hatası: {e}")
+    
+    updated_status = await db.building_status.find_one(
+        {"building_id": current_user.building_id},
+        {"_id": 0}
+    )
+    
+    return {"success": True, "message": "Bina durumu güncellendi", "status": updated_status}
+
+# Mobile app için public endpoint
+@api_router.get("/building-status/{building_id}")
+async def get_building_status_public(building_id: str):
+    """Mobil uygulama için bina durumu - public endpoint"""
+    status = await db.building_status.find_one(
+        {"building_id": building_id},
+        {"_id": 0}
+    )
+    
+    if not status:
+        return {
+            "building_id": building_id,
+            "wifi": "active",
+            "elevator": "active",
+            "electricity": "active",
+            "water": "active"
+        }
+    
+    return status
+
 # ============ BUILDING MANAGER SETTINGS ROUTES ============
 
 class BuildingManagerProfileUpdate(BaseModel):
