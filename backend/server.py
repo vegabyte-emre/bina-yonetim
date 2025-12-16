@@ -2242,6 +2242,12 @@ async def get_building_payments(current_user: User = Depends(get_current_buildin
     
     return payments
 
+@api_router.delete("/building-payments/clear")
+async def clear_building_payments(current_user: User = Depends(get_current_building_admin)):
+    """Clear building payments for testing purposes"""
+    result = await db.building_payments.delete_many({"building_id": current_user.building_id})
+    return {"success": True, "deleted_count": result.deleted_count}
+
 @api_router.post("/building-payments/process")
 async def process_building_payment(data: dict, current_user: User = Depends(get_current_building_admin)):
     """Bina yöneticisi ödeme işlemi"""
