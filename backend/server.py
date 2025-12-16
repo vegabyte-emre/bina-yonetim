@@ -643,6 +643,9 @@ async def get_buildings(current_user: User = Depends(get_current_superadmin)):
             building['created_at'] = datetime.fromisoformat(building['created_at'])
         if isinstance(building.get('subscription_end_date'), str):
             building['subscription_end_date'] = datetime.fromisoformat(building['subscription_end_date'])
+        # Backward compatibility: map old field names to new ones
+        if 'total_apartments' in building and 'apartment_count' not in building:
+            building['apartment_count'] = building.pop('total_apartments')
     return buildings
 
 @api_router.get("/buildings/{building_id}", response_model=Building)
@@ -655,6 +658,9 @@ async def get_building(building_id: str, current_user: User = Depends(get_curren
         building['created_at'] = datetime.fromisoformat(building['created_at'])
     if isinstance(building.get('subscription_end_date'), str):
         building['subscription_end_date'] = datetime.fromisoformat(building['subscription_end_date'])
+    # Backward compatibility: map old field names to new ones
+    if 'total_apartments' in building and 'apartment_count' not in building:
+        building['apartment_count'] = building.pop('total_apartments')
     
     return building
 
