@@ -2339,59 +2339,63 @@ async def update_building_status(
             except Exception as e:
                 print(f"Mail gönderimi hatası ({system_name}): {e}")
             
-            # Push notification gönder
+            # Firebase Push notification gönder
             try:
-                import httpx
-                # Expo push token'ları olan sakinlere bildirim gönder
-                tokens_to_notify = []
-                for resident in residents:
-                    token = resident.get("expo_push_token")
-                    if token:
-                        # Ensure token format
-                        if not token.startswith("ExponentPushToken"):
-                            token = f"ExponentPushToken[{token}]"
-                        tokens_to_notify.append(token)
+                from routes.firebase_push import get_topic_name, FIREBASE_INITIALIZED
+                import firebase_admin
+                from firebase_admin import messaging
                 
-                # Also check push_tokens collection
-                push_tokens_cursor = db.push_tokens.find({
-                    "building_id": current_user.building_id,
-                    "is_active": True
-                })
-                push_tokens = await push_tokens_cursor.to_list(1000)
-                for pt in push_tokens:
-                    token = pt.get("expo_push_token")
-                    if token and token not in tokens_to_notify:
-                        tokens_to_notify.append(token)
-                
-                if tokens_to_notify:
-                    # Send directly to Expo Push API
-                    messages = []
-                    for token in tokens_to_notify:
-                        messages.append({
-                            "to": token,
-                            "sound": "default",
-                            "title": f"⚠️ {system_name} {system_label.title()}",
-                            "body": f"{building_name} binasında {system_name.lower()} {system_label} bildirildi.",
-                            "data": {"type": f"{change['key']}_alert", "building_id": current_user.building_id},
-                            "priority": "high",
-                            "channelId": "building_status"
-                        })
+                if FIREBASE_INITIALIZED:
+                    topic = get_topic_name(current_user.building_id)
                     
-                    async with httpx.AsyncClient() as http_client:
-                        response = await http_client.post(
-                            "https://exp.host/--/api/v2/push/send",
-                            json=messages,
-                            headers={
-                                "Accept": "application/json",
-                                "Content-Type": "application/json"
-                            }
+                    # Android config
+                    android_config = messaging.AndroidConfig(
+                        priority="high",
+                        notification=messaging.AndroidNotification(
+                            icon="notification_icon",
+                            color="#EF4444",  # Red for alerts
+                            sound="default",
+                            channel_id="building_status"
                         )
-                        if response.status_code == 200:
-                            print(f"Push notification gönderildi ({system_name}): {len(tokens_to_notify)} cihaz")
-                        else:
-                            print(f"Expo API hatası: {response.text}")
+                    )
+                    
+                    # iOS config
+                    apns_config = messaging.APNSConfig(
+                        payload=messaging.APNSPayload(
+                            aps=messaging.Aps(
+                                alert=messaging.ApsAlert(
+                                    title=f"⚠️ {system_name} {system_label.title()}",
+                                    body=f"{building_name} binasında {system_name.lower()} {system_label} bildirildi."
+                                ),
+                                sound="default",
+                                badge=1
+                            )
+                        )
+                    )
+                    
+                    # Firebase message
+                    message = messaging.Message(
+                        notification=messaging.Notification(
+                            title=f"⚠️ {system_name} {system_label.title()}",
+                            body=f"{building_name} binasında {system_name.lower()} {system_label} bildirildi."
+                        ),
+                        data={
+                            "type": f"{change['key']}_alert",
+                            "building_id": current_user.building_id,
+                            "status": change['key']
+                        },
+                        topic=topic,
+                        android=android_config,
+                        apns=apns_config
+                    )
+                    
+                    # Send via Firebase
+                    response = messaging.send(message)
+                    print(f"Firebase push notification gönderildi ({system_name}): {response}")
+                else:
+                    print(f"Firebase başlatılamadı, bildirim gönderilemedi ({system_name})")
             except Exception as e:
-                print(f"Push notification hatası ({system_name}): {e}")
+                print(f"Firebase push notification hatası ({system_name}): {e}")
     
     updated_status = await db.building_status.find_one(
         {"building_id": current_user.building_id},
