@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Building2, Users, CreditCard, Settings, LogOut, Menu, X, FileText, Mail, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Building2, Users, CreditCard, Settings, LogOut, Menu, X, FileText, Mail, TrendingUp, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Layout = ({ setIsAuthenticated }) => {
