@@ -18,6 +18,7 @@ import Decisions from './pages/Decisions';
 import MailGonder from './pages/MailGonder';
 import Payments from './pages/Payments';
 import Settings from './pages/Settings';
+import BuildingStatus from './pages/BuildingStatus';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -231,6 +232,7 @@ function App() {
           <Route path="/meetings" element={<Meetings />} />
           <Route path="/decisions" element={<Decisions />} />
           <Route path="/mail-gonder" element={<MailGonder />} />
+          <Route path="/building-status" element={<BuildingStatus />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
         
