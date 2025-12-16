@@ -2341,21 +2341,55 @@ async def update_building_status(
             
             # Push notification gönder
             try:
+                import httpx
                 # Expo push token'ları olan sakinlere bildirim gönder
                 tokens_to_notify = []
                 for resident in residents:
-                    if resident.get("expo_push_token"):
-                        tokens_to_notify.append(resident["expo_push_token"])
+                    token = resident.get("expo_push_token")
+                    if token:
+                        # Ensure token format
+                        if not token.startswith("ExponentPushToken"):
+                            token = f"ExponentPushToken[{token}]"
+                        tokens_to_notify.append(token)
+                
+                # Also check push_tokens collection
+                push_tokens_cursor = db.push_tokens.find({
+                    "building_id": current_user.building_id,
+                    "is_active": True
+                })
+                push_tokens = await push_tokens_cursor.to_list(1000)
+                for pt in push_tokens:
+                    token = pt.get("expo_push_token")
+                    if token and token not in tokens_to_notify:
+                        tokens_to_notify.append(token)
                 
                 if tokens_to_notify:
-                    from routes.expo_push import send_push_notification
-                    await send_push_notification(
-                        tokens=tokens_to_notify,
-                        title=f"⚠️ {system_name} {system_label.title()}",
-                        body=f"{building_name} binasında {system_name.lower()} {system_label} bildirildi.",
-                        data={"type": f"{change['key']}_alert", "building_id": current_user.building_id}
-                    )
-                    print(f"Push notification gönderildi ({system_name}): {len(tokens_to_notify)} cihaz")
+                    # Send directly to Expo Push API
+                    messages = []
+                    for token in tokens_to_notify:
+                        messages.append({
+                            "to": token,
+                            "sound": "default",
+                            "title": f"⚠️ {system_name} {system_label.title()}",
+                            "body": f"{building_name} binasında {system_name.lower()} {system_label} bildirildi.",
+                            "data": {"type": f"{change['key']}_alert", "building_id": current_user.building_id},
+                            "priority": "high",
+                            "channelId": "building_status"
+                        })
+                    
+                    async with httpx.AsyncClient() as http_client:
+                        response = await http_client.post(
+                            "https://exp.host/--/api/v2/push/send",
+                            json=messages,
+                            headers={
+                                "Accept": "application/json",
+                                "Content-Type": "application/json"
+                            }
+                        )
+                        if response.status_code == 200:
+                            print(f"Push notification gönderildi ({system_name}): {len(tokens_to_notify)} cihaz")
+                        else:
+                            print(f"Expo API hatası: {response.text}")
             except Exception as e:
                 print(f"Push notification hatası ({system_name}): {e}")
     
