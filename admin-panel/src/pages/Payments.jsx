@@ -129,7 +129,8 @@ const Payments = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
+    const value = typeof amount === 'number' && !isNaN(amount) ? amount : 0;
+    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
   };
 
   const formatDate = (dateStr) => {
