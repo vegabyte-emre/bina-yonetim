@@ -71,15 +71,15 @@ class UserInDB(User):
 class BuildingBase(BaseModel):
     name: str
     address: str
-    city: str
-    district: str
+    city: str = "Belirtilmemiş"
+    district: str = "Belirtilmemiş"
     block_count: int = 1
-    apartment_count: int
+    apartment_count: int = 0
     currency: str = "TRY"
     aidat_amount: float = 0.0
-    admin_name: str
-    admin_email: EmailStr
-    admin_phone: str
+    admin_name: str = ""
+    admin_email: Optional[EmailStr] = None
+    admin_phone: str = ""
 
 class BuildingCreate(BuildingBase):
     admin_password: str
