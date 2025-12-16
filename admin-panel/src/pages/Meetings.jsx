@@ -80,7 +80,16 @@ const Meetings = () => {
       </div>
 
       <div className="grid gap-4">
-        {meetings.map((meeting) => (
+        {meetings.length === 0 ? (
+          <Card className="border-0 shadow-md">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Calendar className="h-16 w-16 text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Henüz toplantı yok</h3>
+              <p className="text-sm text-gray-500 mb-4">Yeni bir toplantı oluşturarak başlayın</p>
+            </CardContent>
+          </Card>
+        ) : (
+        meetings.map((meeting) => (
           <Card key={meeting.id}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
@@ -104,7 +113,8 @@ const Meetings = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+        ))
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
