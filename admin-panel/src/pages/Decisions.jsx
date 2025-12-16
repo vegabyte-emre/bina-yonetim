@@ -98,7 +98,16 @@ const Decisions = () => {
       </div>
 
       <div className="grid gap-4">
-        {decisions.map((decision) => (
+        {decisions.length === 0 ? (
+          <Card className="border-0 shadow-md">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <FileText className="h-16 w-16 text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Henüz karar yok</h3>
+              <p className="text-sm text-gray-500 mb-4">Yeni bir karar ekleyerek başlayın</p>
+            </CardContent>
+          </Card>
+        ) : (
+        decisions.map((decision) => (
           <Card key={decision.id}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
@@ -124,7 +133,8 @@ const Decisions = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+        ))
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
