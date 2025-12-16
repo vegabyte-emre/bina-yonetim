@@ -97,6 +97,7 @@ class BuildingUpdate(BaseModel):
     admin_email: Optional[EmailStr] = None
     admin_phone: Optional[str] = None
     is_active: Optional[bool] = None
+    subscription_status: Optional[str] = None  # trial, active, passive, expired
 
 class Building(BuildingBase):
     model_config = ConfigDict(extra="ignore")
