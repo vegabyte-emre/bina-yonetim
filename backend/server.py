@@ -2146,30 +2146,33 @@ async def delete_request(request_id: str, current_user: User = Depends(get_curre
 
 # ============ RESIDENT REQUESTS (Mobile App) ============
 
-@api_router.get("/residents/{resident_id}/requests")
-async def get_resident_requests(resident_id: str, current_user: User = Depends(get_current_user)):
+@api_router.get("/residents/my-requests")
+async def get_my_requests(current_resident: Resident = Depends(get_current_resident)):
     """Sakin'in kendi taleplerini listele"""
-    # Sakin kendi taleplerini görebilir
-    if current_user.id != resident_id and current_user.role != "building_admin":
-        raise HTTPException(status_code=403, detail="Bu talepleri görme yetkiniz yok")
-    
-    requests = await db.requests.find(
-        {"resident_id": resident_id}, 
+    requests_list = await db.requests.find(
+        {"resident_id": current_resident.id}, 
         {"_id": 0}
-    ).to_list(100)
+    ).sort("created_at", -1).to_list(100)
     
-    return requests
+    # Convert datetime strings
+    for req in requests_list:
+        if isinstance(req.get('created_at'), str):
+            pass  # Already string
+        if req.get('resolved_at') and isinstance(req.get('resolved_at'), str):
+            pass  # Already string
+    
+    return requests_list
 
 @api_router.post("/residents/requests")
-async def create_resident_request(request_data: dict, current_user: User = Depends(get_current_user)):
+async def create_resident_request(request_data: dict, current_resident: Resident = Depends(get_current_resident)):
     """Sakin'in talep oluşturması"""
     request_id = str(uuid.uuid4())
     
     new_request = {
         "id": request_id,
-        "building_id": current_user.building_id,
-        "resident_id": current_user.id,
-        "apartment_id": request_data.get("apartment_id"),
+        "building_id": current_resident.building_id,
+        "resident_id": current_resident.id,
+        "apartment_id": current_resident.apartment_id or request_data.get("apartment_id"),
         "type": request_data.get("type", "complaint"),
         "category": request_data.get("category", "general"),
         "title": request_data.get("title"),
@@ -2189,7 +2192,7 @@ async def create_resident_request(request_data: dict, current_user: User = Depen
         
         if FIREBASE_INITIALIZED:
             # Yönetici topic'ine bildirim gönder
-            manager_topic = f"manager_{current_user.building_id}"
+            manager_topic = f"manager_{current_resident.building_id}"
             message = messaging.Message(
                 notification=messaging.Notification(
                     title="📝 Yeni Talep",
@@ -2203,6 +2206,20 @@ async def create_resident_request(request_data: dict, current_user: User = Depen
         print(f"Talep bildirimi gönderilemedi: {e}")
     
     return {"success": True, "message": "Talep oluşturuldu", "request": new_request}
+
+@api_router.get("/residents/{resident_id}/requests")
+async def get_resident_requests_by_id(resident_id: str, current_user: User = Depends(get_current_user)):
+    """Sakin'in taleplerini getir (Building Admin için)"""
+    # Sadece building admin görebilir
+    if current_user.role != "building_admin":
+        raise HTTPException(status_code=403, detail="Bu talepleri görme yetkiniz yok")
+    
+    requests_list = await db.requests.find(
+        {"resident_id": resident_id}, 
+        {"_id": 0}
+    ).to_list(100)
+    
+    return requests_list
 
 # ============ RESIDENT DUES (Mobile App) ============
 
