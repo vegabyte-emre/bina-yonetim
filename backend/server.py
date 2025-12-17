@@ -1701,6 +1701,92 @@ async def send_monthly_due_mail(monthly_due_id: str, current_user: User = Depend
         "failed_count": failed_count
     }
 
+# ============ BUILDING MANAGER MAIL TEMPLATES ============
+
+@api_router.get("/building-manager/mail-templates")
+async def get_building_manager_mail_templates(current_user: User = Depends(get_current_building_admin)):
+    """Building Manager için mail şablonlarını getir (bina özel + varsayılan)"""
+    from routes.mail_service import MailService
+    mail_service = MailService(db)
+    
+    # Varsayılan şablonları al
+    default_templates = mail_service.get_default_templates()
+    
+    # Bina özel şablonları al
+    custom_templates = await db.building_mail_templates.find(
+        {"building_id": current_user.building_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    custom_map = {t["name"]: t for t in custom_templates}
+    
+    result = []
+    for name, template in default_templates.items():
+        if name in custom_map:
+            # Özelleştirilmiş şablon
+            result.append({
+                "name": name,
+                "subject": custom_map[name].get("subject", template["subject"]),
+                "body": custom_map[name].get("body", template["body"]),
+                "is_custom": True
+            })
+        else:
+            # Varsayılan şablon
+            result.append({
+                "name": name,
+                "subject": template["subject"],
+                "body": template["body"],
+                "is_custom": False
+            })
+    
+    return result
+
+@api_router.put("/building-manager/mail-templates/{template_name}")
+async def update_building_manager_mail_template(
+    template_name: str, 
+    data: dict, 
+    current_user: User = Depends(get_current_building_admin)
+):
+    """Building Manager için mail şablonunu güncelle/oluştur"""
+    from routes.mail_service import MailService
+    mail_service = MailService(db)
+    
+    # Şablon adı geçerli mi kontrol et
+    default_templates = mail_service.get_default_templates()
+    if template_name not in default_templates:
+        raise HTTPException(status_code=404, detail="Geçersiz şablon adı")
+    
+    # Mevcut özel şablonu güncelle veya yeni oluştur
+    await db.building_mail_templates.update_one(
+        {"building_id": current_user.building_id, "name": template_name},
+        {"$set": {
+            "building_id": current_user.building_id,
+            "name": template_name,
+            "subject": data.get("subject"),
+            "body": data.get("body"),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    return {"success": True, "message": "Şablon güncellendi"}
+
+@api_router.delete("/building-manager/mail-templates/{template_name}")
+async def reset_building_manager_mail_template(
+    template_name: str, 
+    current_user: User = Depends(get_current_building_admin)
+):
+    """Building Manager için özel şablonu sil (varsayılana dön)"""
+    result = await db.building_mail_templates.delete_one({
+        "building_id": current_user.building_id, 
+        "name": template_name
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Özel şablon bulunamadı")
+    
+    return {"success": True, "message": "Şablon varsayılana sıfırlandı"}
+
 # ============ SURVEY ROUTES (Building Admin) ============
 
 @api_router.get("/surveys")
