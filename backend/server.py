@@ -2313,7 +2313,7 @@ async def update_building_status(
         update_data.setdefault("water", "active")
         await db.building_status.insert_one(update_data)
     
-    # Arıza/kesinti varsa bildirim gönder
+    # TÜM durum değişikliklerinde bildirim gönder
     if status_changes:
         # Bina bilgisini al
         building = await db.buildings.find_one({"id": current_user.building_id}, {"_id": 0})
@@ -2325,10 +2325,12 @@ async def update_building_status(
             {"_id": 0}
         ).to_list(1000)
         
-        # Her arıza için bildirim oluştur
+        # Her durum değişikliği için bildirim oluştur
         for change in status_changes:
             system_name = change["name"]
             system_label = change["label"]
+            is_problem = change.get("is_problem", False)
+            emoji = "⚠️" if is_problem else "✅"
             
             # Mail gönder
             try:
