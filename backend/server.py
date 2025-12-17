@@ -2393,8 +2393,8 @@ async def update_building_status(
                     # Firebase message
                     message = messaging.Message(
                         notification=messaging.Notification(
-                            title=f"⚠️ {system_name} {system_label.title()}",
-                            body=f"{building_name} binasında {system_name.lower()} {system_label} bildirildi."
+                            title=f"{emoji} {system_name}: {system_label.upper()}",
+                            body=f"{building_name} binasında {system_name.lower()} durumu güncellendi."
                         ),
                         data={
                             "type": f"{change['key']}_alert",
