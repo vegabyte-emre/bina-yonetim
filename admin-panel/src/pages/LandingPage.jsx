@@ -274,6 +274,9 @@ const LandingPage = () => {
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-12 left-0 right-0 bg-[#fbfbfd]/95 backdrop-blur-2xl border-b border-gray-200/50">
             <div className="px-4 sm:px-6 py-4 space-y-1">
+              <button onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }} className="block w-full text-left text-[#1d1d1f] hover:text-blue-600 py-3 text-sm">
+                Anasayfa
+              </button>
               <button onClick={() => scrollToSection('features')} className="block w-full text-left text-[#1d1d1f] hover:text-blue-600 py-3 text-sm">
                 Özellikler
               </button>
