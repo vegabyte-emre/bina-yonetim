@@ -102,6 +102,19 @@ const Settings = () => {
           sms_notifications: notifData.sms_notifications ?? true
         });
       }
+
+      // Fetch Google Calendar status
+      const userData = JSON.parse(localStorage.getItem('user'));
+      if (userData?.building_id) {
+        const googleRes = await fetch(`${API_URL}/api/google-calendar/config/${userData.building_id}`, { headers });
+        if (googleRes.ok) {
+          const googleData = await googleRes.json();
+          setGoogleStatus({
+            is_configured: googleData.is_configured,
+            is_connected: googleData.is_connected
+          });
+        }
+      }
     } catch (err) {
       console.error('Error fetching settings:', err);
     } finally {
