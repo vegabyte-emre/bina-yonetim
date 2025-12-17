@@ -2179,6 +2179,8 @@ async def create_resident_request(request_data: dict, current_resident: Resident
         "description": request_data.get("description"),
         "priority": request_data.get("priority", "normal"),
         "status": "pending",
+        "response": None,
+        "resolved_at": None,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
@@ -2205,7 +2207,9 @@ async def create_resident_request(request_data: dict, current_resident: Resident
     except Exception as e:
         print(f"Talep bildirimi gönderilemedi: {e}")
     
-    return {"success": True, "message": "Talep oluşturuldu", "request": new_request}
+    # _id'yi response'dan kaldır
+    response_request = {k: v for k, v in new_request.items() if k != "_id"}
+    return {"success": True, "message": "Talep oluşturuldu", "request": response_request}
 
 @api_router.get("/residents/{resident_id}/requests")
 async def get_resident_requests_by_id(resident_id: str, current_user: User = Depends(get_current_user)):
