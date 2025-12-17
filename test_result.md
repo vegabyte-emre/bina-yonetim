@@ -131,3 +131,48 @@ Core functionality excellent, but mobile navigation requires immediate attention
 
 ## Test Status: FULLY PASSED ✅
 Building Status page fully implemented and all functionality working correctly.
+
+---
+
+## Current Test Session - Building Management System Backend API Testing
+**Date:** 2024-12-17  
+**Application:** Building Management System Backend APIs  
+**URL Tested:** https://smartbuild-mgr.preview.emergentagent.com/api  
+**Focus:** Backend API Testing for Resident and Building Manager functionality
+
+### ✅ PASSED TESTS
+
+#### 1. Resident Authentication & APIs
+- ✅ **Resident Login**: Successfully authenticated with phone: `5321111111` and password: `123456`
+- ✅ **Resident Info API**: GET `/api/residents/me` returns complete resident information including building_id
+- ✅ **Resident Dues API (Priority)**: GET `/api/residents/my-dues` returns proper structure with:
+  - `total_debt`: 1000.0
+  - `overdue_count`: 1  
+  - `dues` array with `status` field as required
+
+#### 2. Building Status API
+- ✅ **Building Status Retrieval**: GET `/api/building-status/{building_id}` successfully returns building status data
+- ✅ **Building ID Resolution**: Correctly retrieved building_id from resident info for status lookup
+
+#### 3. Building Manager Authentication & Mail System
+- ✅ **Building Manager Login**: Successfully authenticated with email: `ahmet@mavirezidans.com` and password: `admin123`
+- ✅ **Monthly Dues List**: GET `/api/monthly-dues` returns 1 monthly due definition
+- ✅ **Mail Sending Endpoint**: POST `/api/monthly-dues/{id}/send-mail` endpoint functional (mail service properly configured but inactive in test environment)
+
+#### 4. API Response Validation
+- ✅ **No 401/403/500 Errors**: All API endpoints return proper 200 OK responses
+- ✅ **Data Structure Compliance**: All responses contain required fields as specified
+- ✅ **Authentication Flow**: JWT tokens properly generated and accepted by protected endpoints
+
+### Test Environment
+- **Backend URL**: https://smartbuild-mgr.preview.emergentagent.com/api
+- **Authentication**: ✅ Working (both resident and building manager login)
+- **Database Integration**: ✅ Working (MongoDB connection active)
+- **Mail Service**: ✅ Configured but inactive (expected in test environment)
+
+### Test Credentials Verified
+- **Resident Login**: phone: `5321111111`, password: `123456` ✅
+- **Building Manager Login**: email: `ahmet@mavirezidans.com`, password: `admin123` ✅
+
+## Test Status: FULLY PASSED ✅
+All Building Management System backend APIs are working correctly with proper authentication, data retrieval, and response formatting.
