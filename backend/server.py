@@ -2264,23 +2264,38 @@ async def update_building_status(
     # Hangi durumlar arıza/kesinti olarak değişti kontrol et
     status_changes = []
     status_labels = {
-        "wifi": {"name": "Wi-Fi", "faulty": "inactive", "label_faulty": "kapalı"},
-        "elevator": {"name": "Asansör", "faulty": "faulty", "label_faulty": "arızalı"},
-        "electricity": {"name": "Elektrik", "faulty": "outage", "label_faulty": "kesintisi"},
-        "water": {"name": "Su", "faulty": "outage", "label_faulty": "kesintisi"}
+        "wifi": {
+            "name": "Wi-Fi", 
+            "statuses": {"inactive": "kapalı", "active": "aktif", "maintenance": "bakımda"}
+        },
+        "elevator": {
+            "name": "Asansör", 
+            "statuses": {"faulty": "arızalı", "active": "çalışıyor", "maintenance": "bakımda"}
+        },
+        "electricity": {
+            "name": "Elektrik", 
+            "statuses": {"outage": "kesintisi var", "active": "aktif", "maintenance": "bakımda"}
+        },
+        "water": {
+            "name": "Su", 
+            "statuses": {"outage": "kesintisi var", "active": "aktif", "maintenance": "bakımda"}
+        }
     }
     
     for key, config in status_labels.items():
         new_value = getattr(status_data, key, None)
-        old_value = current_status.get(key) if current_status else "active"
-        faulty_status = config["faulty"]
+        old_value = current_status.get(key) if current_status else None
         
-        # Eğer yeni değer arızalı/kesinti ve eski değer farklıysa
-        if new_value == faulty_status and old_value != faulty_status:
+        # Eğer değer değiştiyse bildirim gönder
+        if new_value and new_value != old_value:
+            label = config["statuses"].get(new_value, new_value)
+            is_problem = new_value in ["inactive", "faulty", "outage"]
             status_changes.append({
                 "key": key,
                 "name": config["name"],
-                "label": config["label_faulty"]
+                "label": label,
+                "is_problem": is_problem,
+                "new_status": new_value
             })
     
     if current_status:
