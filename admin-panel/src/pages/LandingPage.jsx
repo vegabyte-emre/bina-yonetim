@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { 
   Building, Users, Bell, FileText, TrendingUp, Shield, 
   Smartphone, Clock, CheckCircle, ArrowRight, Mail, Phone, 
   MapPin, Zap, Star, Menu, X, BarChart3, MessageSquare, CreditCard,
   Home, CalendarCheck, Vote, Megaphone, PieChart, Lock, Globe,
-  Headphones, Wifi, Layers, Settings, Award, Heart, ChevronRight
+  Headphones, Wifi, Layers, Settings, Award, Heart, ChevronRight, Video
 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
