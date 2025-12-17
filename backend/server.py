@@ -2342,17 +2342,17 @@ async def update_building_status(
                 if email_recipients:
                     await mail_service.send_mail(
                         to=email_recipients,
-                        subject=f"⚠️ {building_name} - {system_name} {system_label.title()} Bildirimi",
+                        subject=f"{emoji} {building_name} - {system_name} Durum Güncellemesi",
                         body_html=f"""
-                        <h2>{system_name} {system_label.title()} Bildirimi</h2>
+                        <h2>{emoji} {system_name} Durum Güncellemesi</h2>
                         <p>Sayın Sakinimiz,</p>
-                        <p><strong>{building_name}</strong> binasında {system_name.lower()} {system_label} bildirilmiştir.</p>
-                        <p>En kısa sürede düzeltilecektir. Anlayışınız için teşekkür ederiz.</p>
+                        <p><strong>{building_name}</strong> binasında {system_name.lower()} durumu: <strong>{system_label.upper()}</strong></p>
+                        {"<p>En kısa sürede düzeltilecektir. Anlayışınız için teşekkür ederiz.</p>" if is_problem else "<p>İyi günler dileriz.</p>"}
                         <br>
                         <p>Saygılarımızla,<br>{building_name} Yönetimi</p>
                         """
                     )
-                    print(f"{system_name} arıza maili gönderildi: {len(email_recipients)} kişi")
+                    print(f"{system_name} durum maili gönderildi: {len(email_recipients)} kişi")
             except Exception as e:
                 print(f"Mail gönderimi hatası ({system_name}): {e}")
             
