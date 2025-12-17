@@ -233,6 +233,7 @@ function App() {
           <Route path="/meetings" element={<Meetings />} />
           <Route path="/decisions" element={<Decisions />} />
           <Route path="/mail-gonder" element={<MailGonder />} />
+          <Route path="/mail-templates" element={<MailTemplates />} />
           <Route path="/building-status" element={<BuildingStatus />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
