@@ -45,6 +45,17 @@ const Settings = () => {
     email_notifications: true,
     sms_notifications: true
   });
+  
+  // Google Calendar settings
+  const [googleCalendar, setGoogleCalendar] = useState({
+    client_id: '',
+    client_secret: '',
+    redirect_uri: `${API_URL}/api/google-calendar/callback`
+  });
+  const [googleStatus, setGoogleStatus] = useState({
+    is_configured: false,
+    is_connected: false
+  });
 
   // Fetch all data on mount
   useEffect(() => {
