@@ -262,6 +262,86 @@ const Settings = () => {
     }
   };
 
+  // Save Google Calendar config
+  const handleSaveGoogleCalendar = async () => {
+    setSaving(prev => ({ ...prev, google: true }));
+    setError(prev => ({ ...prev, google: null }));
+    
+    const token = localStorage.getItem('token');
+    const userData = JSON.parse(localStorage.getItem('user'));
+    
+    try {
+      const res = await fetch(`${API_URL}/api/google-calendar/config/${userData.building_id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(googleCalendar)
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        showSuccessMessage('google');
+        setGoogleStatus(prev => ({ ...prev, is_configured: true }));
+      } else {
+        showErrorMessage('google', data.detail || 'Google Calendar ayarları kaydedilemedi');
+      }
+    } catch (err) {
+      showErrorMessage('google', 'Bağlantı hatası');
+    } finally {
+      setSaving(prev => ({ ...prev, google: false }));
+    }
+  };
+
+  // Connect Google Account
+  const handleConnectGoogle = async () => {
+    const token = localStorage.getItem('token');
+    const userData = JSON.parse(localStorage.getItem('user'));
+    
+    try {
+      const res = await fetch(`${API_URL}/api/google-calendar/auth/${userData.building_id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      const data = await res.json();
+      if (data.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        showErrorMessage('google', data.detail || 'Yetkilendirme URL alınamadı');
+      }
+    } catch (err) {
+      showErrorMessage('google', 'Bağlantı hatası');
+    }
+  };
+
+  // Disconnect Google Account
+  const handleDisconnectGoogle = async () => {
+    const token = localStorage.getItem('token');
+    const userData = JSON.parse(localStorage.getItem('user'));
+    
+    try {
+      await fetch(`${API_URL}/api/google-calendar/config/${userData.building_id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      setGoogleStatus(prev => ({ ...prev, is_connected: false }));
+      showSuccessMessage('google');
+    } catch (err) {
+      showErrorMessage('google', 'Bağlantı kesilemedi');
+    }
+  };
+
+  // Check for Google OAuth callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('google_connected') === 'true') {
+      setGoogleStatus(prev => ({ ...prev, is_connected: true }));
+      window.history.replaceState({}, document.title, '/settings');
+    }
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
