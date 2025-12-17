@@ -246,6 +246,9 @@ const LandingPage = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors">
+                Anasayfa
+              </button>
               <button onClick={() => scrollToSection('features')} className="text-xs font-normal text-[#1d1d1f]/80 hover:text-[#1d1d1f] transition-colors">
                 Özellikler
               </button>
