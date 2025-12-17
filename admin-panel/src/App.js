@@ -156,11 +156,6 @@ function LoginPage({ setIsAuthenticated }) {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-white/50">
-              Demo: ahmet@mavirezidans.com / admin123
-            </p>
-          </div>
         </div>
 
         <p className="text-center text-white/40 text-sm mt-6">
