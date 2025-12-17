@@ -335,12 +335,22 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {/* Hero Visual */}
+        {/* Hero Visual - Building Image + Dashboard */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-6 sm:mt-8">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-b from-blue-500/20 via-transparent to-transparent blur-3xl -z-10"></div>
             
-            <div className="relative bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl sm:rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border border-gray-700/50">
+            {/* Background Building Image */}
+            <div className="absolute inset-0 rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80" 
+                alt="Modern bina"
+                className="w-full h-full object-cover opacity-20"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-gray-900/60"></div>
+            </div>
+
+            <div className="relative bg-gradient-to-b from-gray-900/95 to-gray-800/95 rounded-xl sm:rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border border-gray-700/50 backdrop-blur-sm">
               {/* Browser bar */}
               <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-gray-800/80 border-b border-gray-700/50">
                 <div className="flex gap-1 sm:gap-1.5">
