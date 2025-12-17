@@ -3090,15 +3090,20 @@ from routes import expo_push
 from routes.mail_service import get_mail_routes
 from routes.netgsm_service import NetgsmService
 from routes.paratika_service import ParatikaService
+from routes import google_calendar
 
 # Initialize services
 netgsm_service = NetgsmService(db)
 paratika_service = ParatikaService(db)
 
+# Set database for Google Calendar
+google_calendar.set_db(db)
+
 app.include_router(push_notifications.router)
 app.include_router(firebase_push.router)
 app.include_router(expo_push.router)
 app.include_router(get_mail_routes(db))
+app.include_router(google_calendar.router)
 app.include_router(api_router)
 
 # ============ NETGSM ROUTES ============
