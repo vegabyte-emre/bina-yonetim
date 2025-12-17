@@ -1999,6 +1999,9 @@ async def create_meeting(data: dict, current_user: User = Depends(get_current_bu
         "location": data.get("location"),
         "agenda": data.get("agenda", ""),
         "status": data.get("status", "scheduled"),
+        "meet_link": data.get("meet_link"),
+        "google_event_id": data.get("google_event_id"),
+        "duration_minutes": data.get("duration_minutes", 60),
         "attendees": [],
         "notes": None,
         "created_at": datetime.now(timezone.utc).isoformat()
