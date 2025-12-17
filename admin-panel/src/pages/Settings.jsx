@@ -46,11 +46,20 @@ const Settings = () => {
     sms_notifications: true
   });
   
-  // Google Calendar settings
+  // Google Calendar settings - Production URL for redirect
+  const getRedirectUri = () => {
+    // Production domain
+    if (window.location.hostname.includes('yonetioo.com')) {
+      return 'https://api.yonetioo.com/api/google-calendar/callback';
+    }
+    // Preview/Development
+    return `${API_URL}/api/google-calendar/callback`;
+  };
+  
   const [googleCalendar, setGoogleCalendar] = useState({
     client_id: '',
     client_secret: '',
-    redirect_uri: `${API_URL}/api/google-calendar/callback`
+    redirect_uri: getRedirectUri()
   });
   const [googleStatus, setGoogleStatus] = useState({
     is_configured: false,
