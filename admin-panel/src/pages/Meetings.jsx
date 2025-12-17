@@ -16,7 +16,9 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const Meetings = () => {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -24,11 +26,30 @@ const Meetings = () => {
     time: '',
     location: '',
     agenda: '',
+    use_google_meet: false,
+    duration_minutes: 60,
   });
 
   useEffect(() => {
     fetchMeetings();
+    checkGoogleConnection();
   }, []);
+
+  const checkGoogleConnection = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const userData = JSON.parse(localStorage.getItem('user'));
+      if (!userData?.building_id) return;
+
+      const response = await axios.get(
+        `${API_URL}/api/google-calendar/config/${userData.building_id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setGoogleConnected(response.data.is_connected);
+    } catch (error) {
+      console.log('Google connection check failed');
+    }
+  };
 
   const fetchMeetings = async () => {
     try {
