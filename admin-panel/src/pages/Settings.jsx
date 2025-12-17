@@ -617,6 +617,116 @@ const Settings = () => {
             </Button>
           </CardContent>
         </Card>
+
+        {/* Google Calendar / Meet Entegrasyonu */}
+        <Card className="border-0 shadow-md lg:col-span-2">
+          <CardHeader className="border-b border-gray-100">
+            <CardTitle className="flex items-center text-lg">
+              <Video className="h-5 w-5 mr-2 text-purple-600" />
+              Google Meet Entegrasyonu
+              {googleStatus.is_connected && (
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                  Bağlı
+                </span>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="mb-4 p-4 bg-blue-50 rounded-lg text-sm text-blue-800">
+              <p className="font-medium mb-2">Google Meet Entegrasyonu Nasıl Yapılır?</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li><a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a>'a gidin</li>
+                <li>Yeni proje oluşturun veya mevcut projeyi seçin</li>
+                <li>"APIs & Services" → "Enable APIs" → "Google Calendar API" etkinleştirin</li>
+                <li>"Credentials" → "Create Credentials" → "OAuth client ID" seçin</li>
+                <li>"Web application" seçin ve Redirect URI olarak aşağıdaki adresi ekleyin:</li>
+              </ol>
+              <code className="block mt-2 p-2 bg-blue-100 rounded text-xs break-all">
+                {googleCalendar.redirect_uri}
+              </code>
+            </div>
+
+            {!googleStatus.is_connected ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="google_client_id">Client ID</Label>
+                    <Input
+                      id="google_client_id"
+                      value={googleCalendar.client_id}
+                      onChange={(e) => setGoogleCalendar({ ...googleCalendar, client_id: e.target.value })}
+                      placeholder="xxxx.apps.googleusercontent.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="google_client_secret">Client Secret</Label>
+                    <Input
+                      id="google_client_secret"
+                      type="password"
+                      value={googleCalendar.client_secret}
+                      onChange={(e) => setGoogleCalendar({ ...googleCalendar, client_secret: e.target.value })}
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+
+                {error.google && (
+                  <p className="text-sm text-red-600">{error.google}</p>
+                )}
+
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={handleSaveGoogleCalendar}
+                    disabled={saving.google || !googleCalendar.client_id || !googleCalendar.client_secret}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    {saving.google ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : success.google ? (
+                      <Check className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
+                    Ayarları Kaydet
+                  </Button>
+                  
+                  {googleStatus.is_configured && (
+                    <Button 
+                      onClick={handleConnectGoogle}
+                      className="flex-1 bg-purple-600 hover:bg-purple-700"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Google ile Bağlan
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Check className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-green-800">Google Calendar Bağlandı</p>
+                      <p className="text-sm text-green-600">Toplantılarda Google Meet linki otomatik oluşturulacak</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={handleDisconnectGoogle}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    <Unlink className="h-4 w-4 mr-2" />
+                    Bağlantıyı Kes
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
