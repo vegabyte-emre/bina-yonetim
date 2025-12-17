@@ -282,10 +282,17 @@ const Dues = () => {
                   <Label htmlFor="month">Dönem (Ay/Yıl) *</Label>
                   <Input
                     id="month"
+                    type="month"
                     value={formData.month}
-                    onChange={(e) => setFormData({...formData, month: e.target.value})}
-                    placeholder="Ocak 2025"
+                    onChange={(e) => {
+                      const date = new Date(e.target.value + '-01');
+                      const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 
+                                         'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+                      const formattedMonth = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+                      setFormData({...formData, month: formattedMonth, monthValue: e.target.value});
+                    }}
                     required
+                    className="cursor-pointer"
                   />
                 </div>
                 <div>
