@@ -132,6 +132,7 @@ const Dues = () => {
   const resetForm = () => {
     setFormData({
       month: '',
+      monthValue: '',
       due_date: '',
       expense_items: [{ name: '', amount: '' }]
     });
