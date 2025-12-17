@@ -2375,7 +2375,7 @@ async def create_resident_request(request_data: dict, current_resident: Resident
     
     await db.requests.insert_one(new_request)
     
-    # Bildirim - Yöneticiye haber ver
+    # Bildirim - Yöneticiye haber ver (Push)
     try:
         from routes.firebase_push import get_topic_name, FIREBASE_INITIALIZED
         import firebase_admin
@@ -2394,7 +2394,43 @@ async def create_resident_request(request_data: dict, current_resident: Resident
             )
             messaging.send(message)
     except Exception as e:
-        print(f"Talep bildirimi gönderilemedi: {e}")
+        print(f"Talep push bildirimi gönderilemedi: {e}")
+    
+    # Bildirim - Yöneticiye mail gönder
+    try:
+        # Yöneticiyi bul
+        manager = await db.users.find_one(
+            {"building_id": current_resident.building_id, "role": "building_admin"},
+            {"_id": 0, "email": 1, "full_name": 1}
+        )
+        
+        if manager and manager.get("email"):
+            from routes.mail_service import MailService
+            mail_service = MailService(db)
+            
+            # Bina adını al
+            building = await db.buildings.find_one({"id": current_resident.building_id}, {"_id": 0, "name": 1})
+            building_name = building.get("name", "Bina") if building else "Bina"
+            
+            # Sakin adını al
+            resident_name = current_resident.full_name or "Sakin"
+            
+            await mail_service.send_with_template(
+                to=[manager["email"]],
+                template_name="request_received",
+                variables={
+                    "user_name": manager.get("full_name", "Yönetici"),
+                    "building_name": building_name,
+                    "request_title": new_request['title'],
+                    "resident_name": resident_name,
+                    "category": new_request['category'],
+                    "priority": new_request['priority'],
+                },
+                building_id=current_resident.building_id
+            )
+            print(f"✅ Yöneticiye talep maili gönderildi: {manager['email']}")
+    except Exception as e:
+        print(f"Talep mail bildirimi gönderilemedi: {e}")
     
     # _id'yi response'dan kaldır
     response_request = {k: v for k, v in new_request.items() if k != "_id"}
