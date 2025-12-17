@@ -2144,6 +2144,66 @@ async def delete_request(request_id: str, current_user: User = Depends(get_curre
         raise HTTPException(status_code=404, detail="Request not found")
     return {"message": "Request deleted successfully"}
 
+# ============ RESIDENT REQUESTS (Mobile App) ============
+
+@api_router.get("/residents/{resident_id}/requests")
+async def get_resident_requests(resident_id: str, current_user: User = Depends(get_current_user)):
+    """Sakin'in kendi taleplerini listele"""
+    # Sakin kendi taleplerini görebilir
+    if current_user.id != resident_id and current_user.role != "building_admin":
+        raise HTTPException(status_code=403, detail="Bu talepleri görme yetkiniz yok")
+    
+    requests = await db.requests.find(
+        {"resident_id": resident_id}, 
+        {"_id": 0}
+    ).to_list(100)
+    
+    return requests
+
+@api_router.post("/residents/requests")
+async def create_resident_request(request_data: dict, current_user: User = Depends(get_current_user)):
+    """Sakin'in talep oluşturması"""
+    request_id = str(uuid.uuid4())
+    
+    new_request = {
+        "id": request_id,
+        "building_id": current_user.building_id,
+        "resident_id": current_user.id,
+        "apartment_id": request_data.get("apartment_id"),
+        "type": request_data.get("type", "complaint"),
+        "category": request_data.get("category", "general"),
+        "title": request_data.get("title"),
+        "description": request_data.get("description"),
+        "priority": request_data.get("priority", "normal"),
+        "status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.requests.insert_one(new_request)
+    
+    # Bildirim - Yöneticiye haber ver
+    try:
+        from routes.firebase_push import get_topic_name, FIREBASE_INITIALIZED
+        import firebase_admin
+        from firebase_admin import messaging
+        
+        if FIREBASE_INITIALIZED:
+            # Yönetici topic'ine bildirim gönder
+            manager_topic = f"manager_{current_user.building_id}"
+            message = messaging.Message(
+                notification=messaging.Notification(
+                    title="📝 Yeni Talep",
+                    body=f"{new_request['title']}"
+                ),
+                data={"type": "new_request", "request_id": request_id},
+                topic=manager_topic
+            )
+            messaging.send(message)
+    except Exception as e:
+        print(f"Talep bildirimi gönderilemedi: {e}")
+    
+    return {"success": True, "message": "Talep oluşturuldu", "request": new_request}
+
 # ============ BUILDING MANAGER DASHBOARD ============
 
 @api_router.get("/building-manager/dashboard", response_model=BuildingManagerDashboardStats)
