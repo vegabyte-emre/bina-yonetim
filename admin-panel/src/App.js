@@ -19,6 +19,7 @@ import MailGonder from './pages/MailGonder';
 import Payments from './pages/Payments';
 import Settings from './pages/Settings';
 import BuildingStatus from './pages/BuildingStatus';
+import MailTemplates from './pages/MailTemplates';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
