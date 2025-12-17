@@ -880,43 +880,59 @@ const LandingPage = () => {
             <div>
               <h4 className="text-xs font-semibold text-[#1d1d1f] mb-3 sm:mb-4">Ürün</h4>
               <ul className="space-y-2 sm:space-y-3">
-                {['Özellikler', 'Fiyatlandırma', 'Güncellemeler'].map((item, i) => (
-                  <li key={i}>
-                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
-                  </li>
-                ))}
+                <li><button onClick={() => scrollToSection('features')} className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Özellikler</button></li>
+                <li><button onClick={() => scrollToSection('pricing')} className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Fiyatlandırma</button></li>
+                <li><a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Güncellemeler</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-xs font-semibold text-[#1d1d1f] mb-3 sm:mb-4">Şirket</h4>
               <ul className="space-y-2 sm:space-y-3">
-                {['Hakkımızda', 'Blog', 'İletişim'].map((item, i) => (
-                  <li key={i}>
-                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
-                  </li>
-                ))}
+                <li><a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Hakkımızda</a></li>
+                <li><a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Blog</a></li>
+                <li><button onClick={() => scrollToSection('signup')} className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">İletişim</button></li>
               </ul>
             </div>
             <div>
               <h4 className="text-xs font-semibold text-[#1d1d1f] mb-3 sm:mb-4">Destek</h4>
               <ul className="space-y-2 sm:space-y-3">
-                {['Yardım Merkezi', 'SSS', 'Dökümanlar'].map((item, i) => (
-                  <li key={i}>
-                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
-                  </li>
-                ))}
+                <li><a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Yardım Merkezi</a></li>
+                <li><a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">SSS</a></li>
+                <li><a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Dökümanlar</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-xs font-semibold text-[#1d1d1f] mb-3 sm:mb-4">Yasal</h4>
               <ul className="space-y-2 sm:space-y-3">
-                {['Gizlilik', 'Kullanım Koşulları', 'KVKK'].map((item, i) => (
-                  <li key={i}>
-                    <a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">{item}</a>
-                  </li>
-                ))}
+                <li><button onClick={() => navigate('/privacy')} className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Gizlilik Politikası</button></li>
+                <li><a href="#" className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">Kullanım Koşulları</a></li>
+                <li><button onClick={() => navigate('/privacy')} className="text-xs text-[#424245] hover:text-[#1d1d1f] hover:underline transition-colors">KVKK</button></li>
               </ul>
             </div>
+          </div>
+
+          {/* App Store Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 py-6 border-t border-gray-300">
+            <span className="text-xs text-[#86868b] mr-2">Mobil Uygulama:</span>
+            <a href="#" className="transition-opacity hover:opacity-80" aria-label="App Store'dan İndir">
+              <svg viewBox="0 0 120 40" className="h-10">
+                <rect width="120" height="40" rx="6" fill="#000"/>
+                <path fill="#fff" d="M24.769 20.301a4.947 4.947 0 012.356-4.151 5.066 5.066 0 00-3.99-2.158c-1.679-.176-3.308 1.005-4.164 1.005-.872 0-2.19-.988-3.608-.958a5.315 5.315 0 00-4.473 2.728c-1.934 3.348-.491 8.269 1.361 10.976.927 1.325 2.01 2.805 3.428 2.753 1.387-.058 1.905-.885 3.58-.885 1.658 0 2.144.885 3.59.852 1.489-.025 2.426-1.332 3.32-2.67a10.962 10.962 0 001.52-3.092 4.782 4.782 0 01-2.92-4.4zM22.037 12.21a4.872 4.872 0 001.115-3.49 4.957 4.957 0 00-3.208 1.66 4.636 4.636 0 00-1.144 3.36 4.1 4.1 0 003.237-1.53z"/>
+                <g fill="#fff">
+                  <path d="M42.302 27.14h-4.733l-1.136 3.356h-2.005l4.484-12.418h2.083l4.483 12.418h-2.039l-1.137-3.356zm-4.243-1.55h3.752l-1.85-5.446h-.051l-1.85 5.447zM55.16 25.97c0 2.813-1.506 4.62-3.778 4.62a3.07 3.07 0 01-2.848-1.584h-.043v4.484h-1.859V21.442h1.799v1.506h.034a3.212 3.212 0 012.883-1.6c2.298 0 3.811 1.816 3.811 4.622zm-1.91 0c0-1.833-.948-3.038-2.393-3.038-1.42 0-2.375 1.23-2.375 3.038 0 1.824.955 3.046 2.375 3.046 1.445 0 2.393-1.197 2.393-3.046zM65.124 25.97c0 2.813-1.505 4.62-3.778 4.62a3.07 3.07 0 01-2.848-1.584h-.043v4.484h-1.858V21.442h1.798v1.506h.034a3.212 3.212 0 012.883-1.6c2.298 0 3.812 1.816 3.812 4.622zm-1.91 0c0-1.833-.948-3.038-2.393-3.038-1.42 0-2.375 1.23-2.375 3.038 0 1.824.955 3.046 2.375 3.046 1.445 0 2.393-1.197 2.393-3.046zM71.71 27.036c.138 1.231 1.334 2.04 2.968 2.04 1.566 0 2.693-.809 2.693-1.919 0-.964-.68-1.54-2.29-1.936l-1.609-.388c-2.28-.55-3.339-1.617-3.339-3.348 0-2.142 1.867-3.614 4.519-3.614 2.624 0 4.423 1.472 4.483 3.614h-1.876c-.112-1.239-1.136-1.987-2.634-1.987s-2.521.757-2.521 1.858c0 .878.654 1.395 2.255 1.79l1.368.336c2.548.603 3.606 1.626 3.606 3.443 0 2.323-1.85 3.778-4.793 3.778-2.754 0-4.614-1.42-4.734-3.667h1.904zM83.346 19.3v2.142h1.722v1.472h-1.722v4.991c0 .776.345 1.137 1.102 1.137a5.808 5.808 0 00.611-.043v1.463a5.104 5.104 0 01-1.032.086c-1.833 0-2.548-.689-2.548-2.444v-5.19h-1.316v-1.472h1.316V19.3h1.867zM86.065 25.97c0-2.849 1.678-4.639 4.294-4.639 2.625 0 4.295 1.79 4.295 4.639 0 2.856-1.661 4.638-4.295 4.638-2.633 0-4.294-1.782-4.294-4.638zm6.695 0c0-1.954-.895-3.108-2.401-3.108s-2.4 1.162-2.4 3.108c0 1.962.894 3.106 2.4 3.106s2.401-1.144 2.401-3.106zM96.186 21.442h1.773v1.541h.043a2.16 2.16 0 012.177-1.635 2.866 2.866 0 01.637.07v1.738a2.598 2.598 0 00-.835-.112 1.873 1.873 0 00-1.937 2.083v5.37h-1.858v-9.055zM109.384 27.837c-.25 1.643-1.85 2.771-3.898 2.771-2.634 0-4.269-1.764-4.269-4.595 0-2.84 1.644-4.682 4.19-4.682 2.505 0 4.08 1.72 4.08 4.466v.637h-6.394v.112a2.358 2.358 0 002.436 2.564 2.048 2.048 0 002.09-1.273h1.765zm-6.282-2.702h4.526a2.177 2.177 0 00-2.22-2.298 2.292 2.292 0 00-2.306 2.298z"/>
+                </g>
+              </svg>
+            </a>
+            <a href="#" className="transition-opacity hover:opacity-80" aria-label="Google Play'den İndir">
+              <svg viewBox="0 0 135 40" className="h-10">
+                <rect width="135" height="40" rx="6" fill="#000"/>
+                <path fill="#fff" d="M68.135 21.75a4.273 4.273 0 00-4.07 4.453 4.273 4.273 0 004.07 4.453 4.273 4.273 0 004.07-4.453 4.273 4.273 0 00-4.07-4.453zm0 7.151c-1.33 0-2.478-1.098-2.478-2.698s1.148-2.698 2.478-2.698 2.478 1.098 2.478 2.698-1.148 2.698-2.478 2.698zm-8.882-7.151a4.273 4.273 0 00-4.07 4.453 4.273 4.273 0 004.07 4.453 4.273 4.273 0 004.07-4.453 4.273 4.273 0 00-4.07-4.453zm0 7.151c-1.33 0-2.478-1.098-2.478-2.698s1.148-2.698 2.478-2.698 2.478 1.098 2.478 2.698-1.148 2.698-2.478 2.698zm-10.565-5.784v1.545h3.703a3.233 3.233 0 01-.844 1.95 3.79 3.79 0 01-2.859 1.132 4.115 4.115 0 010-8.23 3.94 3.94 0 012.79 1.098l1.092-1.092a5.373 5.373 0 00-3.882-1.56 5.67 5.67 0 000 11.339 5.21 5.21 0 003.975-1.594 5.145 5.145 0 001.346-3.633 5.076 5.076 0 00-.083-.955h-5.238zm43.255 1.199a3.971 3.971 0 00-3.652-2.566 4.044 4.044 0 00-4.018 4.453 4.174 4.174 0 004.174 4.453 4.192 4.192 0 003.505-1.863l-1.434-.955a2.404 2.404 0 01-2.071 1.166 2.143 2.143 0 01-2.044-1.28l5.643-2.336-.103-.072zm-5.756 1.406a2.34 2.34 0 012.235-2.478 1.662 1.662 0 011.593.905l-3.828 1.573zm-4.416 4.316h1.592V17.28h-1.592v12.758zm-2.61-7.454h-.055a2.513 2.513 0 00-1.91-.826 4.276 4.276 0 00-4.096 4.471 4.256 4.256 0 004.096 4.435 2.461 2.461 0 001.91-.843h.055v.534c0 1.416-.756 2.176-1.978 2.176a2.049 2.049 0 01-1.864-1.315l-1.386.577a3.53 3.53 0 003.25 2.167c1.889 0 3.488-1.113 3.488-3.823v-6.587h-1.51v.534zm-1.866 6.16c-1.33 0-2.444-1.116-2.444-2.68s1.114-2.698 2.444-2.698 2.375 1.142 2.375 2.715-1.063 2.663-2.375 2.663zm26.97-11.625h-3.808v12.72h1.592v-4.82h2.216a3.305 3.305 0 003.505-3.95 3.305 3.305 0 00-3.505-3.95zm.04 6.127h-2.256v-4.355h2.256a2.18 2.18 0 110 4.355zm9.808-1.826a2.978 2.978 0 00-2.83 1.627l1.414.59a1.505 1.505 0 011.45-.782 1.53 1.53 0 011.691 1.368v.11a3.52 3.52 0 00-1.657-.41c-1.52 0-3.065.835-3.065 2.394a2.458 2.458 0 002.637 2.34 2.236 2.236 0 002.02-1.03h.051v.814h1.537v-4.076c0-1.886-1.409-2.946-3.228-2.946l-.02.001zm-.193 5.826c-.52 0-1.245-.26-1.245-.904 0-.822.904-1.137 1.684-1.137a2.83 2.83 0 011.45.355 1.924 1.924 0 01-1.889 1.686zm9.005-5.593l-1.826 4.627h-.051l-1.894-4.627h-1.715l2.842 6.47-1.622 3.598h1.664l4.381-10.068h-1.779zm-14.312 6.836h1.592V17.28h-1.592v12.758z"/>
+                <path fill="#EA4335" d="M10.435 7.538a2.058 2.058 0 00-.475 1.432v22.06c0 .527.163 1.04.475 1.432l.075.073 12.36-12.36v-.29l-12.36-12.42-.075.073z"/>
+                <path fill="#FBBC04" d="M27 24.295l-4.12-4.12v-.29l4.12-4.12.093.054 4.886 2.775c1.395.793 1.395 2.09 0 2.882l-4.886 2.776-.093.043z"/>
+                <path fill="#4285F4" d="M27.093 24.252L22.88 20.04 10.36 32.535c.46.487 1.22.546 1.754.133l14.98-8.416"/>
+                <path fill="#34A853" d="M27.093 15.788L12.113 7.37a1.393 1.393 0 00-1.754.133l12.52 12.537 4.214-4.252z"/>
+              </svg>
+            </a>
           </div>
           
           <div className="pt-6 sm:pt-8 border-t border-gray-300">
