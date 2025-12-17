@@ -2307,6 +2307,32 @@ async def get_resident_notifications(current_resident: Resident = Depends(get_cu
     
     return notifications[:30]
 
+# ============ RESIDENT BUILDING INFO (Mobile App) ============
+
+@api_router.get("/residents/my-building")
+async def get_resident_building(current_resident: Resident = Depends(get_current_resident)):
+    """Sakin'in bina bilgilerini getir"""
+    if not current_resident.building_id:
+        raise HTTPException(status_code=404, detail="Bina bilgisi bulunamadı")
+    
+    building = await db.buildings.find_one(
+        {"id": current_resident.building_id},
+        {"_id": 0}
+    )
+    
+    if not building:
+        raise HTTPException(status_code=404, detail="Bina bulunamadı")
+    
+    return {
+        "id": building.get("id"),
+        "name": building.get("name"),
+        "address": building.get("address"),
+        "city": building.get("city"),
+        "district": building.get("district"),
+        "total_blocks": building.get("total_blocks"),
+        "total_apartments": building.get("total_apartments"),
+    }
+
 # ============ RESIDENT REQUESTS (Mobile App) ============
 
 @api_router.get("/residents/my-requests")
