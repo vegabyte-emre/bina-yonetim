@@ -189,6 +189,7 @@ const LandingPage = () => {
     { icon: Smartphone, text: 'Mobil uygulama', desc: 'iOS & Android' },
     { icon: Clock, text: '7/24 destek', desc: 'Her zaman yanınızda' },
     { icon: CalendarCheck, text: 'Toplantı yönetimi', desc: 'Planlama ve tutanaklar' },
+    { icon: Video, text: 'Google Meet', desc: 'Online toplantı desteği' },
     { icon: Vote, text: 'Oylama sistemi', desc: 'Demokratik kararlar' },
     { icon: Megaphone, text: 'Duyuru sistemi', desc: 'Anlık bilgilendirme' },
     { icon: PieChart, text: 'Gider takibi', desc: 'Kategorize edilmiş giderler' },
