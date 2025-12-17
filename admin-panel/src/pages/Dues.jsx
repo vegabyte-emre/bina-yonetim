@@ -48,6 +48,7 @@ const Dues = () => {
   // Form state
   const [formData, setFormData] = useState({
     month: '',
+    monthValue: '', // YYYY-MM format for input
     due_date: '',
     expense_items: [{ name: '', amount: '' }]
   });
