@@ -2204,6 +2204,86 @@ async def create_resident_request(request_data: dict, current_user: User = Depen
     
     return {"success": True, "message": "Talep oluşturuldu", "request": new_request}
 
+# ============ RESIDENT DUES (Mobile App) ============
+
+@api_router.get("/residents/my-dues")
+async def get_resident_dues(current_user: User = Depends(get_current_user)):
+    """Sakin'in aidat borç bilgilerini getir"""
+    building_id = current_user.building_id
+    
+    # Aylık aidat tanımlarını al
+    monthly_dues = await db.monthly_dues.find(
+        {"building_id": building_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Sakin'in ödeme kayıtlarını al
+    payments = await db.due_payments.find(
+        {"resident_id": current_user.id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    paid_due_ids = [p.get("monthly_due_id") for p in payments if p.get("status") == "paid"]
+    
+    # Borç hesapla
+    total_debt = 0
+    dues_list = []
+    
+    for due in monthly_dues:
+        per_apartment = due.get("per_apartment_amount", 0)
+        is_paid = due.get("id") in paid_due_ids
+        
+        dues_list.append({
+            "id": due.get("id"),
+            "month": due.get("month"),
+            "due_date": due.get("due_date"),
+            "amount": per_apartment,
+            "is_paid": is_paid,
+            "expense_items": due.get("expense_items", [])
+        })
+        
+        if not is_paid:
+            total_debt += per_apartment
+    
+    return {
+        "total_debt": total_debt,
+        "dues": dues_list,
+        "payment_count": len(paid_due_ids)
+    }
+
+@api_router.post("/residents/dues/{due_id}/pay")
+async def pay_resident_due(due_id: str, current_user: User = Depends(get_current_user)):
+    """Sakin aidat ödemesi kaydet (simülasyon)"""
+    # Aidat var mı kontrol et
+    due = await db.monthly_dues.find_one({"id": due_id, "building_id": current_user.building_id})
+    if not due:
+        raise HTTPException(status_code=404, detail="Aidat bulunamadı")
+    
+    # Zaten ödenmiş mi?
+    existing = await db.due_payments.find_one({
+        "monthly_due_id": due_id,
+        "resident_id": current_user.id,
+        "status": "paid"
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="Bu aidat zaten ödenmiş")
+    
+    # Ödeme kaydı oluştur
+    payment = {
+        "id": str(uuid.uuid4()),
+        "monthly_due_id": due_id,
+        "resident_id": current_user.id,
+        "building_id": current_user.building_id,
+        "amount": due.get("per_apartment_amount", 0),
+        "status": "paid",
+        "payment_date": datetime.now(timezone.utc).isoformat(),
+        "payment_method": "online"
+    }
+    
+    await db.due_payments.insert_one(payment)
+    
+    return {"success": True, "message": "Ödeme kaydedildi", "payment": payment}
+
 # ============ BUILDING MANAGER DASHBOARD ============
 
 @api_router.get("/building-manager/dashboard", response_model=BuildingManagerDashboardStats)
