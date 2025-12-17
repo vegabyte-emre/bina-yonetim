@@ -67,24 +67,62 @@ const Meetings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    
     try {
       const token = localStorage.getItem('token');
       const userData = JSON.parse(localStorage.getItem('user'));
       
+      let meetLink = null;
+      let googleEventId = null;
+
+      // Create Google Meet if enabled
+      if (formData.use_google_meet && googleConnected) {
+        try {
+          const googleRes = await axios.post(
+            `${API_URL}/api/google-calendar/meetings/${userData.building_id}`,
+            {
+              title: formData.title,
+              description: formData.description || formData.agenda,
+              date: formData.date,
+              time: formData.time,
+              duration_minutes: parseInt(formData.duration_minutes) || 60,
+            },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          
+          meetLink = googleRes.data.meet_link;
+          googleEventId = googleRes.data.event_id;
+          toast.success('Google Meet linki oluşturuldu!');
+        } catch (googleError) {
+          console.error('Google Meet error:', googleError);
+          toast.error('Google Meet linki oluşturulamadı, toplantı Meet linksiz kaydedilecek');
+        }
+      }
+
+      // Save meeting to database
       await axios.post(`${API_URL}/api/meetings`, {
         ...formData,
         building_id: userData.building_id,
         status: 'scheduled',
+        meet_link: meetLink,
+        google_event_id: googleEventId,
+        location: formData.use_google_meet && meetLink ? 'Google Meet' : formData.location,
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       toast.success('Toplantı oluşturuldu!');
       setDialogOpen(false);
-      setFormData({ title: '', description: '', date: '', time: '', location: '', agenda: '' });
+      setFormData({ 
+        title: '', description: '', date: '', time: '', 
+        location: '', agenda: '', use_google_meet: false, duration_minutes: 60 
+      });
       fetchMeetings();
     } catch (error) {
       toast.error('Toplantı eklenemedi');
+    } finally {
+      setSubmitting(false);
     }
   };
 
