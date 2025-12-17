@@ -216,20 +216,279 @@ class MailService:
                 detail=f"Email gönderilemedi: {str(e)}"
             )
     
+    def get_default_templates(self) -> Dict[str, dict]:
+        """Varsayılan mail şablonlarını döndür"""
+        return {
+            "dues_notification": {
+                "subject": "💰 Aidat Bildirimi - {{building_name}} ({{month}})",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">💰 Aidat Bildirimi</h1>
+                        <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">{{building_name}}</p>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>{{month}} dönemi aidat bilgileriniz aşağıda yer almaktadır:</p>
+                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 0; color: #6b7280;">Daire No:</td>
+                                    <td style="padding: 10px 0; text-align: right; font-weight: bold;">{{apartment_no}}</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 0; color: #6b7280;">Dönem:</td>
+                                    <td style="padding: 10px 0; text-align: right; font-weight: bold;">{{month}}</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e5e7eb;">
+                                    <td style="padding: 10px 0; color: #6b7280;">Aylık Aidat:</td>
+                                    <td style="padding: 10px 0; text-align: right; font-weight: bold; color: #059669;">{{amount}}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 10px 0; color: #6b7280;">Son Ödeme Tarihi:</td>
+                                    <td style="padding: 10px 0; text-align: right; font-weight: bold; color: #dc2626;">{{due_date}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <p style="color: #6b7280; font-size: 14px;">Lütfen son ödeme tarihine kadar ödemenizi gerçekleştiriniz.</p>
+                        <p style="color: #9ca3af; font-size: 12px; margin-top: 30px;">Bu mail {{building_name}} yönetimi tarafından gönderilmiştir.</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "payment_success": {
+                "subject": "✅ Ödeme Onayı - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">✅ Ödeme Onayı</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>Ödemeniz başarıyla alınmıştır. Teşekkür ederiz.</p>
+                        <p><strong>Tutar:</strong> {{amount}}</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "new_announcement": {
+                "subject": "📢 Yeni Duyuru - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">📢 {{announcement_title}}</h1>
+                        <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">{{building_name}}</p>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                            {{announcement_content}}
+                        </div>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "status_change": {
+                "subject": "🏢 Bina Durumu Değişikliği - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">🏢 Durum Değişikliği</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın Sakin,</p>
+                        <p><strong>{{status_item}}</strong> durumu <strong>{{status_value}}</strong> olarak güncellendi.</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "meeting_invite": {
+                "subject": "📅 Toplantı Daveti - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">📅 {{meeting_title}}</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>Aşağıdaki toplantıya davetlisiniz:</p>
+                        <p><strong>Tarih:</strong> {{meeting_date}}<br>
+                        <strong>Saat:</strong> {{meeting_time}}<br>
+                        <strong>Yer:</strong> {{meeting_location}}</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "survey_invite": {
+                "subject": "📊 Anket Daveti - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">📊 {{survey_title}}</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>Görüşlerinizi önemsiyoruz. Lütfen anketi doldurun.</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "welcome": {
+                "subject": "👋 Hoş Geldiniz - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">👋 Hoş Geldiniz!</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>{{building_name}} ailesine hoş geldiniz!</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "request_received": {
+                "subject": "📝 Talebiniz Alındı - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">📝 Talebiniz Alındı</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>"<strong>{{request_title}}</strong>" başlıklı talebiniz alınmıştır.</p>
+                        <p>En kısa sürede değerlendirilecektir.</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "request_resolved": {
+                "subject": "✔️ Talebiniz Çözüldü - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">✔️ Talebiniz Çözüldü</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>"<strong>{{request_title}}</strong>" başlıklı talebiniz çözüme kavuşturulmuştur.</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "meeting_voting": {
+                "subject": "🗳️ Oylama Daveti - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">🗳️ Oylama</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>Lütfen oylamanıza katılın.</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "manager_welcome": {
+                "subject": "🏠 Yönetici Hesabınız Oluşturuldu - Yönetioo",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">🏠 Hoş Geldiniz!</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın Yönetici,</p>
+                        <p>{{building_name}} için yönetici hesabınız oluşturulmuştur.</p>
+                    </div>
+                </body>
+                </html>
+                """
+            },
+            "payment_reminder": {
+                "subject": "⏰ Ödeme Hatırlatması - {{building_name}}",
+                "body": """
+                <html>
+                <body style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px; border-radius: 10px 10px 0 0;">
+                        <h1 style="color: white; margin: 0;">⏰ Ödeme Hatırlatması</h1>
+                    </div>
+                    <div style="background: #f9fafb; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                        <p>Sayın <strong>{{user_name}}</strong>,</p>
+                        <p>{{month}} dönemi aidat ödemenizi hatırlatmak isteriz.</p>
+                        <p><strong>Tutar:</strong> {{amount}}<br>
+                        <strong>Son Ödeme:</strong> {{due_date}}</p>
+                    </div>
+                </body>
+                </html>
+                """
+            }
+        }
+
     async def send_with_template(
         self,
         to: List[str],
         template_name: str,
         variables: Dict[str, Any],
         cc: Optional[List[str]] = None,
-        bcc: Optional[List[str]] = None
+        bcc: Optional[List[str]] = None,
+        building_id: Optional[str] = None
     ) -> dict:
         """Şablon kullanarak email gönder"""
-        # Şablonu bul
-        template = await self.db.mail_templates.find_one(
-            {"name": template_name, "is_active": True},
-            {"_id": 0}
-        )
+        # Önce bina özel şablonunu kontrol et
+        template = None
+        if building_id:
+            custom_template = await self.db.building_mail_templates.find_one(
+                {"building_id": building_id, "name": template_name},
+                {"_id": 0}
+            )
+            if custom_template:
+                template = {
+                    "subject": custom_template.get("subject"),
+                    "body_html": custom_template.get("body")
+                }
+        
+        # Bina özel şablonu yoksa, veritabanındaki genel şablonu kontrol et
+        if not template:
+            db_template = await self.db.mail_templates.find_one(
+                {"name": template_name, "is_active": True},
+                {"_id": 0}
+            )
+            if db_template:
+                template = {
+                    "subject": db_template.get("subject"),
+                    "body_html": db_template.get("body_html")
+                }
+        
+        # Hiçbiri yoksa varsayılan şablonları kullan
+        if not template:
+            default_templates = self.get_default_templates()
+            if template_name in default_templates:
+                template = {
+                    "subject": default_templates[template_name]["subject"],
+                    "body_html": default_templates[template_name]["body"]
+                }
         
         if not template:
             raise HTTPException(
@@ -240,11 +499,8 @@ class MailService:
         # Değişkenleri değiştir
         subject = self.replace_variables(template["subject"], variables)
         body_html = self.replace_variables(template["body_html"], variables)
-        body_text = None
-        if template.get("body_text"):
-            body_text = self.replace_variables(template["body_text"], variables)
         
-        return await self.send_mail(to, subject, body_html, body_text, cc, bcc)
+        return await self.send_mail(to, subject, body_html, None, cc, bcc)
 
 
 # ============ ROUTES ============
