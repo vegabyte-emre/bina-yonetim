@@ -150,11 +150,19 @@ const Meetings = () => {
           </Card>
         ) : (
         meetings.map((meeting) => (
-          <Card key={meeting.id}>
+          <Card key={meeting.id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold mb-2">{meeting.title}</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-lg font-semibold">{meeting.title}</h3>
+                    {meeting.meet_link && (
+                      <Badge className="bg-green-100 text-green-700">
+                        <Video className="h-3 w-3 mr-1" />
+                        Meet
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-gray-600 mb-3">{meeting.description}</p>
                   <div className="flex flex-wrap gap-4 text-sm">
                     <div className="flex items-center gap-2 text-gray-600">
@@ -162,10 +170,28 @@ const Meetings = () => {
                       {new Date(meeting.date).toLocaleDateString('tr-TR')}
                     </div>
                     <div className="flex items-center gap-2 text-gray-600">
-                      <Users className="h-4 w-4" />
+                      <Clock className="h-4 w-4" />
+                      {meeting.time}
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <MapPin className="h-4 w-4" />
                       {meeting.location}
                     </div>
                   </div>
+                  {meeting.meet_link && (
+                    <div className="mt-3">
+                      <a
+                        href={meeting.meet_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
+                      >
+                        <Video className="h-4 w-4" />
+                        Toplantıya Katıl
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  )}
                 </div>
                 <Badge className={meeting.status === 'scheduled' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}>
                   {meeting.status === 'scheduled' ? 'Planlandı' : 'Tamamlandı'}
