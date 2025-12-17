@@ -250,16 +250,71 @@ const Meetings = () => {
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="location">Yer *</Label>
-              <Input
-                id="location"
-                required
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="Site toplantı salonu"
-              />
-            </div>
+            {/* Google Meet Option */}
+            {googleConnected && (
+              <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <Video className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    <div>
+                      <Label htmlFor="use_google_meet" className="font-medium text-indigo-900">
+                        Google Meet ile Toplantı
+                      </Label>
+                      <p className="text-sm text-indigo-600">
+                        Otomatik video konferans linki oluştur
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="use_google_meet"
+                    checked={formData.use_google_meet}
+                    onCheckedChange={(checked) => setFormData({ ...formData, use_google_meet: checked })}
+                  />
+                </div>
+                {formData.use_google_meet && (
+                  <div className="mt-3 pt-3 border-t border-indigo-200">
+                    <Label htmlFor="duration">Süre (dakika)</Label>
+                    <Input
+                      id="duration"
+                      type="number"
+                      min="15"
+                      max="480"
+                      value={formData.duration_minutes}
+                      onChange={(e) => setFormData({ ...formData, duration_minutes: e.target.value })}
+                      className="w-32 mt-1"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!googleConnected && (
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-3">
+                  <Video className="h-5 w-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      Google Meet entegrasyonu için <a href="/settings" className="text-indigo-600 hover:underline">Ayarlar</a> sayfasından bağlantı kurun
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!formData.use_google_meet && (
+              <div>
+                <Label htmlFor="location">Yer *</Label>
+                <Input
+                  id="location"
+                  required={!formData.use_google_meet}
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  placeholder="Site toplantı salonu"
+                />
+              </div>
+            )}
             <div>
               <Label htmlFor="agenda">Gündem</Label>
               <Textarea
@@ -271,11 +326,21 @@ const Meetings = () => {
               />
             </div>
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} disabled={submitting}>
                 İptal
               </Button>
-              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700">
-                Toplantı Oluştur
+              <Button type="submit" className="bg-indigo-600 hover:bg-indigo-700" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {formData.use_google_meet ? 'Meet Linki Oluşturuluyor...' : 'Oluşturuluyor...'}
+                  </>
+                ) : (
+                  <>
+                    {formData.use_google_meet && <Video className="h-4 w-4 mr-2" />}
+                    Toplantı Oluştur
+                  </>
+                )}
               </Button>
             </div>
           </form>
