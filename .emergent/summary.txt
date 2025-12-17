@@ -20,168 +20,179 @@ The user wants to build a Building Management System with three components: a Su
     *   Landing page should dynamically display subscription plans from the backend. (Completed).
     *   Modern, responsive, glassmorphism UI for the dashboard. (Completed).
     *   Allow editing of residents and apartments. (Completed).
-    *   Redesigned the Dues (Aidat) page to allow defining monthly dues based on expense items, calculating per-apartment fees, and sending notification emails. (Completed).
-    *   Implement CRUD endpoints and basic UI for Announcements, Surveys, Voting, Meetings, and Decisions. (Completed).
+    *   Redesigned the Dues (Aidat) page to allow defining monthly dues. (In Progress - UI being updated).
+    *   Implement CRUD for Announcements, Surveys, Voting, Meetings, and Decisions. (Completed).
     *   Replace all dollar ($) currency symbols with the Turkish Lira (₺) symbol. (Completed).
-    *   Remove all mock/test data from UI pages. (Completed).
-    *   Create a Payments page for building managers to pay their subscription fees using Paratika. (Completed).
-    *   Implement a functional Settings page. (In Progress).
-    *   Remove Made with Emergent branding and update the browser tab title to Yönetioo. (Completed).
-    *   Future: Make dashboard cards clickable.
+    *   Create a Payments page for subscription fees using Paratika. (Completed).
+    *   Implement a functional Settings page. (Completed).
+    *   Implement a Building Status page to monitor and notify about facility statuses (Wi-Fi, Elevator, etc.). (Completed).
+    *   Mail system should use Superadmin's configuration. (In Progress).
+    *   Remove Made with Emergent branding and update browser tab title. (Completed).
 
 *   **Mobile App (For Residents):**
-    *   Fix a critical login-redirect loop bug. (Marked as RESOLVED by user).
+    *   Display Building Status on the homepage. (Completed).
+    *   Receive Firebase push notifications for status changes and new dues. (In Progress).
+    *   Display Dues (Aidat) information. (In Progress).
+    *   Allow residents to create requests/tickets. (Completed).
 
 **User's preferred language**: Turkish
 
 **what currently exists?**
-*   A FastAPI backend with a wide range of endpoints for authentication, superadmin functions (manager approval, finance), and building manager functions (CRUD for residents, announcements, dues, payments, etc.).
-*   A Superadmin Panel (React, port 3000) with manager approval flow, integration settings (Netgsm, Paratika), and an advanced Finance Management dashboard.
-*   A Building Manager Panel (React, port 3001) with a dashboard, resident management, a redesigned Dues (Aidat) system, and a fully functional subscription Payments page using Paratika.
-*   The agent has just fixed a bug in the Superadmin panel, cleaned up all test data from the Building Manager panel, and successfully tested the complete subscription payment flow.
+*   A multi-component application: a FastAPI backend, a React Superadmin panel (port 3000), a React Building Manager panel (port 3001), and a React Native mobile app for residents.
+*   The backend serves APIs for authentication, superadmin functions (manager approval, finance), and building manager functions (CRUD for residents, announcements, dues, payments, building status).
+*   The Building Manager panel has a redesigned landing page, a functional settings page, and a new Building Status feature with notification capabilities.
+*   The mobile app has a basic structure, displays building status on the homepage, and has an initiated (but buggy) push notification system. An Android build was recently started.
 
 **Last working item**:
-*   **Last item agent was working:** The user requested the agent to address remaining missing functionalities in the Building Manager Panel (port 3001), specifically pointing out that the Ayarlar (Settings) page is not functional. The agent has acknowledged this and is about to start the investigation and implementation.
-*   **Status:** NOT STARTED
-*   **Agent Testing Done:** N
-*   **Which testing method agent to use?** Frontend testing agent to verify that settings can be updated, saved, and are reflected correctly in the application's behavior.
-*   **User Testing Done:** N
+    - **Last item agent was working:** The agent was in the middle of implementing a 6-item feature and bug-fix list from the user. Work was started on several items, including backend notification logic, mobile app UI, and admin panel UI. The user's last message instructed the agent to prioritize: 1. Transferring dues data to the mobile app. 2. Creating mail templates. 3. Integrating the mail system for the Building Manager panel.
+    - **Status:** IN PROGRESS
+    - **Agent Testing Done:** N
+    - **Which testing method agent to use?** both. Use the backend testing agent to verify new/updated API endpoints for resident dues and requests. Use the frontend testing agent to verify the dues calendar in the admin panel and the new dues and request features in the mobile app.
+    - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-*   **Issue 1: Implement Building Manager Settings Page (P0)**
-    *   **Description:** The Ayarlar (Settings) page in the Building Manager Panel (port 3001) is currently a placeholder or non-functional. The agent needs to define what settings a building manager can configure, implement the necessary backend endpoints for saving/retrieving these settings, and build the frontend UI to manage them.
-    *   **Attempted fixes:** None.
-    *   **Next debug checklist:**
-        1.  Examine the existing  file in  to see if a placeholder UI exists.
-        2.  Identify potential settings for a building manager (e.g., updating building name, address, notification preferences).
-        3.  Design and implement backend endpoints (e.g., , ).
-        4.  Build the React UI with forms to display and update the settings.
-        5.  Ensure settings are fetched on page load and saved via API calls.
-    *   **Status:** NOT STARTED
-    *   **Is recurring issue?** N
+*   **Issue 1: Mobile App EAS Build Failures (P1)**
+    *   **Description:** The agent has repeatedly struggled with Expo Application Services (EAS) builds for the Android mobile app. The builds frequently fail due to Gradle errors related to missing Android resources (e.g., , ) during the prebuild phase.
+    *   **Attempted fixes:** Manually adding resource files, creating a custom  plugin, reverting dependency changes, creating a custom  plugin to generate , and completely cleaning the  directory before prebuilding. While a few builds eventually succeeded, the process is unstable and error-prone. The user's latest request requires a new build after fixes are implemented.
+    *   **Status:** BLOCKED (This is a recurring blocker for any mobile app changes).
+    *   **Is recurring issue?** Y
     *   **Should Test frontend/backend/both after fix?** both
+    *   **Blocked on other issue:** None. This issue blocks mobile app deployment.
 
 *   **Issue 2: Backend Hot Reload is Not Working (P2)**
     *   **Description:** The backend service does not automatically restart on code changes, requiring manual backend: stopped
 backend: started commands, which slows down development.
-    *   **Attempted fixes:** None in recent sessions.
     *   **Next debug checklist:**
         1.  Check  for misconfigurations.
-        2.  Inspect backend logs () to verify  is using the  flag.
-        3.  Verify the project structure and file paths are correctly monitored by the watcher.
+        2.  Inspect backend logs () to verify  is using the  flag correctly.
     *   **Status:** NOT STARTED
     *   **Is recurring issue?** Y
     *   **Should Test frontend/backend/both after fix?** backend
-    *   **Blocked on other issue:** None
 
 **In progress Task List**:
-None.
+*   **Task 1: Complete User's Multi-Part Request (P0)**
+    *   **Description:** The user requested a batch of 6 features/fixes. The agent has started but not completed them.
+    *   **Where to resume:** The agent needs to pick up from the last set of edits and complete the following remaining sub-tasks:
+        1.  **Aidat Verileri (Dues Data):** Implement a backend endpoint () for residents to fetch their personal due information. Integrate this endpoint into the mobile app to display the data.
+        2.  **Mail Sistemi (Mail System):** Create HTML mail templates for notifications (e.g., status changes, new dues). Modify the backend logic for the Building Manager panel () to use the Superadmin's mail configuration for sending all emails.
+        3.  **Test and Build:** Thoroughly test all 6 implemented features (including the partially completed ones) and then initiate a new mobile app build.
+    *   **What will be achieved with this?** This will fulfill the user's latest set of requirements, fixing key bugs, adding critical data flows to the mobile app, and improving the admin panel's usability.
+    *   **Status:** IN PROGRESS
+    *   **Should Test frontend/backend/both after fix?** both
+    *   **Blocked on something:** The final mobile app build is blocked by **Issue 1: Mobile App EAS Build Failures**.
 
 **Upcoming and Future Tasks**
-*   **Upcoming Tasks (User-Postponed):**
-    *   **P1:** Enhance the Subscription model to fully support both monthly and yearly pricing options, including generating the correct payment schedules in the backend.
-    *   **P1:** Enhance the Finance Management page to generate accurate payment schedules based on the new monthly/yearly subscription plans and track payment status (Ödendi/Ödenmedi).
-    *   **P2:** Integrate email notifications for payment status changes (e.g., payment success, payment due, payment failed).
+*   **Upcoming Tasks:**
+    *   **P1:** Enhance the Subscription model to fully support both monthly and yearly pricing options.
+    *   **P1:** Enhance the Finance Management page to generate accurate payment schedules and track payment status (Ödendi/Ödenmedi).
 *   **Future Tasks:**
     *   Implement Superadmin features: Two-factor authentication (2FA), IP/session logging.
-    *   Make the admin dashboard summary cards clickable, navigating to their respective pages.
+    *   Make the admin dashboard summary cards clickable.
     *   Create Docker + Portainer deployment instructions document.
 
 **Completed work in this session**
-- **Bug Fix (Superadmin):** Resolved an issue where a building's status (Aktif/Pasif) was not updating. This involved fixing Pydantic models in  to ensure backward compatibility with older database records.
-- **Task Completion (P0 - Payment Flow):** Fully implemented and tested the Paratika subscription payment flow in the Building Manager panel. This included clearing old test data from the database and verifying the entire flow from payment initiation to UI update.
-- **Data & UI Cleanup (Building Manager Panel):**
-    - Removed all hardcoded test data (Residents, Surveys, Votings, Meetings, Decisions).
-    - Fixed a  (Not a Number) error on the Ödemeler (Payments) page.
-    - Fixed the Tahsilat Özeti (Financial Report) to display apartment numbers instead of raw UUIDs.
-    - Added empty state messages to the Anketler, Oylamalar, Toplantılar, and Kararlar pages for a better user experience when no data is present.
-- **UI Enhancement (Superadmin):** Updated the Subscriptions page to calculate and display the percentage saved on yearly plans.
+- **Building Manager Panel (port 3001) - Major Enhancements:**
+  - Implemented a fully functional **Settings page** () with backend APIs for profile, building info, password, and notification management.
+  - Completely redesigned the **Landing Page**, removing demo content and adding richer sections (stats, testimonials, FAQ) with a responsive layout.
+  - Created the **Building Status** feature () with a modern UI and integrated Firebase/email notifications for status changes.
+  - Replaced the text input for the dues period with a **calendar date picker** in .
+  - Fixed a UI bug where the Bina Durumu menu item was incorrectly highlighted.
+- **Backend - New Features & Fixes:**
+  - Added multiple new API endpoints for settings, building status, and resident-specific requests.
+  - Switched push notification provider from Expo Push to **Firebase Cloud Messaging (FCM)** as per user request.
+  - Modified notification logic to trigger on all status changes (active and inactive).
+- **Mobile App - Features & Fixes:**
+  - Integrated the Building Status feature into the homepage, displaying icons in a single row.
+  - Fixed a credentials validation error for the Create Request feature by adding resident-specific backend endpoints.
+  - Attempted to replace  with  but reverted due to build failures.
+  - Successfully initiated multiple new EAS builds after resolving (and re-resolving) Gradle resource errors.
 
 **Earlier issues found/mentioned but not fixed**
-*   **Backend Hot Reload is Not Working:** This pre-existing issue remains unfixed and is listed in the pending issue list.
+- The Backend Hot Reload issue remains unaddressed and is tracked in the pending issue list.
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork**: Mobile App Login Loop.
-- **Recurrence count**: High
-- **Status**: RESOLVED (Confirmed by user in a previous job).
+- **Issue recurrence in previous fork**: Mobile App EAS Build Failures
+- **Recurrence count**: High (occurred multiple times within this session)
+- **Status**: NOT RESOLVED
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-*   **Frontend:** React, Tailwind CSS, Recharts, , .
-*   **Backend:** FastAPI, Python, Pydantic.
-*   **Database:** MongoDB.
-*   **Integrations:** Custom SMTP (Gmail), Netgsm (SMS), Paratika (Payments).
+*   **Frontend:** React, React Native, Expo, Tailwind CSS
+*   **Backend:** FastAPI, Python, Pydantic
+*   **Database:** MongoDB
+*   **Integrations:** Firebase Cloud Messaging (FCM), Custom SMTP (Gmail), Paratika (Payments), Netgsm (SMS)
+*   **Deployment:** Expo Application Services (EAS) for mobile builds.
 
 **key DB schema**
-*   **users, buildings, registration_requests**: Core collections. The  model was updated to be more flexible with  fields.
-*   **monthly_dues, surveys, votings, meetings, decisions**: Feature-specific collections. Test data was cleared from these.
-*   **netgsm_config, paratika_config**: Integration settings.
-*   **subscription_payments**: Stores payment records for building managers. Old, incomplete test data was cleared from this collection.
+*   **building_status**: New collection to store the status of building facilities.
+*   **users, buildings, registration_requests**: Core collections, no major schema changes.
+*   **monthly_dues**: To be exposed to residents via a new API.
+*   **requests**: Endpoints added to allow creation by residents.
 
 **changes in tech stack**
-- None in this session.
+- **Primary Push Notification Service:** Shifted from Expo Push Notifications to Firebase Cloud Messaging (FCM).
 
 **All files of reference**
-*   : Key file for backend logic, models, and API endpoints. Was modified to fix the building status bug and ensure backward compatibility.
-*   : Frontend for building manager subscription payments. Was fixed and successfully tested.
-*   : UI for financial summaries. Was fixed to show meaningful data instead of UUIDs.
-*   : Superadmin UI for managing subscription plans. Was enhanced to show yearly savings.
-*   , , : Modified to include empty state messages.
+*   : The central hub for all new business logic, including APIs for settings, building status, resident requests, dues, and updated notification/mailing logic.
+*   : New feature page for managing facility statuses.
+*   : UI changes for building status cards.
+*   : UI updated with a calendar picker.
+*   : Modified multiple times to manage plugins and fix EAS build errors.
+*   : A custom Expo plugin created to programmatically add Android resources and fix recurring Gradle build failures.
 
 **Areas that need refactoring**:
-*    (Superadmin) and  (Admin Panel) remain large components that could be broken down for better maintainability.
+*   The EAS build process for the mobile app is extremely brittle. The reliance on custom plugins and manual folder cleaning indicates a fragile setup that needs a more robust solution.
+*    is becoming very large. Logic for different domains (auth, superadmin, manager, resident, notifications) should be broken out into separate router files in the  directory.
 
 **key api endpoints**
-*   **PUT **: Fixed to correctly update the .
-*   **GET **: Logic was implicitly fixed by cleaning up bad data in the database that caused this endpoint to fail.
-*   **POST **: Successfully tested end-to-end.
-*   **DELETE **, , etc.: Used to clear all test data.
+*   : Manages building manager settings.
+*   : Manages building facility status.
+*   : Subscribes a device to a building's FCM topic.
+*   : **New** endpoints for residents to manage their service requests.
+*   : **To be implemented** for residents to fetch their dues.
 
 **Critical Info for New Agent**
-*   **User Priority Shift:** The user has explicitly paused work on the upcoming P1 tasks (subscription model enhancements). The new, highest priority (P0) is to fix and implement missing functionalities in the Building Manager panel (port 3001), starting with the Ayarlar (Settings) page.
-*   **Payment Flow is Complete:** The Paratika payment flow for building managers is fully functional and tested. Do not revisit unless the user reports a bug.
-*   **Data Integrity:** The agent resolved several bugs caused by old or incomplete data in the database. When debugging, always consider that legacy data might be causing compatibility issues with new code.
+*   **Mobile Build is a Major Blocker:** The most significant challenge is the unstable EAS build process. Be prepared to debug Gradle and Android resource issues. The custom plugin at  is a key part of the current workaround.
+*   **User Priorities:** The user's current focus is completing the 6-item list, with a special emphasis on getting Dues data into the mobile app and fixing the mail system for the admin panel.
+*   **Push Notifications are Firebase:** All push notification logic should use FCM. The backend sends notifications to a topic (e.g., ), and the mobile app is responsible for subscribing to that topic upon login. The agent has confirmed the backend sends notifications, but suspects the mobile app isn't subscribing correctly.
 
 **documents created in this job**
-- None.
+- 
 
 **Last 10 User Messages and any pending user messages**
-1.  **User:** Reports a bug where the building status isn't updating on the Superadmin panel. **Status:** COMPLETED.
-2.  **Agent:** Acknowledges and successfully fixes the bug.
-3.  **User:** Asks the agent to review the Building Manager panel (3001), remove all test data, and complete any missing parts. **Status:** COMPLETED (mostly).
-4.  **Agent:** Identifies and removes test data from multiple pages (Residents, Surveys, etc.).
-5.  **Agent:** Identifies and fixes UI bugs ( error on Payments page, UUIDs on Financial Report page).
-6.  **Agent:** Identifies and adds empty state messages for pages that are now empty after data cleanup.
-7.  **User:** Confirms the agent should proceed with the previously planned tasks (P0: Paratika test). **Status:** COMPLETED.
-8.  **Agent:** Completes and tests the entire Paratika payment flow successfully.
-9.  **Agent:** Completes the UI enhancement for monthly/yearly subscription savings.
-10. **User:** Points out that the Ayarlar (Settings) page on the Building Manager panel is still non-functional. **Status:** PENDING - This is the next task.
+1.  **User:** Requests a new build. **Status:** COMPLETED.
+2.  **User:** Reports the latest build succeeded with notifications but provides a new 6-item list of tasks: 1) Notifications for active statuses. 2) Mobile app dues data + notifications. 3) Fix credentials error on mobile requests. 4) Calendar for dues date in admin panel. 5) Fix admin mail system using superadmin config + create templates. 6) 4-icon row for status on mobile. Asks to build without waiting. **Status:** IN PROGRESS.
+3.  **Agent:** Acknowledges and starts working on the 6 items.
+4.  **User:** Asks agent to complete the remaining tasks from the list (Dues data for mobile, mail templates, mail system integration). **Status:** PENDING. This is the current active instruction.
 
 **Project Health Check:**
-*   **Working:** Superadmin Panel, Building Manager Panel, Backend.
-*   **Broken:** None.
-*   **In Progress:** Building Manager Settings page implementation.
+*   **Working:** Superadmin Panel (3000), Building Manager Panel (3001) for most features.
+*   **Broken:** Mobile App build process is highly unstable and error-prone.
+*   **Mocked:** None.
+*   **In Progress:** Implementation of a 6-item user request list, including mobile app dues integration and admin panel mail system.
 
 **3rd Party Integrations**
-*   Expo Application Services (EAS)
-*   Firebase Cloud Messaging (FCM)
-*   Nginx Proxy Manager
-*   Netgsm (SMS)
-*   Paratika (Payments)
+*   **Firebase Cloud Messaging (FCM):** Used for all push notifications.
+*   **Paratika:** Payment gateway.
+*   **Netgsm:** SMS provider.
+*   **Custom SMTP (Gmail):** Email provider, configured in the superadmin panel.
+*   **Expo Application Services (EAS):** Used for building the mobile application.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES. The agent used the backend testing agent to validate the payment flow logic, although it passed on the first try.
+- **Testing agent used after significant changes:** YES, for the Settings page implementation.
 - **Troubleshoot agent used after agent stuck in loop:** NO.
-- **Test files created:**  was updated.
-- **Known regressions:** None.
+- **Test files created:**  was updated for various tests.
+- **Known regressions:** The EAS build process has regressed multiple times.
 
 **Credentials to test flow:**
 *   **Superadmin Panel (port 3000):** (email: , password: )
 *   **Building Manager Panel (port 3001):** (email: , password: )
 *   **Mobile App:** (phone: , password: )
-*   **Paratika Test Card:** (Number: , Expiry: , CVV: , 3D Secure: )
+*   **Expo Token:** 
 
 **What agent forgot to execute**
-*   The agent did not forget anything, but rather adapted to the user's changing priorities. The user pointed out that the Settings page in the admin panel was non-functional, which has now become the primary task. The long-standing backend hot-reload issue remains unaddressed but is a lower priority.</analysis>
+- The agent has not yet created the mail templates requested by the user.
+- The agent has not fully integrated the superadmin mail configuration into the building manager's notification logic.
+- The agent has not yet added the resident-facing API endpoint for fetching dues.</analysis>

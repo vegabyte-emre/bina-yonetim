@@ -62,7 +62,7 @@ Core functionality excellent, but mobile navigation requires immediate attention
 ## Current Test Session - Building Status Page Testing
 **Date:** 2024-12-16  
 **Application:** Building Status Management Page  
-**URL Tested:** https://propertyflow-8.preview.emergentagent.com/building-status  
+**URL Tested:** https://smartbuild-mgr.preview.emergentagent.com/building-status  
 **Focus:** Building Status Page Implementation and Testing
 
 ### ✅ IMPLEMENTATION COMPLETED
@@ -124,7 +124,7 @@ Core functionality excellent, but mobile navigation requires immediate attention
 - ✅ **Information Section**: Bildirim Sistemi section with status explanations
 
 ### Test Environment
-- **Frontend URL**: https://propertyflow-8.preview.emergentagent.com/building-status
+- **Frontend URL**: https://smartbuild-mgr.preview.emergentagent.com/building-status
 - **Backend Integration**: ✅ Working (API endpoints responding correctly)
 - **Authentication**: ✅ Working (login required and functioning)
 - **Responsive Breakpoints**: Mobile ✅ | Tablet ✅ | Desktop ✅
