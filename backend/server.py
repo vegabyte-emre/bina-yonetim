@@ -2230,6 +2230,83 @@ async def delete_request(request_id: str, current_user: User = Depends(get_curre
         raise HTTPException(status_code=404, detail="Request not found")
     return {"message": "Request deleted successfully"}
 
+# ============ RESIDENT NOTIFICATIONS (Mobile App) ============
+
+@api_router.get("/residents/notifications")
+async def get_resident_notifications(current_resident: Resident = Depends(get_current_resident)):
+    """Sakin'in tüm bildirimlerini getir (duyurular, durum değişiklikleri, vb.)"""
+    notifications = []
+    
+    # 1. Duyuruları al
+    announcements = await db.announcements.find(
+        {"building_id": current_resident.building_id, "is_active": True},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(20)
+    
+    for ann in announcements:
+        notifications.append({
+            "id": ann.get("id"),
+            "type": "announcement",
+            "category": ann.get("category", "general"),
+            "title": ann.get("title"),
+            "content": ann.get("content"),
+            "priority": ann.get("priority", "normal"),
+            "created_at": ann.get("created_at"),
+            "icon": "megaphone"
+        })
+    
+    # 2. Bina durumu değişikliklerini al (notification_logs)
+    status_logs = await db.notification_logs.find(
+        {"building_id": current_resident.building_id},
+        {"_id": 0}
+    ).sort("sent_at", -1).to_list(20)
+    
+    for log in status_logs:
+        notifications.append({
+            "id": log.get("id", str(uuid.uuid4())),
+            "type": "status_change",
+            "category": "building_status",
+            "title": f"Bina Durumu: {log.get('status_item', 'Durum')}",
+            "content": f"{log.get('status_item', 'Durum')} {log.get('new_status', '')} olarak güncellendi.",
+            "priority": "normal",
+            "created_at": log.get("sent_at"),
+            "icon": "business"
+        })
+    
+    # 3. Aylık aidat bildirimlerini al
+    monthly_dues = await db.monthly_dues.find(
+        {"building_id": current_resident.building_id, "is_sent": True},
+        {"_id": 0}
+    ).sort("sent_at", -1).to_list(10)
+    
+    for due in monthly_dues:
+        notifications.append({
+            "id": due.get("id"),
+            "type": "dues",
+            "category": "payment",
+            "title": f"Aidat Bildirimi - {due.get('month', '')}",
+            "content": f"₺{due.get('per_apartment_amount', 0):,.2f} tutarında aidat bildirimi.",
+            "priority": "high",
+            "created_at": due.get("sent_at") or due.get("created_at"),
+            "icon": "wallet"
+        })
+    
+    # Tarihe göre sırala
+    def parse_date(item):
+        date_str = item.get("created_at")
+        if not date_str:
+            return datetime.min.replace(tzinfo=timezone.utc)
+        if isinstance(date_str, str):
+            try:
+                return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+            except:
+                return datetime.min.replace(tzinfo=timezone.utc)
+        return date_str
+    
+    notifications.sort(key=parse_date, reverse=True)
+    
+    return notifications[:30]
+
 # ============ RESIDENT REQUESTS (Mobile App) ============
 
 @api_router.get("/residents/my-requests")
