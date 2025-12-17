@@ -227,12 +227,17 @@ async def oauth_callback(code: str, state: str):
         })
         
         # Redirect back to settings with success message
+        # Check for production domain
         frontend_url = os.environ.get("ADMIN_PANEL_URL", "http://localhost:3001")
+        if "yonetioo.com" in config.get("redirect_uri", ""):
+            frontend_url = "https://www.yonetioo.com"
         return RedirectResponse(f"{frontend_url}/settings?google_connected=true")
         
     except Exception as e:
         print(f"OAuth callback error: {e}")
         frontend_url = os.environ.get("ADMIN_PANEL_URL", "http://localhost:3001")
+        if "yonetioo.com" in (config.get("redirect_uri", "") if config else ""):
+            frontend_url = "https://www.yonetioo.com"
         return RedirectResponse(f"{frontend_url}/settings?google_error=true")
 
 
